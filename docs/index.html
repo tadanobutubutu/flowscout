@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flowscout - GitHub Actions & CI/CD モバイル監視アプリ</title>
+  <meta name="description" content="Flowscoutは、スマートフォンで直感的にGitHub Actionsの実行結果やエラー詳細をリアルタイム監視できる、完全無料・オープンソースのモバイルアプリです。">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@500;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="glass-bg"></div>
+
+  <header>
+    <div class="container nav-container">
+      <div class="logo">Flowscout</div>
+      <nav>
+        <a href="#features">機能</a>
+        <a href="#download" class="btn-primary">ダウンロード</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- ヒーローセクション -->
+    <section class="hero">
+      <h1>スマートフォンから、<br><span class="gradient-text">GitHub Actions をリアルタイム監視</span></h1>
+      <p class="subtitle">直コミットやプルリクエストで走ったCI/CDの実行結果、ステップごとの詳細ログ、エラー内容をスマホから瞬時に特定。完全無料のオープンソース監視クライアント。</p>
+      
+      <div class="hero-actions">
+        <a href="#download" class="btn-primary-large">無料ダウンロード</a>
+        <a href="https://github.com/tadanobutubutu/flowscout" class="btn-secondary-large">GitHub で見る (OSS)</a>
+      </div>
+    </section>
+
+    <!-- 機能セクション -->
+    <section id="features" class="features">
+      <h2>プレミアムな機能体験</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🔍</div>
+          <h3>超高速リポジトリ検索</h3>
+          <p>所有する大量のリポジトリの中から、目的のプロジェクトを一瞬で検索・アクセスできます。スクロールの必要はありません。</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🚨</div>
+          <h3>詳細なエラーログ特定</h3>
+          <p>どのジョブのどのステップでビルドエラーが起きたのか、スマートにエラー行をハイライトしてスマホでサクッと確認できます。</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔄</div>
+          <h3>アプデ自動チェック</h3>
+          <p>アプリ起動時に最新バージョンを自動検知。ワンタップで手軽にアップデートでき、常に最新機能をご利用いただけます。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- インストール・ダウンロードセクション -->
+    <section id="download" class="download-section">
+      <h2>アプリを手に入れる</h2>
+      <p class="section-desc">Flowscoutは「生涯0円」での開発・配布を徹底しています。お好みのプラットフォームからダウンロードしてください。</p>
+      
+      <div class="download-grid">
+        <!-- Android -->
+        <div class="download-card">
+          <div class="platform-icon">🤖</div>
+          <h3>Android 版</h3>
+          <p>F-Droidストア、またはGitHub Releasesから直接APKファイルを安全にダウンロードできます。</p>
+          <div class="download-links">
+            <a href="https://github.com/tadanobutubutu/flowscout/releases" class="btn-platform">F-Droid (準備中)</a>
+            <a href="https://github.com/tadanobutubutu/flowscout/releases" class="btn-platform-secondary">APK 直接ダウンロード</a>
+          </div>
+        </div>
+
+        <!-- iOS -->
+        <div class="download-card">
+          <div class="platform-icon">🍏</div>
+          <h3>iOS 版 (iPadOS / macOS対応)</h3>
+          <p>AltStoreサイドロード、またはGitHub ReleasesからIPAパッケージを取得してご利用いただけます。</p>
+          <div class="download-links">
+            <a href="https://github.com/tadanobutubutu/flowscout/releases" class="btn-platform">AltStore で追加</a>
+            <a href="https://github.com/tadanobutubutu/flowscout/releases" class="btn-platform-secondary">IPA 直接ダウンロード</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GitHub Appセットアップ連携 -->
+    <section class="setup-section">
+      <h2>GitHub Appとの連携</h2>
+      <p>Flowscoutをインストールしたら、以下のボタンからあなたのGitHubアカウントまたは組織にFlowscout Appを連携してください。1クリックで完璧に安全なRead-only連携が完了します。</p>
+      <div style="margin-top: 24px;">
+        <a href="https://github.com/apps/flowscout-monitor/installations/new" class="btn-primary-large">GitHub App をインストールする</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-content">
+      <p>&copy; 2026 Flowscout. Released under the MIT License.</p>
+      <p>Designed with ❤️ for developers by Google DeepMind team pair programming with tadanobutubutu.</p>
+    </div>
+  </footer>
+</body>
+</html>

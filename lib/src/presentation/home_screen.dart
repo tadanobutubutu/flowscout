@@ -73,10 +73,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             children: [
               Text(
                 '新しいバージョン (${updateInfo['latestVersion']}) が利用可能です！',
+                semanticsLabel: '新しいバージョン、${updateInfo['latestVersion']}、が利用可能です。',
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              Text('現在のバージョン: ${updateInfo['currentVersion']}'),
+              Text(
+                '現在のバージョン: ${updateInfo['currentVersion']}',
+                semanticsLabel: '現在のバージョン、${updateInfo['currentVersion']}',
+              ),
               const SizedBox(height: 12),
               const Text('リリースノート:', style: TextStyle(fontWeight: FontWeight.bold)),
               Container(
@@ -321,10 +325,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   );
                 },
                 loading: () => const Center(
-                  child: CircularProgressIndicator(color: Color(0xFF6366F1)),
+                  child: Semantics(
+                    liveRegion: true,
+                    label: 'リポジトリ一覧をロード中',
+                    child: CircularProgressIndicator(color: Color(0xFF6366F1)),
+                  ),
                 ),
                 error: (error, stack) => Center(
-                  child: Text('エラーが発生しました: $error'),
+                  child: Text(
+                    'エラーが発生しました: $error',
+                    semanticsLabel: 'エラーが発生しました、内容、 $error',
+                  ),
                 ),
               ),
             ),

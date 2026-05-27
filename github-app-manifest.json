@@ -1,0 +1,17 @@
+{
+  "name": "Flowscout Monitor",
+  "url": "https://github.com/tadanobutubutu/flowscout",
+  "hook_attributes": {
+    "active": false
+  },
+  "redirect_url": "https://flowscout-oauth.tadanobutubutu.workers.dev/setup-success",
+  "callback_urls": [
+    "https://flowscout-oauth.tadanobutubutu.workers.dev/callback"
+  ],
+  "default_permissions": {
+    "metadata": "read",
+    "actions": "read",
+    "members": "read"
+  },
+  "default_events": []
+}

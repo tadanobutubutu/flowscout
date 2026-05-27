@@ -31,13 +31,20 @@ class WorkflowDetailScreen extends ConsumerWidget {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
-              child: CircularProgressIndicator(color: Color(0xFF6366F1)),
+              child: Semantics(
+                liveRegion: true,
+                label: 'ワークフロー一覧をロード中',
+                child: CircularProgressIndicator(color: Color(0xFF6366F1)),
+              ),
             );
           }
 
           if (snapshot.hasError) {
             return Center(
-              child: Text('ワークフローの取得に失敗しました: ${snapshot.error}'),
+              child: Text(
+                'ワークフローの取得に失敗しました: ${snapshot.error}',
+                semanticsLabel: 'ワークフローの取得に失敗しました、原因、 ${snapshot.error}',
+              ),
             );
           }
 
@@ -141,6 +148,7 @@ class WorkflowDetailScreen extends ConsumerWidget {
                                     children: [
                                       Text(
                                         'Job: ${job['name']}',
+                                        semanticsLabel: 'ジョブ名、 ${job['name']}',
                                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                                       ),
                                       const SizedBox(height: 8),
