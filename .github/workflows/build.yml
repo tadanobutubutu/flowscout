@@ -1,0 +1,91 @@
+name: Flowscout CI/CD Orchestrator
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  build-and-deploy:
+    name: Build mobile apps
+    runs-on: macos-13
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java Development Kit (JDK)
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Set up Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          flutter-version: '3.19.x'
+          cache: true
+
+      - name: Doctor and Info
+        run: flutter doctor -v
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      # 1. Android ビルド
+      - name: Build Android APK
+        run: flutter build apk --release
+
+      - name: Build Android App Bundle (AAB)
+        run: flutter build appbundle --release
+
+      # 2. iOS ビルド (※証明書がないため --no-codesign でビルドし、リリース用にアーカイブ)
+      - name: Build iOS IPA
+        run: flutter build ipa --release --no-codesign
+
+      # 3. ブランチごとのビルド成果物管理 (Dev vs Release)
+      - name: Upload Android APK (Dev Build)
+        if: github.ref != 'refs/heads/main'
+        uses: actions/upload-artifact@v3
+        with:
+          name: flowscout-android-dev
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Upload iOS Payload (Dev Build)
+        if: github.ref != 'refs/heads/main'
+        uses: actions/upload-artifact@v3
+        with:
+          name: flowscout-ios-dev
+          path: build/ios/archive/Runner.xcarchive
+
+      # 4. Mainブランチの場合: 自動で GitHub Releases を作成し、成果物をアップロード
+      # これにより、アプリの自動アプデチェック機能が検知できるようになります！
+      - name: Create GitHub Release and Upload Artifacts (Main Release)
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v1.0.0-${{ github.run_number }}
+          name: Flowscout Release v1.0.0+${{ github.run_number }}
+          draft: false
+          prerelease: false
+          files: |
+            build/app/outputs/flutter-apk/app-release.apk
+            build/app/outputs/bundle/release/app-release.aab
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # 5. [フォールバック設計のプレースホルダー]
+      # 万が一、このGitHub Actionsの無料枠（プライベートの場合月2000分）が切れた場合、
+      # または別CIでビルドしたい場合は、以下のステップを実行して外部CIをキック可能です。
+      # - name: Trigger Codemagic Fallback API
+      #   if: failure()
+      #   run: |
+      #     curl -H "Content-Type: application/json" \
+      #          -H "x-auth-token: ${{ secrets.CODEMAGIC_API_KEY }}" \
+      #          -d '{"appId": "${{ secrets.CODEMAGIC_APP_ID }}", "workflowId": "flutter-android", "branch": "${{ github.ref_name }}"}' \
+      #          https://api.codemagic.io/builds

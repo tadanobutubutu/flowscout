@@ -1,0 +1,37 @@
+os: linux
+dist: jammy
+language: generic
+
+jobs:
+  include:
+    - stage: "Build Android"
+      os: linux
+      addons:
+        apt:
+          packages:
+            - openjdk-17-jdk
+      before_install:
+        - git clone https://github.com/flutter/flutter.git -b stable --depth 1
+        - export PATH="$PATH:`pwd`/flutter/bin"
+        - flutter doctor
+      script:
+        - flutter build apk --release
+
+    - stage: "Build iOS"
+      os: osx
+      osx_image: xcode15
+      before_install:
+        - git clone https://github.com/flutter/flutter.git -b stable --depth 1
+        - export PATH="$PATH:`pwd`/flutter/bin"
+        - flutter doctor
+      script:
+        - flutter build ipa --release --no-codesign
+
+branches:
+  only:
+    - main
+    - dev
+
+cache:
+  directories:
+    - $HOME/.pub-cache

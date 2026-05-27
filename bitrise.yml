@@ -1,0 +1,28 @@
+format_version: "11"
+default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
+
+project_type: flutter
+
+trigger_map:
+- push_branch: main
+  workflow: primary
+- push_branch: dev
+  workflow: primary
+
+workflows:
+  primary:
+    steps:
+    - activate-ssh-key@4:
+        run_if: '{{getenv "SSH_RSA_PRIVATE_KEY" | notempty}}'
+    - git-clone@6: {}
+    - flutter-installer@0:
+        inputs:
+        - version: stable
+    - flutter-analyze@0: {}
+    - flutter-test@0: {}
+    - flutter-build@0:
+        inputs:
+        - project_location: "."
+        - platform: both
+        - ios_additional_parameters: "--no-codesign"
+    - deploy-to-bitrise-io@2: {}
