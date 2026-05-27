@@ -1,0 +1,79 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+migrate.log
+
+# IntelliJ Related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Visual Studio Code Related
+.vscode/
+.history/
+
+# Flutter / Dart Related
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+ephemeral/
+
+# Android Related
+*.apk
+*.aar
+*.ap_
+*.aab
+dex_caches/
+/android/.gradle
+/android/local.properties
+/android/app/signatures/
+/android/captures/
+/android/app/google-services.json
+
+# iOS Related
+*.mode1v3
+*.mode2v3
+*.nib
+*.pbxuser
+*.perspectivev3
+*.xcworkspace
+!default.xcworkspace
+xcshareddata/
+/ios/.bundle/
+/ios/Flutter/Generated.xcconfig
+/ios/Flutter/flutter_export_environment.sh
+/ios/Pods/
+/ios/Runner/GeneratedPluginRegistrant.h
+/ios/Runner/GeneratedPluginRegistrant.m
+/ios/Runner/GoogleService-Info.plist
+
+# Encryption & Secrets
+*.keystore
+*.jks
+*.p12
+*.pfx
+*.pem
+*.key
+*.der
+*.crt
+secrets.json
+.env*
+!.env.example
+jwt_private.pem
+jwt_public.pem
+
+# CI/CD / Build tools
+/node_modules/
+dist/
