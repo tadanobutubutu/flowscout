@@ -1,0 +1,21 @@
+# Chainguard Source Integrity Configuration
+# For securing open-source software supply chain
+
+schema: "chainguard/source/v1"
+
+policy:
+  enforce_commit_signing: true
+  allowed_signers:
+    - pattern: ".*@github.com"
+    - pattern: ".*@users.noreply.github.com"
+
+monitors:
+  vulnerability_scan:
+    enabled: true
+    schedule: "0 0 * * *" # 毎日スキャン
+  dependency_analysis:
+    enabled: true
+    exclude_dirs:
+      - "node_modules"
+      - ".dart_tool"
+      - "build"
