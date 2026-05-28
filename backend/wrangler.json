@@ -3,8 +3,8 @@
   "main": "src/index.js",
   "compatibility_date": "2024-05-28",
   "vars": {
-    "GITHUB_CLIENT_ID": "TODO_REPLACE_WITH_YOUR_APP_CLIENT_ID",
-    "GITHUB_CLIENT_SECRET": "TODO_REPLACE_WITH_YOUR_APP_CLIENT_SECRET",
-    "GITHUB_APP_NAME": "flowscout-monitor"
+    "GITHUB_CLIENT_ID": "Iv23limzxSsYeKcuUopY",
+    "GITHUB_APP_NAME": "flowscout-monitor",
+    "GITHUB_APP_ID": "3894738"
   }
 }
