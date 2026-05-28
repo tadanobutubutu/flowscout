@@ -77,3 +77,9 @@ jwt_public.pem
 # CI/CD / Build tools
 /node_modules/
 dist/
+
+# Cloudflare Wrangler Related
+.wrangler/
+.dev.vars
+wrangler.log
+
