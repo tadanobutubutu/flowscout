@@ -3,3 +3,13 @@ defaultPath: lib/src/localization/app_en.arb
 languages:
   - relativePath: lib/src/localization/app_ja.arb
     language: Japanese
+  - relativePath: lib/src/localization/app_es.arb
+    language: Spanish
+  - relativePath: lib/src/localization/app_fr.arb
+    language: French
+  - relativePath: lib/src/localization/app_de.arb
+    language: German
+  - relativePath: lib/src/localization/app_zh.arb
+    language: Chinese
+  - relativePath: lib/src/localization/app_ko.arb
+    language: Korean
