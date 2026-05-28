@@ -51,7 +51,76 @@ iOSはAppleのセキュリティ制限が厳しいため、有料デベロッパ
     *   AltStoreアプリを開き、「My Apps」タブの左上の「＋」ボタンを押し、ダウンロードしたIPAファイルを選択します。
     *   自動で個人署名が行われ、ホーム画面にFlowscoutがインストールされます！
 
+### 🔌 C. Xcodeを用いた無料の個人アカウントによる直接有線デプロイ (最も一般的)
+1.  **iPhoneをMacに有線接続し「信頼」する:**
+    *   USB/Lightning/USB-C ケーブルでiPhoneをMacに繋ぎ、iPhone画面上で「このコンピュータを信頼しますか？」と出たら「信頼」をタップしてパスコードを入力します。
+2.  **iOSの「デベロッパモード」を有効にする (iOS 16以降):**
+    *   iPhoneの「設定」➔「プライバシーとセキュリティ」➔ 最下部にある「デベロッパモード」をオンにして再起動します。
+    *   再起動後、画面に確認ダイアログが出るので「オンにする」をタップしてパスコードを入力します。
+3.  **Xcodeでプロジェクトを開き、アカウントを登録する:**
+    *   Macで Xcode を開き、`ios/Runner.xcworkspace` を開きます。
+    *   Xcodeの「Settings...」➔「Accounts」タブを開き、左下の「＋」ボタンでご自身のApple IDを追加します。
+4.  **プロビジョニング設定 (Signing & Capabilities):**
+    *   Xcodeの左側ツリー最上部にある「Runner」ターゲットを選択します。
+    *   「Signing & Capabilities」タブを選択し、「Automatically manage signing」にチェックを入れます。
+    *   「Team」ドロップダウンから、先ほど登録したご自身のApple ID（Personal Team）を選択します。
+    *   「Bundle Identifier」が重複エラーになる場合、末尾に適当な文字列を追加（例: `com.tadanobutubutu.flowscout.dev`）して一意にします。
+5.  **実機を指定してビルド・インストール:**
+    *   Xcodeの画面上部、またはターミナルから接続中のiPhoneをデプロイ先デバイスとして選択します。
+    *   ターミナルからは以下を実行します。
+        ```bash
+        flutter run -d <あなたのiPhoneの名前またはUUID>
+        ```
+    *   ※初回実行時に「信頼されていないデベロッパ」とエラーが出た場合は、「設定」➔「一般」➔「VPNとデバイス管理」からご自身のApple IDを「信頼」してください。
+
 ---
 
-## 🤖 エージェントによるエミュレータ操作について
-エージェント（私）が裏でテストや操作を行う場合は、作成した `scripts/start-android-emulator.sh --headless` を実行してGUIなしでバックグラウンド起動し、`adb` 経由でスクリーンショットの取得やUI動作チェックを自動実行できます。
+## 🤖 3. エミュレータ / シミュレータの操作と自動化 (macOS / Xcode 環境)
+
+macOSの開発環境を活かし、iOSシミュレータおよびAndroidエミュレータをコマンドラインやスクリプトから自動起動・制御できます。
+
+### 🍏 iOS シミュレータの起動・操作 (Xcode Simctl)
+Mac上でiOSシミュレータを起動してテストを実行するために必要なステップです。
+
+1.  **利用可能なiOSデバイス（シミュレータ）の確認:**
+    ```bash
+    xcrun simctl list devices
+    ```
+2.  **特定のシミュレータを起動 (例: iPhone 15 Pro):**
+    *   エージェントが提供する自動スクリプトを実行：
+        ```bash
+        ./scripts/start-ios-simulator.sh
+        ```
+    *   または手動で直接起動：
+        ```bash
+        open -a Simulator
+        # 特定のUUIDの端末をブート
+        xcrun simctl boot <DEVICE_UUID>
+        ```
+3.  **シミュレータへアプリをインストールして起動:**
+    ```bash
+    flutter run -d iphonesimulator
+    ```
+
+### 🤖 Android エミュレータ (AVD) の起動・操作
+Android SDKおよび `adb` (Android Debug Bridge) がセットアップされているため、バックグラウンドでのヘッドレス起動やテストが可能です。
+
+1.  **エミュレータのバックグラウンド（ヘッドレス）起動:**
+    ```bash
+    ./scripts/start-android-emulator.sh --headless
+    ```
+2.  **ADBを通じたエミュレータ操作 (タップ・入力・キャプチャ):**
+    *   **スクリーンショット取得:**
+        ```bash
+        adb shell screencap -p /sdcard/screen.png
+        adb pull /sdcard/screen.png ./scratch/
+        ```
+    *   **キーイベント送信 (Homeボタンなど):**
+        ```bash
+        adb shell input keyevent 3
+        ```
+    *   **タップ操作:**
+        ```bash
+        adb shell input tap 500 1000
+        ```
+

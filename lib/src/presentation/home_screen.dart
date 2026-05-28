@@ -84,7 +84,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               const SizedBox(height: 12),
               const Text('リリースノート:', style: TextStyle(fontWeight: FontWeight.bold)),
               Container(
-                maxHeight: 100,
+                constraints: const BoxConstraints(maxHeight: 100),
                 width: double.maxFinite,
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
@@ -251,7 +251,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             },
                             borderRadius: BorderRadius.circular(16),
                             child: Card(
-                              margin: EdgeInsets.none,
+                              margin: EdgeInsets.zero,
                               child: Padding(
                                 padding: const EdgeInsets.all(16.0),
                                 child: Row(
@@ -324,7 +324,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     },
                   );
                 },
-                loading: () => const Center(
+                loading: () => Center(
                   child: Semantics(
                     liveRegion: true,
                     label: 'リポジトリ一覧をロード中',

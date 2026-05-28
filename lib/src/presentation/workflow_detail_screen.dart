@@ -30,7 +30,7 @@ class WorkflowDetailScreen extends ConsumerWidget {
         future: service.getWorkflowRuns(repoFullName),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
+            return Center(
               child: Semantics(
                 liveRegion: true,
                 label: 'ワークフロー一覧をロード中',

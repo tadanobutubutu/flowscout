@@ -53,12 +53,12 @@ class FlowscoutApp extends ConsumerWidget {
           titleMedium: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF334155)),
           bodyMedium: TextStyle(color: Color(0xFF475569)),
         ),
-        cardTheme: CardTheme(
+        cardTheme: const CardThemeData(
           color: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-            side: const BorderSide(color: Color(0xFFE2E8F0), width: 1),
+            borderRadius: BorderRadius.all(Radius.circular(16)),
+            side: BorderSide(color: Color(0xFFE2E8F0), width: 1),
           ),
         ),
       ),
@@ -81,12 +81,12 @@ class FlowscoutApp extends ConsumerWidget {
           titleMedium: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFFCBD5E1)),
           bodyMedium: TextStyle(color: Color(0xFF94A3B8)),
         ),
-        cardTheme: CardTheme(
-          color: const Color(0xFF131B2E), // 美しい半透明調のベースとなるダークカード
+        cardTheme: const CardThemeData(
+          color: Color(0xFF131B2E), // 美しい半透明調のベースとなるダークカード
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-            side: const BorderSide(color: Color(0xFF1E293B), width: 1),
+            borderRadius: BorderRadius.all(Radius.circular(16)),
+            side: BorderSide(color: Color(0xFF1E293B), width: 1),
           ),
         ),
       ),

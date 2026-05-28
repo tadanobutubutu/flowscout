@@ -59,7 +59,7 @@ class SettingsScreen extends ConsumerWidget {
                           // ログアウト処理を実行する想定
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
+                            SnackBar(
                               content: Semantics(
                                 liveRegion: true,
                                 label: 'GitHubとの連携を解除しました',
@@ -96,12 +96,14 @@ class SettingsScreen extends ConsumerWidget {
   Widget _buildSectionHeader(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-      style: TextStyle(
-        color: const Color(0xFF6366F1),
-        fontWeight: FontWeight.bold,
-        fontSize: 14,
+      child: Text(
+        title.toUpperCase(),
+        style: const TextStyle(
+          color: Color(0xFF6366F1),
+          fontWeight: FontWeight.bold,
+          fontSize: 14,
+        ),
       ),
-      child: Text(title.toUpperCase()),
     );
   }
 }
