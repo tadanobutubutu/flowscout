@@ -24,7 +24,8 @@ class SettingsScreen extends ConsumerWidget {
           _buildSectionHeader(context, '通知とアップデート'),
           SwitchListTile(
             title: const Text('アプデチェック通知'),
-            subtitle: const Text('アプリ起動時にGitHubの最新リリース情報を自動でチェックし、アップデートがある場合に通知します。'),
+            subtitle: const Text(
+                'アプリ起動時にGitHubの最新リリース情報を自動でチェックし、アップデートがある場合に通知します。'),
             value: notifyEnabled,
             activeColor: const Color(0xFF6366F1),
             onChanged: (value) {
@@ -54,7 +55,8 @@ class SettingsScreen extends ConsumerWidget {
                         child: const Text('キャンセル'),
                       ),
                       ElevatedButton(
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red),
                         onPressed: () {
                           // ログアウト処理を実行する想定
                           Navigator.pop(context);
@@ -68,7 +70,8 @@ class SettingsScreen extends ConsumerWidget {
                             ),
                           );
                         },
-                        child: const Text('解除', style: TextStyle(color: Colors.white)),
+                        child: const Text('解除',
+                            style: TextStyle(color: Colors.white)),
                       ),
                     ],
                   ),
@@ -86,7 +89,8 @@ class SettingsScreen extends ConsumerWidget {
           const ListTile(
             leading: Icon(Icons.accessibility_new_rounded),
             title: Text('アクセシビリティ対応'),
-            subtitle: Text('WCAG 2.2、Apple HIG Accessibility、およびAndroid Build Accessible Apps ガイドラインに準拠して設計されています。'),
+            subtitle: Text(
+                'WCAG 2.2、Apple HIG Accessibility、およびAndroid Build Accessible Apps ガイドラインに準拠して設計されています。'),
           ),
         ],
       ),

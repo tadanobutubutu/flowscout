@@ -5,7 +5,7 @@ import 'src/presentation/home_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // ステータスバーとナビゲーションバーのスタイル設定
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
@@ -34,7 +34,7 @@ class FlowscoutApp extends ConsumerWidget {
       title: 'Flowscout',
       debugShowCheckedModeBanner: false,
       themeMode: themeMode,
-      
+
       // プレミアム・ライトテーマ (WCAG 2.2 コントラスト準拠)
       theme: ThemeData(
         useMaterial3: true,
@@ -49,8 +49,12 @@ class FlowscoutApp extends ConsumerWidget {
           onSurface: const Color(0xFF0F172A),
         ),
         textTheme: const TextTheme(
-          headlineMedium: TextStyle(fontWeight: FontWeight.bold, letterSpacing: -0.5, color: Color(0xFF0F172A)),
-          titleMedium: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF334155)),
+          headlineMedium: TextStyle(
+              fontWeight: FontWeight.bold,
+              letterSpacing: -0.5,
+              color: Color(0xFF0F172A)),
+          titleMedium:
+              TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF334155)),
           bodyMedium: TextStyle(color: Color(0xFF475569)),
         ),
         cardTheme: const CardThemeData(
@@ -77,8 +81,12 @@ class FlowscoutApp extends ConsumerWidget {
           onSurface: const Color(0xFFF1F5F9),
         ),
         textTheme: const TextTheme(
-          headlineMedium: TextStyle(fontWeight: FontWeight.bold, letterSpacing: -0.5, color: Color(0xFFF1F5F9)),
-          titleMedium: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFFCBD5E1)),
+          headlineMedium: TextStyle(
+              fontWeight: FontWeight.bold,
+              letterSpacing: -0.5,
+              color: Color(0xFFF1F5F9)),
+          titleMedium:
+              TextStyle(fontWeight: FontWeight.w600, color: Color(0xFFCBD5E1)),
           bodyMedium: TextStyle(color: Color(0xFF94A3B8)),
         ),
         cardTheme: const CardThemeData(

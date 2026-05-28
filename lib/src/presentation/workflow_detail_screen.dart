@@ -55,9 +55,11 @@ class WorkflowDetailScreen extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.analytics_outlined, size: 64, color: Theme.of(context).hintColor),
+                  Icon(Icons.analytics_outlined,
+                      size: 64, color: Theme.of(context).hintColor),
                   const SizedBox(height: 16),
-                  const Text('実行されたワークフローがありません', style: TextStyle(fontSize: 16)),
+                  const Text('実行されたワークフローがありません',
+                      style: TextStyle(fontSize: 16)),
                 ],
               ),
             );
@@ -72,7 +74,8 @@ class WorkflowDetailScreen extends ConsumerWidget {
               final isSuccess = run['conclusion'] == 'success';
               final isFailure = run['conclusion'] == 'failure';
               final isCancelled = run['conclusion'] == 'cancelled';
-              final isRunning = run['status'] == 'in_progress' || run['status'] == 'queued';
+              final isRunning =
+                  run['status'] == 'in_progress' || run['status'] == 'queued';
 
               Color statusColor = const Color(0xFF94A3B8); // pending/queued
               IconData statusIcon = Icons.help_outline_rounded;
@@ -102,7 +105,8 @@ class WorkflowDetailScreen extends ConsumerWidget {
                       leading: Icon(statusIcon, color: statusColor, size: 30),
                       title: Text(
                         run['head_commit_message'],
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 15),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -110,7 +114,8 @@ class WorkflowDetailScreen extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const SizedBox(height: 4),
-                          Text('Event: ${run['event']} • Branch: ${run['head_branch']}'),
+                          Text(
+                              'Event: ${run['event']} • Branch: ${run['head_branch']}'),
                           Text('Author: ${run['head_commit_author']}'),
                         ],
                       ),
@@ -119,10 +124,13 @@ class WorkflowDetailScreen extends ConsumerWidget {
                         FutureBuilder<List<Map<String, dynamic>>>(
                           future: service.getRunJobs(repoFullName, run['id']),
                           builder: (context, jobSnapshot) {
-                            if (jobSnapshot.connectionState == ConnectionState.waiting) {
+                            if (jobSnapshot.connectionState ==
+                                ConnectionState.waiting) {
                               return const Padding(
                                 padding: EdgeInsets.all(16.0),
-                                child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                                child: Center(
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2)),
                               );
                             }
 
@@ -136,7 +144,8 @@ class WorkflowDetailScreen extends ConsumerWidget {
 
                             return Container(
                               padding: const EdgeInsets.all(16),
-                              color: Theme.of(context).brightness == Brightness.dark
+                              color: Theme.of(context).brightness ==
+                                      Brightness.dark
                                   ? const Color(0xFF0F172A)
                                   : const Color(0xFFF8FAFC),
                               child: Column(
@@ -144,25 +153,33 @@ class WorkflowDetailScreen extends ConsumerWidget {
                                 children: jobs.map((job) {
                                   final steps = job['steps'] as List<dynamic>;
                                   return Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         'Job: ${job['name']}',
                                         semanticsLabel: 'ジョブ名、 ${job['name']}',
-                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 14),
                                       ),
                                       const SizedBox(height: 8),
                                       ...steps.map((step) {
-                                        final isStepSuccess = step['conclusion'] == 'success';
-                                        final isStepFailure = step['conclusion'] == 'failure';
-                                        final isStepRunning = step['status'] == 'in_progress';
+                                        final isStepSuccess =
+                                            step['conclusion'] == 'success';
+                                        final isStepFailure =
+                                            step['conclusion'] == 'failure';
+                                        final isStepRunning =
+                                            step['status'] == 'in_progress';
 
                                         Color stepColor = Colors.grey;
-                                        IconData stepIcon = Icons.radio_button_unchecked_rounded;
+                                        IconData stepIcon = Icons
+                                            .radio_button_unchecked_rounded;
 
                                         if (isStepRunning) {
                                           stepColor = Colors.amber;
-                                          stepIcon = Icons.hourglass_bottom_rounded;
+                                          stepIcon =
+                                              Icons.hourglass_bottom_rounded;
                                         } else if (isStepSuccess) {
                                           stepColor = Colors.green;
                                           stepIcon = Icons.check_rounded;
@@ -172,30 +189,44 @@ class WorkflowDetailScreen extends ConsumerWidget {
                                         }
 
                                         return Padding(
-                                          padding: const EdgeInsets.only(left: 12.0, bottom: 6.0),
+                                          padding: const EdgeInsets.only(
+                                              left: 12.0, bottom: 6.0),
                                           child: Row(
                                             children: [
-                                              Icon(stepIcon, color: stepColor, size: 16),
+                                              Icon(stepIcon,
+                                                  color: stepColor, size: 16),
                                               const SizedBox(width: 8),
                                               Expanded(
                                                 child: Text(
                                                   step['name'],
                                                   style: TextStyle(
-                                                    color: isStepFailure ? Colors.red : null,
+                                                    color: isStepFailure
+                                                        ? Colors.red
+                                                        : null,
                                                     fontSize: 13,
                                                   ),
                                                 ),
                                               ),
                                               if (isStepFailure)
                                                 Container(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 6,
+                                                      vertical: 2),
                                                   decoration: BoxDecoration(
-                                                    color: Colors.red.withOpacity(0.1),
-                                                    borderRadius: BorderRadius.circular(4),
+                                                    color: Colors.red
+                                                        .withOpacity(0.1),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            4),
                                                   ),
                                                   child: const Text(
                                                     'Error Details',
-                                                    style: TextStyle(color: Colors.red, fontSize: 10, fontWeight: FontWeight.bold),
+                                                    style: TextStyle(
+                                                        color: Colors.red,
+                                                        fontSize: 10,
+                                                        fontWeight:
+                                                            FontWeight.bold),
                                                   ),
                                                 ),
                                             ],
