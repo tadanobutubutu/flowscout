@@ -34,7 +34,7 @@ class WorkflowDetailScreen extends ConsumerWidget {
               child: Semantics(
                 liveRegion: true,
                 label: 'ワークフロー一覧をロード中',
-                child: CircularProgressIndicator(color: Color(0xFF6366F1)),
+                child: const CircularProgressIndicator(color: Color(0xFF6366F1)),
               ),
             );
           }
@@ -215,7 +215,7 @@ class WorkflowDetailScreen extends ConsumerWidget {
                                                       vertical: 2),
                                                   decoration: BoxDecoration(
                                                     color: Colors.red
-                                                        .withOpacity(0.1),
+                                                        .withValues(alpha: 0.1),
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             4),

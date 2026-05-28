@@ -27,7 +27,7 @@ class SettingsScreen extends ConsumerWidget {
             subtitle: const Text(
                 'アプリ起動時にGitHubの最新リリース情報を自動でチェックし、アップデートがある場合に通知します。'),
             value: notifyEnabled,
-            activeColor: const Color(0xFF6366F1),
+            activeTrackColor: const Color(0xFF6366F1),
             onChanged: (value) {
               ref.read(updateNotifyEnabledProvider.notifier).state = value;
             },
@@ -65,7 +65,7 @@ class SettingsScreen extends ConsumerWidget {
                               content: Semantics(
                                 liveRegion: true,
                                 label: 'GitHubとの連携を解除しました',
-                                child: Text('GitHubとの連携を解除しました。'),
+                                child: const Text('GitHubとの連携を解除しました。'),
                               ),
                             ),
                           );
