@@ -36,8 +36,11 @@ class WorkflowDetailScreen extends ConsumerWidget {
           }
 
           if (snapshot.hasError) {
-            return Center(
-              child: Text('ワークフローの取得に失敗しました: ${snapshot.error}'),
+            return Semantics(
+              label: 'ワークフローの取得に失敗しました: ${snapshot.error}',
+              child: Center(
+                child: Text('ワークフローの取得に失敗しました: ${snapshot.error}'),
+              ),
             );
           }
 
@@ -112,12 +115,15 @@ class WorkflowDetailScreen extends ConsumerWidget {
                         FutureBuilder<List<Map<String, dynamic>>>(
                           future: service.getRunJobs(repoFullName, run['id']),
                           builder: (context, jobSnapshot) {
-                            if (jobSnapshot.connectionState == ConnectionState.waiting) {
-                              return const Padding(
+                          if (jobSnapshot.connectionState == ConnectionState.waiting) {
+                            return const Semantics(
+                              liveRegion: true,
+                              child: Padding(
                                 padding: EdgeInsets.all(16.0),
                                 child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                              );
-                            }
+                              ),
+                            );
+                          }
 
                             final jobs = jobSnapshot.data ?? [];
                             if (jobs.isEmpty) {
@@ -139,9 +145,12 @@ class WorkflowDetailScreen extends ConsumerWidget {
                                   return Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        'Job: ${job['name']}',
-                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                      Semantics(
+                                        label: 'ジョブ名: ${job['name']}',
+                                        child: Text(
+                                          'Job: ${job['name']}',
+                                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                        ),
                                       ),
                                       const SizedBox(height: 8),
                                       ...steps.map((step) {

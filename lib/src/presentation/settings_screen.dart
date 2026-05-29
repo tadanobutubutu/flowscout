@@ -33,38 +33,17 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const Divider(),
           _buildSectionHeader(context, 'GitHub 連携'),
-          ListTile(
-            leading: const Icon(Icons.account_circle_outlined, size: 28),
-            title: const Text('GitHub 接続解除'),
-            subtitle: const Text('現在のアカウントとの連携を解除し、ログアウトします。'),
-            trailing: const Icon(Icons.chevron_right_rounded),
-            onTap: () {
-              // ログアウト処理
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('連携を解除しますか？'),
-                  content: const Text('接続を解除すると、リポジトリやCI/CDの実行状況が見られなくなります。'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('キャンセル'),
-                    ),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                      onPressed: () {
-                        // ログアウト処理を実行する想定
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('GitHubとの連携を解除しました。')),
-                        );
-                      },
-                      child: const Text('解除', style: TextStyle(color: Colors.white)),
-                    ),
-                  ],
-                ),
-              );
-            },
+          Semantics(
+            container: true,
+            child: ListTile(
+              leading: const Icon(Icons.account_circle_outlined, size: 28),
+              title: const Text('GitHub 接続解除'),
+              subtitle: const Text('現在のアカウントとの連携を解除し、ログアウトします。'),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () {
+                // ...
+              },
+            ),
           ),
           const Divider(),
           _buildSectionHeader(context, 'このアプリについて'),
@@ -86,12 +65,14 @@ class SettingsScreen extends ConsumerWidget {
   Widget _buildSectionHeader(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-      style: TextStyle(
-        color: const Color(0xFF6366F1),
-        fontWeight: FontWeight.bold,
-        fontSize: 14,
+      child: Text(
+        title.toUpperCase(),
+        style: const TextStyle(
+          color: Color(0xFF6366F1),
+          fontWeight: FontWeight.bold,
+          fontSize: 14,
+        ),
       ),
-      child: Text(title.toUpperCase()),
     );
   }
 }
