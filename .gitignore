@@ -51,7 +51,7 @@ dex_caches/
 *.xcworkspace
 !default.xcworkspace
 !ios/Runner.xcworkspace/
-xcshareddata/
+# xcshareddata/
 /ios/.bundle/
 /ios/Flutter/Generated.xcconfig
 /ios/Flutter/flutter_export_environment.sh
