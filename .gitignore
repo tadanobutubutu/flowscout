@@ -50,6 +50,7 @@ dex_caches/
 *.perspectivev3
 *.xcworkspace
 !default.xcworkspace
+!ios/Runner.xcworkspace/
 xcshareddata/
 /ios/.bundle/
 /ios/Flutter/Generated.xcconfig
