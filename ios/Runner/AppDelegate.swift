@@ -38,7 +38,10 @@ import Flutter
   }
   
   private func performHeavyNativeJob(data: String?) -> String {
-    // iOS特有の重い処理やSwift固有の最適化ロジックプレースホルダー
-    return "Processed iOS native Swift data: \(String(data?.reversed() ?? ""))"
+    guard let input = data else {
+      return "Processed iOS native Swift data: "
+    }
+    let reversedStr = String(input.reversed())
+    return "Processed iOS native Swift data: \(reversedStr)"
   }
 }
