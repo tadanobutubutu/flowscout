@@ -1,0 +1,41 @@
+name: Release Agent
+on:
+  # Phase A — propose: opens a release PR with version bump + CHANGELOG.
+  # No tag or GitHub Release is created here.
+  workflow_dispatch:
+    inputs:
+      release_plan:
+        required: true
+        type: string
+      issue_number:
+        required: false
+        type: string
+        default: ""
+      dry_run:
+        required: false
+        type: boolean
+        default: false
+  # Phase B — finalize: tags the merge commit + publishes the GitHub
+  # Release once the release PR is merged into the production branch.
+  # Triggered on `push` because PRs opened with GITHUB_TOKEN do NOT fire
+  # `pull_request: closed` events (GitHub anti-recursion behavior). The
+  # action self-filters and no-ops for non-release pushes.
+  push:
+    branches: [main, master]
+jobs:
+  release:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: HelicanHQ/tagline-release-agent-action@v1
+        with:
+          release_plan: ${{ inputs.release_plan }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          issue_number: ${{ inputs.issue_number }}
+          dry_run: ${{ inputs.dry_run }}
