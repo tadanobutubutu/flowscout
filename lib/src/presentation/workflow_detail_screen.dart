@@ -129,8 +129,14 @@ class WorkflowDetailScreen extends ConsumerWidget {
                               return const Padding(
                                 padding: EdgeInsets.all(16.0),
                                 child: Center(
-                                    child: CircularProgressIndicator(
-                                        strokeWidth: 2)),
+                                  child: Semantics(
+                                    liveRegion: true,
+                                    label: 'ジョブ情報をロード中',
+                                    child: const CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  ),
+                                ),
                               );
                             }
 

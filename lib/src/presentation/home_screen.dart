@@ -346,7 +346,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       ),
                                     ),
                                     const SizedBox(width: 8),
-                                    const Icon(Icons.chevron_right_rounded),
+                                    const ExcludeSemantics(
+                                      child: Icon(Icons.chevron_right_rounded),
+                                    ),
                                   ],
                                 ),
                               ),
