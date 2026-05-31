@@ -50,7 +50,8 @@ dex_caches/
 *.perspectivev3
 *.xcworkspace
 !default.xcworkspace
-xcshareddata/
+!ios/Runner.xcworkspace/
+# xcshareddata/
 /ios/.bundle/
 /ios/Flutter/Generated.xcconfig
 /ios/Flutter/flutter_export_environment.sh
@@ -77,3 +78,34 @@ jwt_public.pem
 # CI/CD / Build tools
 /node_modules/
 dist/
+
+# Cloudflare Wrangler Related
+.wrangler/
+.dev.vars
+wrangler.log
+
+# Advanced Credentials & Secrets Prevention
+*credentials*.json
+*.keystore
+*.jks
+*.p12
+*.pfx
+*private*.key
+*private*.pem
+*secret*.json
+google-services*.json
+GoogleService-Info*.plist
+
+# Editor & OS Personal Workspace Locks
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/dictionary.xml
+.vscode/launch.json
+.vscode/tasks.json
+.vscode/settings.json
+.vscode/chrome-devtools.json
+.AppleDouble
+.LSOverride
+Icon
+
+

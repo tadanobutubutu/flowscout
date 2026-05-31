@@ -32,13 +32,16 @@ class GitHubService {
   }
 
   // 2. リポジトリ検索機能 (プライベート/パブリック両対応、ページネーション/検索クエリ対応)
-  Future<List<Map<String, dynamic>>> searchRepositories({String query = ''}) async {
+  Future<List<Map<String, dynamic>>> searchRepositories(
+      {String query = ''}) async {
     final headers = await _getHeaders();
-    
+
     // クエリが空の場合は、ユーザーがアクセス可能なリポジトリ一覧を取得
     final url = query.isEmpty
-        ? Uri.parse('https://api.github.com/user/repos?sort=updated&per_page=50')
-        : Uri.parse('https://api.github.com/search/repositories?q=$query+in:name&sort=updated&order=desc');
+        ? Uri.parse(
+            'https://api.github.com/user/repos?sort=updated&per_page=50')
+        : Uri.parse(
+            'https://api.github.com/search/repositories?q=$query+in:name&sort=updated&order=desc');
 
     try {
       final response = await http.get(url, headers: headers);
@@ -48,17 +51,19 @@ class GitHubService {
             ? json.decode(response.body) as List<dynamic>
             : data['items'] as List<dynamic>;
 
-        return items.map((item) => {
-          'id': item['id'],
-          'name': item['name'],
-          'full_name': item['full_name'],
-          'private': item['private'],
-          'description': item['description'] ?? 'No description',
-          'stargazers_count': item['stargazers_count'],
-          'updated_at': item['updated_at'],
-          'owner': item['owner']['login'],
-          'avatar_url': item['owner']['avatar_url'],
-        }).toList();
+        return items
+            .map((item) => {
+                  'id': item['id'],
+                  'name': item['name'],
+                  'full_name': item['full_name'],
+                  'private': item['private'],
+                  'description': item['description'] ?? 'No description',
+                  'stargazers_count': item['stargazers_count'],
+                  'updated_at': item['updated_at'],
+                  'owner': item['owner']['login'],
+                  'avatar_url': item['owner']['avatar_url'],
+                })
+            .toList();
       } else {
         throw Exception('Failed to load repositories: ${response.statusCode}');
       }
@@ -69,9 +74,11 @@ class GitHubService {
   }
 
   // 3. 直コミットやPRで走ったワークフローラン (Workflow Runs) の一覧取得
-  Future<List<Map<String, dynamic>>> getWorkflowRuns(String repoFullName) async {
+  Future<List<Map<String, dynamic>>> getWorkflowRuns(
+      String repoFullName) async {
     final headers = await _getHeaders();
-    final url = Uri.parse('https://api.github.com/repos/$repoFullName/actions/runs?per_page=30');
+    final url = Uri.parse(
+        'https://api.github.com/repos/$repoFullName/actions/runs?per_page=30');
 
     try {
       final response = await http.get(url, headers: headers);
@@ -79,20 +86,25 @@ class GitHubService {
         final Map<String, dynamic> data = json.decode(response.body);
         final List<dynamic> runs = data['workflow_runs'] ?? [];
 
-        return runs.map((run) => {
-          'id': run['id'],
-          'name': run['name'],
-          'event': run['event'], // push, pull_request, etc.
-          'status': run['status'], // completed, in_progress, queued
-          'conclusion': run['conclusion'] ?? 'pending', // success, failure, cancelled
-          'html_url': run['html_url'],
-          'run_number': run['run_number'],
-          'head_branch': run['head_branch'],
-          'head_commit_message': run['head_commit']['message'] ?? 'No commit message',
-          'head_commit_author': run['head_commit']['author']['name'] ?? 'Unknown',
-          'created_at': run['created_at'],
-          'updated_at': run['updated_at'],
-        }).toList();
+        return runs
+            .map((run) => {
+                  'id': run['id'],
+                  'name': run['name'],
+                  'event': run['event'], // push, pull_request, etc.
+                  'status': run['status'], // completed, in_progress, queued
+                  'conclusion': run['conclusion'] ??
+                      'pending', // success, failure, cancelled
+                  'html_url': run['html_url'],
+                  'run_number': run['run_number'],
+                  'head_branch': run['head_branch'],
+                  'head_commit_message':
+                      run['head_commit']['message'] ?? 'No commit message',
+                  'head_commit_author':
+                      run['head_commit']['author']['name'] ?? 'Unknown',
+                  'created_at': run['created_at'],
+                  'updated_at': run['updated_at'],
+                })
+            .toList();
       } else {
         throw Exception('Failed to load workflow runs: ${response.statusCode}');
       }
@@ -103,9 +115,11 @@ class GitHubService {
   }
 
   // 4. ジョブおよび詳細なステップの取得 (エラーログ詳細の特定用)
-  Future<List<Map<String, dynamic>>> getRunJobs(String repoFullName, int runId) async {
+  Future<List<Map<String, dynamic>>> getRunJobs(
+      String repoFullName, int runId) async {
     final headers = await _getHeaders();
-    final url = Uri.parse('https://api.github.com/repos/$repoFullName/actions/runs/$runId/jobs');
+    final url = Uri.parse(
+        'https://api.github.com/repos/$repoFullName/actions/runs/$runId/jobs');
 
     try {
       final response = await http.get(url, headers: headers);
@@ -122,12 +136,14 @@ class GitHubService {
             'conclusion': job['conclusion'] ?? 'pending',
             'started_at': job['started_at'],
             'completed_at': job['completed_at'],
-            'steps': steps.map((step) => {
-              'name': step['name'],
-              'status': step['status'],
-              'conclusion': step['conclusion'] ?? 'pending',
-              'number': step['number'],
-            }).toList(),
+            'steps': steps
+                .map((step) => {
+                      'name': step['name'],
+                      'status': step['status'],
+                      'conclusion': step['conclusion'] ?? 'pending',
+                      'number': step['number'],
+                    })
+                .toList(),
           };
         }).toList();
       } else {
@@ -143,7 +159,8 @@ class GitHubService {
   Future<Map<String, dynamic>> checkUpdate() async {
     final headers = await _getHeaders();
     // Flowscout 本体のパブリックリポジトリから最新のリリースを取得する想定
-    final url = Uri.parse('https://api.github.com/repos/tadanobutubutu/flowscout/releases/latest');
+    final url = Uri.parse(
+        'https://api.github.com/repos/tadanobutubutu/flowscout/releases/latest');
 
     try {
       final response = await http.get(url, headers: headers);

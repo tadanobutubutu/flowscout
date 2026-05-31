@@ -12,7 +12,8 @@ final gitHubServiceProvider = Provider((ref) => GitHubService());
 final searchQueryProvider = StateProvider<String>((ref) => '');
 
 // リポジトリ一覧を取得するFutureProvider
-final repositoriesProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
+final repositoriesProvider =
+    FutureProvider<List<Map<String, dynamic>>>((ref) async {
   final service = ref.watch(gitHubServiceProvider);
   final query = ref.watch(searchQueryProvider);
   return service.searchRepositories(query: query);
@@ -46,24 +47,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Future<void> _checkForUpdates() async {
     final service = ref.read(gitHubServiceProvider);
     final updateInfo = await service.checkUpdate();
-    
+
     final prefs = ref.read(updateNotifyEnabledProvider);
     if (updateInfo['hasUpdate'] == true && prefs) {
       if (!mounted) return;
-      
+
       // プレミアムで美しいアプデ通知ダイアログ
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
           backgroundColor: Theme.of(context).cardTheme.color,
           title: Row(
             children: [
-              const Icon(Icons.system_update_alt_rounded, color: Color(0xFF6366F1), size: 30),
+              const Icon(Icons.system_update_alt_rounded,
+                  color: Color(0xFF6366F1), size: 30),
               const SizedBox(width: 12),
               Text(
                 'アップデートのご案内',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 20),
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(fontSize: 20),
               ),
             ],
           ),
@@ -84,9 +90,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: Text('現在のバージョン: ${updateInfo['currentVersion']}'),
               ),
               const SizedBox(height: 12),
-              const Text('リリースノート:', style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text('リリースノート:',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
               Container(
-                maxHeight: 100,
+                constraints: const BoxConstraints(maxHeight: 100),
                 width: double.maxFinite,
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
@@ -114,7 +121,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF6366F1),
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
               ),
               child: const Text('アップデート'),
             ),
@@ -137,17 +145,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         title: Text(
           'Flowscout',
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-            fontSize: 28,
-            fontFamily: 'Outfit',
-            foreground: Paint()
-              ..shader = const LinearGradient(
-                colors: [Color(0xFF6366F1), Color(0xFF0EA5E9)],
-              ).createShader(const Rect.fromLTWH(0.0, 0.0, 200.0, 70.0)),
-          ),
+                fontSize: 28,
+                fontFamily: 'Outfit',
+                foreground: Paint()
+                  ..shader = const LinearGradient(
+                    colors: [Color(0xFF6366F1), Color(0xFF0EA5E9)],
+                  ).createShader(const Rect.fromLTWH(0.0, 0.0, 200.0, 70.0)),
+              ),
         ),
         actions: [
           IconButton(
-            icon: Icon(isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded),
+            icon: Icon(
+                isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded),
             tooltip: 'テーマ切り替え',
             onPressed: () {
               ref.read(themeModeProvider.notifier).state =
@@ -184,7 +193,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 },
                 decoration: InputDecoration(
                   hintText: 'リポジトリを検索...',
-                  prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF6366F1)),
+                  prefixIcon: const Icon(Icons.search_rounded,
+                      color: Color(0xFF6366F1)),
                   suffixIcon: _searchController.text.isNotEmpty
                       ? IconButton(
                           icon: const Icon(Icons.clear_rounded),
@@ -195,14 +205,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         )
                       : null,
                   filled: true,
-                  fillColor: isDark ? const Color(0xFF131B2E) : const Color(0xFFF1F5F9),
+                  fillColor: isDark
+                      ? const Color(0xFF131B2E)
+                      : const Color(0xFFF1F5F9),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
                     borderSide: BorderSide.none,
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFF6366F1), width: 1.5),
+                    borderSide:
+                        const BorderSide(color: Color(0xFF6366F1), width: 1.5),
                   ),
                 ),
               ),
@@ -210,7 +223,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             const SizedBox(height: 20),
             Text(
               'マイリポジトリ',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 18),
+              style: Theme.of(context)
+                  .textTheme
+                  .titleMedium
+                  ?.copyWith(fontSize: 18),
             ),
             const SizedBox(height: 10),
             Expanded(
@@ -221,9 +237,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.folder_open_rounded, size: 64, color: Theme.of(context).hintColor),
+                          Icon(Icons.folder_open_rounded,
+                              size: 64, color: Theme.of(context).hintColor),
                           const SizedBox(height: 16),
-                          const Text('リポジトリが見つかりません', style: TextStyle(fontSize: 16)),
+                          const Text('リポジトリが見つかりません',
+                              style: TextStyle(fontSize: 16)),
                         ],
                       ),
                     );
@@ -253,19 +271,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             },
                             borderRadius: BorderRadius.circular(16),
                             child: Card(
-                              margin: EdgeInsets.none,
+                              margin: EdgeInsets.zero,
                               child: Padding(
                                 padding: const EdgeInsets.all(16.0),
                                 child: Row(
                                   children: [
                                     CircleAvatar(
-                                      backgroundImage: NetworkImage(repo['avatar_url']),
+                                      backgroundImage:
+                                          NetworkImage(repo['avatar_url']),
                                       radius: 20,
                                     ),
                                     const SizedBox(width: 16),
                                     Expanded(
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Row(
                                             children: [
@@ -276,24 +296,35 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 16,
                                                   ),
-                                                  overflow: TextOverflow.ellipsis,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                 ),
                                               ),
                                               const SizedBox(width: 8),
                                               Container(
-                                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 8,
+                                                        vertical: 4),
                                                 decoration: BoxDecoration(
                                                   color: repo['private']
-                                                      ? const Color(0xFFEF4444).withOpacity(0.1)
-                                                      : const Color(0xFF10B981).withOpacity(0.1),
-                                                  borderRadius: BorderRadius.circular(8),
+                                                      ? const Color(0xFFEF4444)
+                                                          .withValues(alpha: 0.1)
+                                                      : const Color(0xFF10B981)
+                                                          .withValues(alpha: 0.1),
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
                                                 ),
                                                 child: Text(
-                                                  repo['private'] ? 'Private' : 'Public',
+                                                  repo['private']
+                                                      ? 'Private'
+                                                      : 'Public',
                                                   style: TextStyle(
                                                     color: repo['private']
-                                                        ? const Color(0xFFEF4444)
-                                                        : const Color(0xFF10B981),
+                                                        ? const Color(
+                                                            0xFFEF4444)
+                                                        : const Color(
+                                                            0xFF10B981),
                                                     fontSize: 11,
                                                     fontWeight: FontWeight.bold,
                                                   ),
@@ -305,7 +336,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                           Text(
                                             repo['description'],
                                             style: TextStyle(
-                                              color: Theme.of(context).hintColor,
+                                              color:
+                                                  Theme.of(context).hintColor,
                                               fontSize: 13,
                                             ),
                                             maxLines: 1,
@@ -315,7 +347,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       ),
                                     ),
                                     const SizedBox(width: 8),
-                                    const Icon(Icons.chevron_right_rounded),
+                                    const ExcludeSemantics(
+                                      child: Icon(Icons.chevron_right_rounded),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -326,8 +360,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     },
                   );
                 },
-                loading: () => const Center(
-                  child: CircularProgressIndicator(color: Color(0xFF6366F1)),
+                loading: () => Center(
+                  child: Semantics(
+                    liveRegion: true,
+                    label: 'リポジトリ一覧をロード中',
+                    child: const CircularProgressIndicator(color: Color(0xFF6366F1)),
+                  ),
                 ),
                 error: (error, stack) => Semantics(
                   label: 'エラーが発生しました: $error',
