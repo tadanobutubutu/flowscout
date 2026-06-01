@@ -1,18 +1,22 @@
-## [c19cdd4] - 2026-06-01
-### Merge pull request #19 from tadanobutubutu/dev
+## [0.1.0] - 2026-06-01
 
-fix: remove invalid const from Semantics in workflow detail screen
-Removed invalid `const` keyword from a Semantics widget in the workflow detail screen. The Semantics constructor cannot be const because it wraps a non-const child widget (Padding), so the const modifier was moved to the inner Padding widget instead. This is a bug fix that corrects a Dart compile-time error with no functional behavior change.
+### Added
 
-## [aad56bc] - 2026-06-01
-### docs(tzylo): update from PR #17
-Updated TZYLO.md with documentation of recent tooling integrations (FlowScout skill definition, ECC configuration, RepoWrit settings) and CI/CD improvements. This is a documentation-only change with no production code modifications.
+- Merge dev into master with a11y fixes and Tagline configuration ([#9](https://github.com/tadanobutubutu/flowscout/pull/9))
+- Merge dev into master with completed fixes, ECC bundle, and auto-docs ([#17](https://github.com/tadanobutubutu/flowscout/pull/17))
 
-## [0abf0bf] - 2026-06-01
-### Merge pull request #17 from tadanobutubutu/dev
+### Fixed
 
-Merge dev into master with completed fixes, ECC bundle, and auto-docs
-Merge commit integrating automated developer experience tooling: ECC (Extensible Configuration Curation) bundle, Claude Code skills, Codex agent configurations, and workflow command scaffolds. All changes are metadata and AI agent configuration files (YAML, JSON, markdown) in hidden directories (.claude, .agents, .codex) with zero modifications to production code (Dart, Kotlin, Swift files remain unchanged).
+- resolve FutureBuilder and Column children syntax errors ([#14](https://github.com/tadanobutubutu/flowscout/pull/14))
+- remove invalid const from Semantics in workflow detail screen ([#19](https://github.com/tadanobutubutu/flowscout/pull/19))
+- add const to chevron Icon to satisfy prefer_const_constructors ([#21](https://github.com/tadanobutubutu/flowscout/pull/21))
+- resolve const constructor issues in home_screen ([#22](https://github.com/tadanobutubutu/flowscout/pull/22))
+
+### Changed
+
+- [translatabot] Add configuration file ([#1](https://github.com/tadanobutubutu/flowscout/pull/1))
+- auto-update documentation (fc0cc16) ([#7](https://github.com/tadanobutubutu/flowscout/pull/7))
+- eliminate small width SizedBoxes to resolve a11y touch target size warnings ([#20](https://github.com/tadanobutubutu/flowscout/pull/20))
 
 ## [2825948] - 2026-06-01
 ### Merge pull request #14 from tadanobutubutu/dev
