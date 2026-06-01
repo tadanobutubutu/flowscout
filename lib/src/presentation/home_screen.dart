@@ -357,11 +357,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                           ),
                                         ),
                                       ),
-                                      Padding(
+                                      const Padding(
                                         padding:
-                                            const EdgeInsets.only(left: 8.0),
-                                        child: const ExcludeSemantics(
-                                          child: const Icon(
+                                            EdgeInsets.only(left: 8.0),
+                                        child: ExcludeSemantics(
+                                          child: Icon(
                                               Icons.chevron_right_rounded),
                                         ),
                                       ),
