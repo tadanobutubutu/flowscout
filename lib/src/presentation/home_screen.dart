@@ -53,7 +53,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       if (!mounted) return;
 
       // プレミアムで美しいアプデ通知ダイアログ
-      showDialog(
+      showDialog<void>(
         context: context,
         builder: (context) => AlertDialog(
           shape:
@@ -78,16 +78,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Semantics(
-                label: '新しいバージョン ${updateInfo['latestVersion']} が利用可能です！',
+                label: '新しいバージョン ${updateInfo['latestVersion'] as String? ?? ''} が利用可能です！',
                 child: Text(
-                  '新しいバージョン (${updateInfo['latestVersion']}) が利用可能です！',
+                  '新しいバージョン (${updateInfo['latestVersion'] as String? ?? ''}) が利用可能です！',
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
               const SizedBox(height: 8),
               Semantics(
-                label: '現在のバージョン: ${updateInfo['currentVersion']}',
-                child: Text('現在のバージョン: ${updateInfo['currentVersion']}'),
+                label: '現在のバージョン: ${updateInfo['currentVersion'] as String? ?? ''}',
+                child: Text('現在のバージョン: ${updateInfo['currentVersion'] as String? ?? ''}'),
               ),
               const SizedBox(height: 12),
               const Text('リリースノート:',
@@ -101,7 +101,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: SingleChildScrollView(
-                  child: Text(updateInfo['releaseNotes'] ?? 'バグ修正とパフォーマンスの向上。'),
+                  child: Text((updateInfo['releaseNotes'] as String?) ?? 'バグ修正とパフォーマンスの向上。'),
                 ),
               ),
             ],
@@ -113,7 +113,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
             ElevatedButton(
               onPressed: () async {
-                final url = Uri.parse(updateInfo['downloadUrl'] ?? '');
+                final url = Uri.parse((updateInfo['downloadUrl'] as String?) ?? '');
                 if (await canLaunchUrl(url)) {
                   await launchUrl(url, mode: LaunchMode.externalApplication);
                 }
@@ -167,9 +167,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             icon: const Icon(Icons.settings_outlined),
             tooltip: '設定',
             onPressed: () {
-              Navigator.push(
+              Navigator.push<void>(
                 context,
-                MaterialPageRoute(builder: (context) => const SettingsScreen()),
+                MaterialPageRoute<void>(builder: (context) => const SettingsScreen()),
               );
             },
           ),
@@ -250,21 +250,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     itemCount: repos.length,
                     physics: const BouncingScrollPhysics(),
                     itemBuilder: (context, index) {
-                      final repo = repos[index];
+                      final repo = repos[index] as Map<String, dynamic>;
+                      final isPrivate = repo['private'] as bool? ?? false;
+                      final repoName = repo['name'] as String? ?? '';
+                      final repoFullName = repo['full_name'] as String? ?? '';
+                      final avatarUrl = repo['avatar_url'] as String? ?? '';
+                      final description = repo['description'] as String? ?? 'No description';
+
                       return Semantics(
                         button: true,
-                        label: '${repo['name']} リポジトリ',
+                        label: '$repoName リポジトリ',
                         hint: 'ダブルタップしてワークフロー実行状況を表示します',
                         child: Container(
                           margin: const EdgeInsets.only(bottom: 12),
                           child: InkWell(
                             onTap: () {
-                              Navigator.push(
+                              Navigator.push<void>(
                                 context,
-                                MaterialPageRoute(
+                                MaterialPageRoute<void>(
                                   builder: (context) => WorkflowDetailScreen(
-                                    repoFullName: repo['full_name'],
-                                    repoName: repo['name'],
+                                    repoFullName: repoFullName,
+                                    repoName: repoName,
                                   ),
                                 ),
                               );
@@ -279,7 +285,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     children: [
                                       CircleAvatar(
                                         backgroundImage:
-                                            NetworkImage(repo['avatar_url']),
+                                            NetworkImage(avatarUrl),
                                         radius: 20,
                                       ),
                                       Expanded(
@@ -294,7 +300,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                                 children: [
                                                   Expanded(
                                                     child: Text(
-                                                      repo['name'],
+                                                      repoName,
                                                       style: const TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold,
@@ -311,7 +317,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                                         horizontal: 8,
                                                         vertical: 4),
                                                     decoration: BoxDecoration(
-                                                      color: repo['private']
+                                                      color: isPrivate
                                                           ? const Color(
                                                                   0xFFEF4444)
                                                               .withValues(
@@ -325,11 +331,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                                               8),
                                                     ),
                                                     child: Text(
-                                                      repo['private']
+                                                      isPrivate
                                                           ? 'Private'
                                                           : 'Public',
                                                       style: TextStyle(
-                                                        color: repo['private']
+                                                        color: isPrivate
                                                             ? const Color(
                                                                 0xFFEF4444)
                                                             : const Color(
@@ -344,7 +350,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                               ),
                                               const SizedBox(height: 4),
                                               Text(
-                                                repo['description'],
+                                                description,
                                                 style: TextStyle(
                                                   color: Theme.of(context)
                                                       .hintColor,

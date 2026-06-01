@@ -71,12 +71,14 @@ class WorkflowDetailScreen extends ConsumerWidget {
             physics: const BouncingScrollPhysics(),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             itemBuilder: (context, index) {
-              final run = runs[index];
-              final isSuccess = run['conclusion'] == 'success';
-              final isFailure = run['conclusion'] == 'failure';
-              final isCancelled = run['conclusion'] == 'cancelled';
+              final run = runs[index] as Map<String, dynamic>;
+              final conclusion = run['conclusion'] as String? ?? 'pending';
+              final status = run['status'] as String? ?? 'queued';
+              final isSuccess = conclusion == 'success';
+              final isFailure = conclusion == 'failure';
+              final isCancelled = conclusion == 'cancelled';
               final isRunning =
-                  run['status'] == 'in_progress' || run['status'] == 'queued';
+                  status == 'in_progress' || status == 'queued';
 
               Color statusColor = const Color(0xFF94A3B8); // pending/queued
               IconData statusIcon = Icons.help_outline_rounded;
@@ -95,9 +97,16 @@ class WorkflowDetailScreen extends ConsumerWidget {
                 statusIcon = Icons.cancel_outlined;
               }
 
+              final runName = run['name'] as String? ?? 'Workflow';
+              final headCommitMessage = run['head_commit_message'] as String? ?? 'No message';
+              final event = run['event'] as String? ?? '';
+              final headBranch = run['head_branch'] as String? ?? '';
+              final headCommitAuthor = run['head_commit_author'] as String? ?? '';
+              final runId = run['id'] as int? ?? 0;
+
               return Semantics(
                 button: true,
-                label: 'ワークフローラン ${run['name']}、ステータス: ${run['conclusion']}',
+                label: 'ワークフローラン $runName、ステータス: $conclusion',
                 child: Container(
                   margin: const EdgeInsets.only(bottom: 16),
                   child: Card(
@@ -105,7 +114,7 @@ class WorkflowDetailScreen extends ConsumerWidget {
                       shape: const Border(), // ExpansionTileの上下のボーダーを消去
                       leading: Icon(statusIcon, color: statusColor, size: 30),
                       title: Text(
-                        run['head_commit_message'],
+                        headCommitMessage,
                         style: const TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 15),
                         maxLines: 2,
@@ -116,14 +125,14 @@ class WorkflowDetailScreen extends ConsumerWidget {
                         children: [
                           const SizedBox(height: 4),
                           Text(
-                              'Event: ${run['event']} • Branch: ${run['head_branch']}'),
-                          Text('Author: ${run['head_commit_author']}'),
+                              'Event: $event • Branch: $headBranch'),
+                          Text('Author: $headCommitAuthor'),
                         ],
                       ),
                       children: [
                         // 詳細ジョブとステップの取得
                         FutureBuilder<List<Map<String, dynamic>>>(
-                          future: service.getRunJobs(repoFullName, run['id']),
+                          future: service.getRunJobs(repoFullName, runId),
                           builder: (context, jobSnapshot) {
                             if (jobSnapshot.connectionState ==
                                 ConnectionState.waiting) {
@@ -156,15 +165,17 @@ class WorkflowDetailScreen extends ConsumerWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: jobs.map((job) {
-                                  final steps = job['steps'] as List<dynamic>;
+                                  final jobMap = job;
+                                  final jobName = jobMap['name'] as String? ?? 'Job';
+                                  final steps = jobMap['steps'] as List<dynamic>? ?? [];
                                   return Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
                                       Semantics(
-                                        label: 'ジョブ名: ${job['name']}',
+                                        label: 'ジョブ名: $jobName',
                                         child: Text(
-                                          'Job: ${job['name']}',
+                                          'Job: $jobName',
                                           style: const TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 14),
@@ -172,12 +183,17 @@ class WorkflowDetailScreen extends ConsumerWidget {
                                       ),
                                       const SizedBox(height: 8),
                                       ...steps.map((step) {
+                                        final stepMap = step as Map<String, dynamic>;
+                                        final stepConclusion = stepMap['conclusion'] as String? ?? 'pending';
+                                        final stepStatus = stepMap['status'] as String? ?? 'queued';
+                                        final stepName = stepMap['name'] as String? ?? 'Step';
+                                        
                                         final isStepSuccess =
-                                            step['conclusion'] == 'success';
+                                            stepConclusion == 'success';
                                         final isStepFailure =
-                                            step['conclusion'] == 'failure';
+                                            stepConclusion == 'failure';
                                         final isStepRunning =
-                                            step['status'] == 'in_progress';
+                                            stepStatus == 'in_progress';
 
                                         Color stepColor = Colors.grey;
                                         IconData stepIcon = Icons
@@ -205,7 +221,7 @@ class WorkflowDetailScreen extends ConsumerWidget {
                                               const SizedBox(width: 8),
                                               Expanded(
                                                 child: Text(
-                                                  step['name'],
+                                                  stepName,
                                                   style: TextStyle(
                                                     color: isStepFailure
                                                         ? Colors.red
