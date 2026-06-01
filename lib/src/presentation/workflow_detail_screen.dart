@@ -34,7 +34,8 @@ class WorkflowDetailScreen extends ConsumerWidget {
               child: Semantics(
                 liveRegion: true,
                 label: 'ワークフロー一覧をロード中',
-                child: const CircularProgressIndicator(color: Color(0xFF6366F1)),
+                child:
+                    const CircularProgressIndicator(color: Color(0xFF6366F1)),
               ),
             );
           }
@@ -123,16 +124,20 @@ class WorkflowDetailScreen extends ConsumerWidget {
                         // 詳細ジョブとステップの取得
                         FutureBuilder<List<Map<String, dynamic>>>(
                           future: service.getRunJobs(repoFullName, run['id']),
-                          if (jobSnapshot.connectionState == ConnectionState.waiting) {
-                            return const Semantics(
-                              liveRegion: true,
-                              label: 'ジョブ情報をロード中',
-                              child: Padding(
-                                padding: EdgeInsets.all(16.0),
-                                child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                              ),
-                            );
-                          }
+                          builder: (context, jobSnapshot) {
+                            if (jobSnapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Semantics(
+                                liveRegion: true,
+                                label: 'ジョブ情報をロード中',
+                                child: Padding(
+                                  padding: EdgeInsets.all(16.0),
+                                  child: Center(
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2)),
+                                ),
+                              );
+                            }
 
                             final jobs = jobSnapshot.data ?? [];
                             if (jobs.isEmpty) {
@@ -155,11 +160,14 @@ class WorkflowDetailScreen extends ConsumerWidget {
                                   return Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
+                                    children: [
                                       Semantics(
                                         label: 'ジョブ名: ${job['name']}',
                                         child: Text(
                                           'Job: ${job['name']}',
-                                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 14),
                                         ),
                                       ),
                                       const SizedBox(height: 8),
