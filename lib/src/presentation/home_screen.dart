@@ -270,89 +270,97 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               );
                             },
                             borderRadius: BorderRadius.circular(16),
-                            child: Card(
-                              margin: EdgeInsets.zero,
-                              child: Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Row(
-                                  children: [
-                                    CircleAvatar(
-                                      backgroundImage:
-                                          NetworkImage(repo['avatar_url']),
-                                      radius: 20,
-                                    ),
-                                    const SizedBox(width: 16),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  repo['name'],
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 16,
+                            child: ExcludeSemantics(
+                              child: Card(
+                                margin: EdgeInsets.zero,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Row(
+                                    children: [
+                                      CircleAvatar(
+                                        backgroundImage:
+                                            NetworkImage(repo['avatar_url']),
+                                        radius: 20,
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    repo['name'],
+                                                    style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 16,
+                                                    ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
                                                   ),
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
                                                 ),
-                                              ),
-                                              const SizedBox(width: 8),
-                                              Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 8,
-                                                        vertical: 4),
-                                                decoration: BoxDecoration(
-                                                  color: repo['private']
-                                                      ? const Color(0xFFEF4444)
-                                                          .withValues(
-                                                              alpha: 0.1)
-                                                      : const Color(0xFF10B981)
-                                                          .withValues(
-                                                              alpha: 0.1),
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                ),
-                                                child: Text(
-                                                  repo['private']
-                                                      ? 'Private'
-                                                      : 'Public',
-                                                  style: TextStyle(
+                                                const SizedBox(width: 8),
+                                                Container(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 8,
+                                                      vertical: 4),
+                                                  decoration: BoxDecoration(
                                                     color: repo['private']
                                                         ? const Color(
-                                                            0xFFEF4444)
+                                                                0xFFEF4444)
+                                                            .withValues(
+                                                                alpha: 0.1)
                                                         : const Color(
-                                                            0xFF10B981),
-                                                    fontSize: 11,
-                                                    fontWeight: FontWeight.bold,
+                                                                0xFF10B981)
+                                                            .withValues(
+                                                                alpha: 0.1),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8),
+                                                  ),
+                                                  child: Text(
+                                                    repo['private']
+                                                        ? 'Private'
+                                                        : 'Public',
+                                                    style: TextStyle(
+                                                      color: repo['private']
+                                                          ? const Color(
+                                                              0xFFEF4444)
+                                                          : const Color(
+                                                              0xFF10B981),
+                                                      fontSize: 11,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            repo['description'],
-                                            style: TextStyle(
-                                              color:
-                                                  Theme.of(context).hintColor,
-                                              fontSize: 13,
+                                              ],
                                             ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ],
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              repo['description'],
+                                              style: TextStyle(
+                                                color:
+                                                    Theme.of(context).hintColor,
+                                                fontSize: 13,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    const ExcludeSemantics(
-                                      child: Icon(Icons.chevron_right_rounded),
-                                    ),
-                                  ],
+                                      const SizedBox(width: 8),
+                                      const ExcludeSemantics(
+                                        child:
+                                            Icon(Icons.chevron_right_rounded),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -370,9 +378,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         color: Color(0xFF6366F1)),
                   ),
                 ),
-                error: (error, stack) => Semantics(
-                  label: 'エラーが発生しました: $error',
-                  child: Text('エラーが発生しました: $error'),
+                error: (error, stack) => Center(
+                  child: Text(
+                    'エラーが発生しました: $error',
+                    semanticsLabel: 'エラーが発生しました: $error',
+                  ),
                 ),
               ),
             ),
