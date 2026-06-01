@@ -1,3 +1,7 @@
+## [aad56bc] - 2026-06-01
+### docs(tzylo): update from PR #17
+Updated TZYLO.md with documentation of recent tooling integrations (FlowScout skill definition, ECC configuration, RepoWrit settings) and CI/CD improvements. This is a documentation-only change with no production code modifications.
+
 ## [0abf0bf] - 2026-06-01
 ### Merge pull request #17 from tadanobutubutu/dev
 
