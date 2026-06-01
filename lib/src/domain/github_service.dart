@@ -46,23 +46,27 @@ class GitHubService {
     try {
       final response = await http.get(url, headers: headers);
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
+        final Map<String, dynamic> data = json.decode(response.body) as Map<String, dynamic>;
         final List<dynamic> items = query.isEmpty
             ? json.decode(response.body) as List<dynamic>
             : data['items'] as List<dynamic>;
 
         return items
-            .map((item) => {
-                  'id': item['id'],
-                  'name': item['name'],
-                  'full_name': item['full_name'],
-                  'private': item['private'],
-                  'description': item['description'] ?? 'No description',
-                  'stargazers_count': item['stargazers_count'],
-                  'updated_at': item['updated_at'],
-                  'owner': item['owner']['login'],
-                  'avatar_url': item['owner']['avatar_url'],
-                })
+            .map((item) {
+              final Map<String, dynamic> itemMap = item as Map<String, dynamic>;
+              final Map<String, dynamic> ownerMap = itemMap['owner'] as Map<String, dynamic>;
+              return {
+                'id': itemMap['id'],
+                'name': itemMap['name'],
+                'full_name': itemMap['full_name'],
+                'private': itemMap['private'],
+                'description': itemMap['description'] ?? 'No description',
+                'stargazers_count': itemMap['stargazers_count'],
+                'updated_at': itemMap['updated_at'],
+                'owner': ownerMap['login'],
+                'avatar_url': ownerMap['avatar_url'],
+              };
+            })
             .toList();
       } else {
         throw Exception('Failed to load repositories: ${response.statusCode}');
@@ -83,27 +87,32 @@ class GitHubService {
     try {
       final response = await http.get(url, headers: headers);
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
-        final List<dynamic> runs = data['workflow_runs'] ?? [];
+        final Map<String, dynamic> data = json.decode(response.body) as Map<String, dynamic>;
+        final List<dynamic> runs = data['workflow_runs'] as List<dynamic>? ?? [];
 
         return runs
-            .map((run) => {
-                  'id': run['id'],
-                  'name': run['name'],
-                  'event': run['event'], // push, pull_request, etc.
-                  'status': run['status'], // completed, in_progress, queued
-                  'conclusion': run['conclusion'] ??
-                      'pending', // success, failure, cancelled
-                  'html_url': run['html_url'],
-                  'run_number': run['run_number'],
-                  'head_branch': run['head_branch'],
-                  'head_commit_message':
-                      run['head_commit']['message'] ?? 'No commit message',
-                  'head_commit_author':
-                      run['head_commit']['author']['name'] ?? 'Unknown',
-                  'created_at': run['created_at'],
-                  'updated_at': run['updated_at'],
-                })
+            .map((run) {
+              final Map<String, dynamic> runMap = run as Map<String, dynamic>;
+              final Map<String, dynamic> headCommit = runMap['head_commit'] as Map<String, dynamic>;
+              final Map<String, dynamic> author = headCommit['author'] as Map<String, dynamic>;
+              return {
+                'id': runMap['id'],
+                'name': runMap['name'],
+                'event': runMap['event'], // push, pull_request, etc.
+                'status': runMap['status'], // completed, in_progress, queued
+                'conclusion': runMap['conclusion'] ??
+                    'pending', // success, failure, cancelled
+                'html_url': runMap['html_url'],
+                'run_number': runMap['run_number'],
+                'head_branch': runMap['head_branch'],
+                'head_commit_message':
+                    headCommit['message'] ?? 'No commit message',
+                'head_commit_author':
+                    author['name'] ?? 'Unknown',
+                'created_at': runMap['created_at'],
+                'updated_at': runMap['updated_at'],
+              };
+            })
             .toList();
       } else {
         throw Exception('Failed to load workflow runs: ${response.statusCode}');
@@ -124,25 +133,29 @@ class GitHubService {
     try {
       final response = await http.get(url, headers: headers);
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
-        final List<dynamic> jobs = data['jobs'] ?? [];
+        final Map<String, dynamic> data = json.decode(response.body) as Map<String, dynamic>;
+        final List<dynamic> jobs = data['jobs'] as List<dynamic>? ?? [];
 
         return jobs.map((job) {
-          final List<dynamic> steps = job['steps'] ?? [];
+          final Map<String, dynamic> jobMap = job as Map<String, dynamic>;
+          final List<dynamic> steps = jobMap['steps'] as List<dynamic>? ?? [];
           return {
-            'id': job['id'],
-            'name': job['name'],
-            'status': job['status'],
-            'conclusion': job['conclusion'] ?? 'pending',
-            'started_at': job['started_at'],
-            'completed_at': job['completed_at'],
+            'id': jobMap['id'],
+            'name': jobMap['name'],
+            'status': jobMap['status'],
+            'conclusion': jobMap['conclusion'] ?? 'pending',
+            'started_at': jobMap['started_at'],
+            'completed_at': jobMap['completed_at'],
             'steps': steps
-                .map((step) => {
-                      'name': step['name'],
-                      'status': step['status'],
-                      'conclusion': step['conclusion'] ?? 'pending',
-                      'number': step['number'],
-                    })
+                .map((step) {
+                  final Map<String, dynamic> stepMap = step as Map<String, dynamic>;
+                  return {
+                    'name': stepMap['name'],
+                    'status': stepMap['status'],
+                    'conclusion': stepMap['conclusion'] ?? 'pending',
+                    'number': stepMap['number'],
+                  };
+                })
                 .toList(),
           };
         }).toList();
@@ -165,10 +178,10 @@ class GitHubService {
     try {
       final response = await http.get(url, headers: headers);
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
-        final String latestTagName = data['tag_name'] ?? 'v1.0.0'; // 例: v1.0.1
-        final String body = data['body'] ?? '';
-        final String downloadUrl = data['html_url'] ?? '';
+        final Map<String, dynamic> data = json.decode(response.body) as Map<String, dynamic>;
+        final String latestTagName = data['tag_name'] as String? ?? 'v1.0.0'; // 例: v1.0.1
+        final String body = data['body'] as String? ?? '';
+        final String downloadUrl = data['html_url'] as String? ?? '';
 
         final packageInfo = await PackageInfo.fromPlatform();
         final String currentVersion = 'v${packageInfo.version}';
@@ -195,8 +208,8 @@ class GitHubService {
       final latestClean = latest.replaceAll('v', '').split('+')[0];
       final currentClean = current.replaceAll('v', '').split('+')[0];
 
-      List<int> latestParts = latestClean.split('.').map(int.parse).toList();
-      List<int> currentParts = currentClean.split('.').map(int.parse).toList();
+      final List<int> latestParts = latestClean.split('.').map(int.parse).toList();
+      final List<int> currentParts = currentClean.split('.').map(int.parse).toList();
 
       for (int i = 0; i < latestParts.length; i++) {
         if (i >= currentParts.length) return true;
