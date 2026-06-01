@@ -62,6 +62,8 @@
 - Resolved FutureBuilder syntax by adding missing builder parameter.
 - Corrected formatting syntax related to Column children in the workflow detail screen.
 - Fixed CircularProgressIndicator syntax in home and workflow detail screens.
+- Removed invalid 'const' keyword from Semantics widget in workflow detail screen.
+- Resolved Flutter linter error (const_with_non_const) to maintain CI/CD build integrity.
 
 <!-- TZYLO:FIX_END -->
 
