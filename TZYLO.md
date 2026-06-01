@@ -64,8 +64,9 @@
 - Fixed CircularProgressIndicator syntax in home and workflow detail screens.
 - Removed invalid 'const' keyword from Semantics widget in workflow detail screen.
 - Added const keyword to chevron Icon in ExcludeSemantics.
-- Resolved Flutter linter warning for prefer_const_constructors.
+- Resolved Flutter linter warnings for prefer_const_constructors in home_screen.dart and other locations.
 - Resolved Flutter linter error (const_with_non_const) to maintain CI/CD build integrity.
+- Removed unnecessary 'const' keywords from Padding and Icon widgets.
 - Replaced small SizedBoxes with Padding to eliminate touch target size warnings.
 - Resolved FLUTTER_007 static analysis warnings for touch targets on home screen list row.
 
