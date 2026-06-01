@@ -1,3 +1,9 @@
+## [c19cdd4] - 2026-06-01
+### Merge pull request #19 from tadanobutubutu/dev
+
+fix: remove invalid const from Semantics in workflow detail screen
+Removed invalid `const` keyword from a Semantics widget in the workflow detail screen. The Semantics constructor cannot be const because it wraps a non-const child widget (Padding), so the const modifier was moved to the inner Padding widget instead. This is a bug fix that corrects a Dart compile-time error with no functional behavior change.
+
 ## [aad56bc] - 2026-06-01
 ### docs(tzylo): update from PR #17
 Updated TZYLO.md with documentation of recent tooling integrations (FlowScout skill definition, ECC configuration, RepoWrit settings) and CI/CD improvements. This is a documentation-only change with no production code modifications.
