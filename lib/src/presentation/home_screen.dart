@@ -250,7 +250,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     itemCount: repos.length,
                     physics: const BouncingScrollPhysics(),
                     itemBuilder: (context, index) {
-                      final repo = repos[index] as Map<String, dynamic>;
+                      final repo = repos[index];
                       final isPrivate = repo['private'] as bool? ?? false;
                       final repoName = repo['name'] as String? ?? '';
                       final repoFullName = repo['full_name'] as String? ?? '';

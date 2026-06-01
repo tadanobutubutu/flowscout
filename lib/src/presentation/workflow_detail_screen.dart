@@ -71,7 +71,7 @@ class WorkflowDetailScreen extends ConsumerWidget {
             physics: const BouncingScrollPhysics(),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             itemBuilder: (context, index) {
-              final run = runs[index] as Map<String, dynamic>;
+              final run = runs[index];
               final conclusion = run['conclusion'] as String? ?? 'pending';
               final status = run['status'] as String? ?? 'queued';
               final isSuccess = conclusion == 'success';
