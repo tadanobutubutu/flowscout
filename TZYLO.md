@@ -64,6 +64,8 @@
 - Fixed CircularProgressIndicator syntax in home and workflow detail screens.
 - Removed invalid 'const' keyword from Semantics widget in workflow detail screen.
 - Resolved Flutter linter error (const_with_non_const) to maintain CI/CD build integrity.
+- Replaced small SizedBoxes with Padding to eliminate touch target size warnings.
+- Resolved FLUTTER_007 static analysis warnings for touch targets on home screen list row.
 
 <!-- TZYLO:FIX_END -->
 
@@ -78,5 +80,6 @@
 - Cleaned up build scripts to streamline the CI/CD process.
 - Removed TODO comments from the Gradle build configuration.
 - Completed accessibility fixes across multiple components in the UI to ensure compliance with accessibility standards.
+- Adjusted layout margins to improve visual consistency while maintaining existing functionality and enhancing accessibility.
 
 <!-- TZYLO:GEN_END -->
