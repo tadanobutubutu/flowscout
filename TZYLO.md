@@ -63,6 +63,8 @@
 - Corrected formatting syntax related to Column children in the workflow detail screen.
 - Fixed CircularProgressIndicator syntax in home and workflow detail screens.
 - Removed invalid 'const' keyword from Semantics widget in workflow detail screen.
+- Added const keyword to chevron Icon in ExcludeSemantics.
+- Resolved Flutter linter warning for prefer_const_constructors.
 - Resolved Flutter linter error (const_with_non_const) to maintain CI/CD build integrity.
 - Replaced small SizedBoxes with Padding to eliminate touch target size warnings.
 - Resolved FLUTTER_007 static analysis warnings for touch targets on home screen list row.
