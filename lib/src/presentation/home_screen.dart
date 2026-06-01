@@ -361,8 +361,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                         padding:
                                             const EdgeInsets.only(left: 8.0),
                                         child: const ExcludeSemantics(
-                                          child:
-                                              Icon(Icons.chevron_right_rounded),
+                                          child: const Icon(
+                                              Icons.chevron_right_rounded),
                                         ),
                                       ),
                                     ],
