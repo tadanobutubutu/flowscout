@@ -127,10 +127,10 @@ class WorkflowDetailScreen extends ConsumerWidget {
                           builder: (context, jobSnapshot) {
                             if (jobSnapshot.connectionState ==
                                 ConnectionState.waiting) {
-                              return const Semantics(
+                              return Semantics(
                                 liveRegion: true,
                                 label: 'ジョブ情報をロード中',
-                                child: Padding(
+                                child: const Padding(
                                   padding: EdgeInsets.all(16.0),
                                   child: Center(
                                       child: CircularProgressIndicator(
