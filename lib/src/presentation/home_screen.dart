@@ -309,9 +309,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                                 decoration: BoxDecoration(
                                                   color: repo['private']
                                                       ? const Color(0xFFEF4444)
-                                                          .withValues(alpha: 0.1)
+                                                          .withValues(
+                                                              alpha: 0.1)
                                                       : const Color(0xFF10B981)
-                                                          .withValues(alpha: 0.1),
+                                                          .withValues(
+                                                              alpha: 0.1),
                                                   borderRadius:
                                                       BorderRadius.circular(8),
                                                 ),
@@ -364,7 +366,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   child: Semantics(
                     liveRegion: true,
                     label: 'リポジトリ一覧をロード中',
-                    child: const CircularProgressIndicator(color: Color(0xFF6366F1)),
+                    child: const CircularProgressIndicator(
+                        color: Color(0xFF6366F1)),
                   ),
                 ),
                 error: (error, stack) => Semantics(
