@@ -1,3 +1,9 @@
+## [0abf0bf] - 2026-06-01
+### Merge pull request #17 from tadanobutubutu/dev
+
+Merge dev into master with completed fixes, ECC bundle, and auto-docs
+Merge commit integrating automated developer experience tooling: ECC (Extensible Configuration Curation) bundle, Claude Code skills, Codex agent configurations, and workflow command scaffolds. All changes are metadata and AI agent configuration files (YAML, JSON, markdown) in hidden directories (.claude, .agents, .codex) with zero modifications to production code (Dart, Kotlin, Swift files remain unchanged).
+
 ## [2825948] - 2026-06-01
 ### Merge pull request #14 from tadanobutubutu/dev
 
