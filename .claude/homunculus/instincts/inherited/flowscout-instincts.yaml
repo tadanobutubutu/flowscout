@@ -1,0 +1,581 @@
+# Instincts generated from https://github.com/tadanobutubutu/flowscout
+# Generated: 2026-05-31T20:29:46.613Z
+# Version: 2.0
+# NOTE: This file supplements (does not replace) any existing curated instincts.
+# High-confidence manually curated instincts should be preserved alongside these.
+
+---
+id: flowscout-commit-conventional
+trigger: "when writing a commit message"
+confidence: 0.85
+domain: git
+source: repo-analysis
+source_repo: https://github.com/tadanobutubutu/flowscout
+---
+
+# Flowscout Commit Conventional
+
+## Action
+
+Use conventional commit format with prefixes: chore, feat, fix, security
+
+## Evidence
+
+- 20 commits analyzed
+- Detected conventional commit pattern
+- Examples: feat: implement advanced 100/100 accessibility fixes, multi-language Crowdin foundation, Cloudflare Workers Smart-Routing OAuth API, GitHub App Manifests, github.io docs homepage, and fallback CI API script, fix: resolve Mermaid diagram syntax, implement secure dynamic status badges, restructure English/Japanese READMEs, configure dedicated GitHub Pages deployment for docs-only updates, and optimize Translatabot formatting
+
+---
+id: flowscout-commit-length
+trigger: "when writing a commit message"
+confidence: 0.6
+domain: git
+source: repo-analysis
+source_repo: https://github.com/tadanobutubutu/flowscout
+---
+
+# Flowscout Commit Length
+
+## Action
+
+Write detailed commit messages (~114 characters for first line)
+
+## Evidence
+
+- Average commit message length: 114 chars
+- Based on 20 commits
+
+---
+id: flowscout-naming-files
+trigger: "when creating a new file"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/tadanobutubutu/flowscout
+---
+
+# Flowscout Naming Files
+
+## Action
+
+Use camelCase naming convention
+
+## Evidence
+
+- Analyzed file naming patterns in repository
+- Dominant pattern: camelCase
+
+---
+id: flowscout-import-relative
+trigger: "when importing modules"
+confidence: 0.75
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/tadanobutubutu/flowscout
+---
+
+# Flowscout Import Relative
+
+## Action
+
+Use relative imports for project files
+
+## Evidence
+
+- Import analysis shows relative import pattern
+- Example: import { x } from '../lib/x'
+
+---
+id: flowscout-export-style
+trigger: "when exporting from a module"
+confidence: 0.7
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/tadanobutubutu/flowscout
+---
+
+# Flowscout Export Style
+
+## Action
+
+Prefer default exports
+
+## Evidence
+
+- Export pattern analysis
+- Dominant style: default
+
+---
+id: flowscout-test-separate
+trigger: "when writing tests"
+confidence: 0.8
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/tadanobutubutu/flowscout
+---
+
+# Flowscout Test Separate
+
+## Action
+
+Place tests in the tests/ or __tests__/ directory, mirroring src structure
+
+## Evidence
+
+- Separate test directory pattern detected
+- Tests live in dedicated test folders
+
+---
+id: flowscout-workflow-feature-development
+trigger: "when implementing a new feature"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/tadanobutubutu/flowscout
+---
+
+# Flowscout Workflow Feature Development
+
+## Action
+
+Follow the feature-development workflow:
+1. Add feature implementation
+2. Add tests for feature
+3. Update documentation
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~14x per month
+- Files: **/*.test.*
+
+---
+id: flowscout-workflow-update-github-actions-workflow
+trigger: "when doing update github actions workflow"
+confidence: 0.7
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/tadanobutubutu/flowscout
+---
+
+# Flowscout Workflow Update Github Actions Workflow
+
+## Action
+
+Follow the update-github-actions-workflow workflow:
+1. Edit one or more files in .github/workflows/ (e.g., build.yml, deploy-pages.yml, release-agent.yml)
+2. Optionally update related config files or scripts if needed
+3. Commit with a message referencing workflow, build, deploy, or release
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~4x per month
+- Files: .github/workflows/build.yml, .github/workflows/deploy-pages.yml, .github/workflows/release-agent.yml
+
+---
+id: flowscout-workflow-update-gitignore-for-secrets-or-platform
+trigger: "when doing update gitignore for secrets or platform"
+confidence: 0.65
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/tadanobutubutu/flowscout
+---
+
+# Flowscout Workflow Update Gitignore For Secrets Or Platform
+
+## Action
+
+Follow the update-gitignore-for-secrets-or-platform workflow:
+1. Edit .gitignore to add or adjust patterns
+2. Optionally add or remove files that are now ignored or tracked
+3. Commit with a message referencing security, fix, or platform
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~3x per month
+- Files: .gitignore
+
+---
+id: flowscout-workflow-add-or-update-localization-files
+trigger: "when doing add or update localization files"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/tadanobutubutu/flowscout
+---
+
+# Flowscout Workflow Add Or Update Localization Files
+
+## Action
+
+Follow the add-or-update-localization-files workflow:
+1. Create or edit files in lib/src/localization/ (e.g., app_en.arb, app_ja.arb, app_de.arb, etc.)
+2. Optionally update translation configuration (e.g., crowdin.yml, .github/translatabot.yml)
+3. Commit with a message referencing language, localization, or translation
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: lib/src/localization/app_en.arb, lib/src/localization/app_ja.arb, lib/src/localization/app_de.arb
+
+---
+id: flowscout-workflow-update-documentation-and-readme
+trigger: "when doing update documentation and readme"
+confidence: 0.65
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/tadanobutubutu/flowscout
+---
+
+# Flowscout Workflow Update Documentation And Readme
+
+## Action
+
+Follow the update-documentation-and-readme workflow:
+1. Edit docs/*.md, docs/index.html, docs/style.css, README.md, README.ja.md, or CONTRIBUTING.md
+2. Optionally update LICENSE or other meta files
+3. Commit with a message referencing docs, README, or checklist
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~3x per month
+- Files: docs/index.html, docs/style.css, docs/a11y_ux_checklist.md
+
+---
+id: flowscout-workflow-fix-accessibility-in-presentation-layer
+trigger: "when doing fix accessibility in presentation layer"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/tadanobutubutu/flowscout
+---
+
+# Flowscout Workflow Fix Accessibility In Presentation Layer
+
+## Action
+
+Follow the fix-accessibility-in-presentation-layer workflow:
+1. Edit files in lib/src/presentation/ (e.g., home_screen.dart, settings_screen.dart, workflow_detail_screen.dart)
+2. Commit with a message referencing a11y, accessibility, or fix
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: lib/src/presentation/home_screen.dart, lib/src/presentation/settings_screen.dart, lib/src/presentation/workflow_detail_screen.dart
+
+---
+id: flowscout-instinct-camelcase-files
+trigger: "When creating or renaming a source code file"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: tadanobutubutu/flowscout
+---
+
+# Flowscout Instinct Camelcase Files
+
+## Action
+
+Name the file using camelCase (e.g., homeScreen.dart)
+
+## Evidence
+
+- Pattern in namingConventions.files: camelCase
+
+---
+id: flowscout-instinct-camelcase-functions
+trigger: "When defining a function or method"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: tadanobutubutu/flowscout
+---
+
+# Flowscout Instinct Camelcase Functions
+
+## Action
+
+Name the function using camelCase
+
+## Evidence
+
+- Pattern in namingConventions.functions: camelCase
+
+---
+id: flowscout-instinct-pascalcase-classes
+trigger: "When defining a class"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: tadanobutubutu/flowscout
+---
+
+# Flowscout Instinct Pascalcase Classes
+
+## Action
+
+Name the class using PascalCase
+
+## Evidence
+
+- Pattern in namingConventions.classes: PascalCase
+
+---
+id: flowscout-instinct-screaming-constants
+trigger: "When defining a constant value"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: tadanobutubutu/flowscout
+---
+
+# Flowscout Instinct Screaming Constants
+
+## Action
+
+Name the constant using SCREAMING_SNAKE_CASE
+
+## Evidence
+
+- Pattern in namingConventions.constants: SCREAMING_SNAKE_CASE
+
+---
+id: flowscout-instinct-relative-imports
+trigger: "When importing modules within the codebase"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: tadanobutubutu/flowscout
+---
+
+# Flowscout Instinct Relative Imports
+
+## Action
+
+Use relative import paths
+
+## Evidence
+
+- Pattern in importStyle: relative
+
+---
+id: flowscout-instinct-default-exports
+trigger: "When exporting modules or components"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: tadanobutubutu/flowscout
+---
+
+# Flowscout Instinct Default Exports
+
+## Action
+
+Use default export style
+
+## Evidence
+
+- Pattern in exportStyle: default
+
+---
+id: flowscout-instinct-feature-test-doc-sequence
+trigger: "When implementing a new feature"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: tadanobutubutu/flowscout
+---
+
+# Flowscout Instinct Feature Test Doc Sequence
+
+## Action
+
+First add the feature, then add tests, then update documentation
+
+## Evidence
+
+- feature-development workflow commitSequence
+- Seen in feat: implement advanced 100/100 accessibility fixes...
+
+---
+id: flowscout-instinct-test-location-separate
+trigger: "When adding tests for a feature"
+confidence: 0.8
+domain: testing
+source: repo-analysis
+source_repo: tadanobutubutu/flowscout
+---
+
+# Flowscout Instinct Test Location Separate
+
+## Action
+
+Place test files in a separate directory from source code
+
+## Evidence
+
+- Pattern in architecture.folderStructure.testLocation: separate
+
+---
+id: flowscout-instinct-conventional-commits
+trigger: "When writing a commit message"
+confidence: 0.9
+domain: git
+source: repo-analysis
+source_repo: tadanobutubutu/flowscout
+---
+
+# Flowscout Instinct Conventional Commits
+
+## Action
+
+Use conventional commit prefixes: chore, feat, fix, security
+
+## Evidence
+
+- Pattern in commits.prefixes
+- Seen in feat: implement advanced 100/100 accessibility fixes...
+
+---
+id: flowscout-instinct-commit-length
+trigger: "When writing a commit message"
+confidence: 0.7
+domain: git
+source: repo-analysis
+source_repo: tadanobutubutu/flowscout
+---
+
+# Flowscout Instinct Commit Length
+
+## Action
+
+Write descriptive commit messages averaging over 100 characters
+
+## Evidence
+
+- Pattern in commits.averageLength: 114
+
+---
+id: flowscout-instinct-update-github-actions-workflow
+trigger: "When someone needs to change CI/CD pipeline logic, triggers, or formatting enforcement"
+confidence: 0.95
+domain: workflow
+source: repo-analysis
+source_repo: tadanobutubutu/flowscout
+---
+
+# Flowscout Instinct Update Github Actions Workflow
+
+## Action
+
+Edit .github/workflows/*.yml files and commit with a message referencing workflow, build, deploy, or release
+
+## Evidence
+
+- update-github-actions-workflow workflow
+- Pattern in files: .github/workflows/build.yml, ...
+
+---
+id: flowscout-instinct-update-gitignore-for-secrets-or-platform
+trigger: "When new secrets, build artifacts, or platform-specific files need to be ignored"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: tadanobutubutu/flowscout
+---
+
+# Flowscout Instinct Update Gitignore For Secrets Or Platform
+
+## Action
+
+Edit .gitignore to add or adjust patterns and commit with a message referencing security, fix, or platform
+
+## Evidence
+
+- update-gitignore-for-secrets-or-platform workflow
+- Seen in security: add Wrangler-specific exclusions...
+
+---
+id: flowscout-instinct-add-or-update-localization-files
+trigger: "When adding or updating language support"
+confidence: 0.85
+domain: workflow
+source: repo-analysis
+source_repo: tadanobutubutu/flowscout
+---
+
+# Flowscout Instinct Add Or Update Localization Files
+
+## Action
+
+Create or edit ARB files in lib/src/localization/ and update translation configs as needed, then commit with a message referencing language, localization, or translation
+
+## Evidence
+
+- add-or-update-localization-files workflow
+- Pattern in files: lib/src/localization/app_en.arb, ...
+
+---
+id: flowscout-instinct-update-documentation-and-readme
+trigger: "When documenting new features, updating checklists, or restructuring README files"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: tadanobutubutu/flowscout
+---
+
+# Flowscout Instinct Update Documentation And Readme
+
+## Action
+
+Edit docs/*.md, docs/index.html, docs/style.css, README.md, README.ja.md, or CONTRIBUTING.md and commit with a message referencing docs, README, or checklist
+
+## Evidence
+
+- update-documentation-and-readme workflow
+- Pattern in files: docs/index.html, README.md, ...
+
+---
+id: flowscout-instinct-fix-accessibility-in-presentation-layer
+trigger: "When improving or fixing accessibility in the app UI"
+confidence: 0.85
+domain: workflow
+source: repo-analysis
+source_repo: tadanobutubutu/flowscout
+---
+
+# Flowscout Instinct Fix Accessibility In Presentation Layer
+
+## Action
+
+Edit files in lib/src/presentation/ and commit with a message referencing a11y, accessibility, or fix
+
+## Evidence
+
+- fix-accessibility-in-presentation-layer workflow
+- Pattern in files: lib/src/presentation/home_screen.dart, ...
+
+---
+id: flowscout-instinct-try-catch-error-handling
+trigger: "When handling errors in code"
+confidence: 0.7
+domain: code-style
+source: repo-analysis
+source_repo: tadanobutubutu/flowscout
+---
+
+# Flowscout Instinct Try Catch Error Handling
+
+## Action
+
+Use try-catch blocks for error handling
+
+## Evidence
+
+- Pattern in errorHandling.style: try-catch
+
