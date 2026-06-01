@@ -8,6 +8,12 @@
 
 ## 🔌 API Changes
 <!-- TZYLO:API_START -->
+
+### FlowScout Skill Definition
+
+- Added a new skill definition file for FlowScout with development patterns.
+- Skill includes templates for coding conventions, workflows, and typical commands.
+
 <!-- TZYLO:API_END -->
 
 ---
@@ -38,6 +44,12 @@
 
 ## ⚙️ Configuration
 <!-- TZYLO:CONF_START -->
+
+### ECC and RepoWrit Configurations
+
+- Integrated ECC tool configurations into the repository.
+- Updated repoWrit settings to enhance documentation generation.
+
 <!-- TZYLO:CONF_END -->
 
 ---
@@ -61,5 +73,8 @@
 ### Impact on CI/CD
 
 - Fixing syntax issues restored functionality to the workflow detail screen.
+- Cleaned up build scripts to streamline the CI/CD process.
+- Removed TODO comments from the Gradle build configuration.
+- Completed accessibility fixes across multiple components in the UI to ensure compliance with accessibility standards.
 
 <!-- TZYLO:GEN_END -->
