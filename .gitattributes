@@ -1,0 +1,8 @@
+# GitHub Linguist language statistics overrides
+# Exclude HTML documentation/generated pages from language statistics to accurately reflect Dart as the main language
+
+docs/* linguist-documentation
+docs/**/* linguist-documentation
+web/* linguist-vendored
+web/**/* linguist-vendored
+*.html linguist-generated

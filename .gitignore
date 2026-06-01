@@ -31,6 +31,7 @@ migrate.log
 ephemeral/
 
 # Android Related
+/android/build/
 *.apk
 *.aar
 *.ap_
