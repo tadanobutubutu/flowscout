@@ -7,3 +7,14 @@ web/* linguist-vendored
 web/**/* linguist-vendored
 *.html linguist-generated
 *.abap linguist-documentation
+scripts/* linguist-documentation
+scripts/**/* linguist-documentation
+backend/* linguist-vendored
+backend/**/* linguist-vendored
+android/* linguist-vendored
+android/**/* linguist-vendored
+ios/* linguist-vendored
+ios/**/* linguist-vendored
+macos/* linguist-vendored
+macos/**/* linguist-vendored
+
