@@ -245,10 +245,9 @@ class GitHubService {
     // ソートして返す
     allRepos.sort((a, b) => (b['updated_at'] as String).compareTo(a['updated_at'] as String));
     return allRepos;
-              };
-            })
-            .toList();
-      }
+
+
+
     } catch (e) {
       debugPrint('Error searching repos (fallback): $e');
     }

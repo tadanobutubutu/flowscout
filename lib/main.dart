@@ -123,17 +123,16 @@ class FlowscoutApp extends ConsumerWidget {
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(16)),
-            side: BorderSide(color: Color(0xFF1E293B), width: 1),
+
+              side: BorderSide(color: Color(0xFF1E293B), width: 1),
+            ),
           ),
         ),
-      ),
 
-      // 起動時のルーティング: トークンがあれば HomeScreen、なければ LoginScreen
-      import 'src/presentation/scroll_behavior.dart';
-    
-    // Inside MaterialApp builder
-    scrollBehavior: const MyCustomScrollBehavior(),
-    ),);
+        // 起動時のルーティング: トークンがあれば HomeScreen、なければ LoginScreen
+        home: const _AppStartupRouter(),
+      ),
+    );
   }
 }
 
