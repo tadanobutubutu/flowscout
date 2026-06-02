@@ -6,3 +6,4 @@ docs/**/* linguist-documentation
 web/* linguist-vendored
 web/**/* linguist-vendored
 *.html linguist-generated
+*.abap linguist-documentation
