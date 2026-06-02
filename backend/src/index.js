@@ -73,7 +73,13 @@ export default {
     // 3. GitHub App Manifest作成成功時のリダイレクト先
     if (url.pathname === '/setup-success') {
       const code = url.searchParams.get('code');
+      const installationId = url.searchParams.get('installation_id');
+
       if (!code) {
+        if (installationId) {
+          // GitHub Appのインストール完了後のリダイレクトの場合、アプリに戻す
+          return Response.redirect(`flowscout://setup-success?installation_id=${installationId}`, 302);
+        }
         return new Response('Setup code missing', { status: 400 });
       }
 

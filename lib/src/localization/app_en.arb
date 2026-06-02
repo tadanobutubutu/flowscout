@@ -3,5 +3,9 @@
   "appTitle": "Flowscout",
   "searchHint": "Search repositories...",
   "myRepositories": "My Repositories",
-  "settings": "Settings"
+  "settings": "Settings",
+  "selectOrder": "Order",
+  "sortLastUpdated": "Last updated",
+  "sortName": "Name",
+  "sortStars": "Stars"
 }

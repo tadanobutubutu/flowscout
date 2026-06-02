@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'home_screen.dart';
 import 'premium_widgets.dart';
+import 'job_log_screen.dart';
 
 class WorkflowDetailScreen extends ConsumerWidget {
   final String repoFullName;
@@ -102,6 +103,7 @@ class WorkflowDetailScreen extends ConsumerWidget {
           return ListView.builder(
             itemCount: runs.length,
             physics: const BouncingScrollPhysics(),
+            cacheExtent: 400,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             itemBuilder: (context, index) {
               final run = runs[index];
@@ -200,18 +202,44 @@ class WorkflowDetailScreen extends ConsumerWidget {
                                 children: jobs.map((job) {
                                   final jobMap = job;
                                   final jobName = jobMap['name'] as String? ?? 'Job';
+                                  final int jobId = jobMap['id'] as int? ?? 0;
                                   final steps = jobMap['steps'] as List<dynamic>? ?? [];
                                   return Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Semantics(
-                                        label: 'ジョブ名: $jobName',
-                                        child: Text(
-                                          'Job: $jobName',
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 14),
+                                      InkWell(
+                                        onTap: () {
+                                          Navigator.push<void>(
+                                            context,
+                                            MaterialPageRoute<void>(
+                                              builder: (context) => JobLogScreen(
+                                                repoFullName: repoFullName,
+                                                jobId: jobId,
+                                                jobName: jobName,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 4.0),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Semantics(
+                                                label: 'ジョブ名: $jobName',
+                                                child: Text(
+                                                  'Job: $jobName',
+                                                  style: const TextStyle(
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 14,
+                                                      color: Color(0xFF6366F1)),
+                                                ),
+                                              ),
+                                              const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: Colors.grey),
+                                            ],
+                                          ),
                                         ),
                                       ),
                                       const SizedBox(height: 8),
@@ -244,48 +272,64 @@ class WorkflowDetailScreen extends ConsumerWidget {
                                           stepIcon = Icons.close_rounded;
                                         }
 
-                                        return Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 12.0, bottom: 6.0),
-                                          child: Row(
-                                            children: [
-                                              Icon(stepIcon,
-                                                  color: stepColor, size: 16),
-                                              const SizedBox(width: 8),
-                                              Expanded(
-                                                child: Text(
-                                                  stepName,
-                                                  style: TextStyle(
-                                                    color: isStepFailure
-                                                        ? Colors.red
-                                                        : null,
-                                                    fontSize: 13,
-                                                  ),
+                                        return InkWell(
+                                          onTap: () {
+                                            Navigator.push<void>(
+                                              context,
+                                              MaterialPageRoute<void>(
+                                                builder: (context) => JobLogScreen(
+                                                  repoFullName: repoFullName,
+                                                  jobId: jobId,
+                                                  jobName: '$jobName - $stepName',
+                                                  highlightKeyword: stepName,
                                                 ),
                                               ),
-                                              if (isStepFailure)
-                                                Container(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 6,
-                                                      vertical: 2),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.red
-                                                        .withValues(alpha: 0.1),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            4),
-                                                  ),
-                                                  child: const Text(
-                                                    'Error Details',
+                                            );
+                                          },
+                                          borderRadius: BorderRadius.circular(6),
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 12.0, bottom: 6.0, top: 6.0),
+                                            child: Row(
+                                              children: [
+                                                Icon(stepIcon,
+                                                    color: stepColor, size: 16),
+                                                const SizedBox(width: 8),
+                                                Expanded(
+                                                  child: Text(
+                                                    stepName,
                                                     style: TextStyle(
-                                                        color: Colors.red,
-                                                        fontSize: 10,
-                                                        fontWeight:
-                                                            FontWeight.bold),
+                                                      color: isStepFailure
+                                                          ? Colors.red
+                                                          : null,
+                                                      fontSize: 13,
+                                                    ),
                                                   ),
                                                 ),
-                                            ],
+                                                if (isStepFailure)
+                                                  Container(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 6,
+                                                        vertical: 2),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.red
+                                                          .withValues(alpha: 0.1),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              4),
+                                                    ),
+                                                    child: const Text(
+                                                      'Error Details',
+                                                      style: TextStyle(
+                                                          color: Colors.red,
+                                                          fontSize: 10,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                  ),
+                                              ],
+                                            ),
                                           ),
                                         );
                                       }),

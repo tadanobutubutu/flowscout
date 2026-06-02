@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../localization/app_localizations.dart';
 import '../domain/github_service.dart';
 import '../../main.dart';
 import 'workflow_detail_screen.dart';
@@ -9,15 +11,54 @@ import 'premium_widgets.dart';
 
 final gitHubServiceProvider = Provider((ref) => GitHubService());
 
+enum RepositorySortOrder {
+  lastUpdated,
+  name,
+  stars,
+}
+
 // リポジトリ検索のクエリを管理するStateProvider
 final searchQueryProvider = StateProvider<String>((ref) => '');
+
+// 並び替え順を管理するStateProvider
+final repositorySortOrderProvider =
+    StateProvider<RepositorySortOrder>((ref) => RepositorySortOrder.lastUpdated);
 
 // リポジトリ一覧を取得するFutureProvider
 final repositoriesProvider =
     FutureProvider<List<Map<String, dynamic>>>((ref) async {
   final service = ref.watch(gitHubServiceProvider);
   final query = ref.watch(searchQueryProvider);
-  return service.searchRepositories(query: query);
+  final sortOrder = ref.watch(repositorySortOrderProvider);
+
+  final repos = await service.searchRepositories(query: query);
+
+  // クライアント側で並び替えを適用
+  switch (sortOrder) {
+    case RepositorySortOrder.lastUpdated:
+      repos.sort((a, b) {
+        final aTime = a['updated_at'] as String? ?? '';
+        final bTime = b['updated_at'] as String? ?? '';
+        return bTime.compareTo(aTime); // 最新順
+      });
+      break;
+    case RepositorySortOrder.name:
+      repos.sort((a, b) {
+        final aName = a['name'] as String? ?? '';
+        final bName = b['name'] as String? ?? '';
+        return aName.toLowerCase().compareTo(bName.toLowerCase()); // アルファベット順
+      });
+      break;
+    case RepositorySortOrder.stars:
+      repos.sort((a, b) {
+        final aStars = a['stargazers_count'] as int? ?? 0;
+        final bStars = b['stargazers_count'] as int? ?? 0;
+        return bStars.compareTo(aStars); // スター数順
+      });
+      break;
+  }
+
+  return repos;
 });
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -141,6 +182,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+          statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text(
@@ -222,12 +268,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            Text(
-              'マイリポジトリ',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(fontSize: 18),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'マイリポジトリ',
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium
+                      ?.copyWith(fontSize: 18),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.sort_rounded, color: Color(0xFF6366F1)),
+                  tooltip: '並び替え',
+                  onPressed: () => _showSortOrderBottomSheet(context),
+                ),
+              ],
             ),
             const SizedBox(height: 10),
             Expanded(
@@ -250,6 +306,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   return ListView.builder(
                     itemCount: repos.length,
                     physics: const BouncingScrollPhysics(),
+                    cacheExtent: 400,
                     itemBuilder: (context, index) {
                       final repo = repos[index];
                       final isPrivate = repo['private'] as bool? ?? false;
@@ -288,8 +345,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     child: Row(
                                       children: [
                                         CircleAvatar(
-                                          backgroundImage:
-                                              NetworkImage(avatarUrl),
+                                          backgroundImage: ResizeImage(
+                                            NetworkImage(avatarUrl),
+                                            width: 80,
+                                            height: 80,
+                                          ),
                                           radius: 20,
                                         ),
                                         Expanded(
@@ -452,6 +512,136 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     semanticsLabel: 'エラーが発生しました: $error',
                   ),
                 ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showSortOrderBottomSheet(BuildContext context) {
+    final currentOrder = ref.read(repositorySortOrderProvider);
+    final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: isDark ? const Color(0xFF0F0F12) : Colors.white, // フラットで洗練された黒/白
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // ヘッダー部分
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 16, 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      l10n.selectOrder,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Outfit',
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Icon(
+                        Icons.close_rounded,
+                        color: isDark ? const Color(0xFF71717A) : Colors.black54,
+                        size: 20,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                height: 0.5,
+                color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+              ),
+              // オプションリスト
+              _buildSortOption(
+                context: context,
+                label: l10n.sortLastUpdated,
+                order: RepositorySortOrder.lastUpdated,
+                isSelected: currentOrder == RepositorySortOrder.lastUpdated,
+              ),
+              _buildSortOption(
+                context: context,
+                label: l10n.sortName,
+                order: RepositorySortOrder.name,
+                isSelected: currentOrder == RepositorySortOrder.name,
+              ),
+              _buildSortOption(
+                context: context,
+                label: l10n.sortStars,
+                order: RepositorySortOrder.stars,
+                isSelected: currentOrder == RepositorySortOrder.stars,
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSortOption({
+    required BuildContext context,
+    required String label,
+    required RepositorySortOrder order,
+    required bool isSelected,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return InkWell(
+      onTap: () {
+        ref.read(repositorySortOrderProvider.notifier).state = order;
+        Navigator.pop(context);
+      },
+      child: Container(
+        width: double.maxFinite,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? (isDark ? Colors.white.withValues(alpha: 0.02) : Colors.black.withValues(alpha: 0.01))
+              : Colors.transparent,
+          border: Border(
+            bottom: BorderSide(
+              color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+              width: 0.5,
+            ),
+          ),
+        ),
+        child: Row(
+          children: [
+            // シンプルで洗練されたチェックマーク
+            SizedBox(
+              width: 24,
+              child: isSelected
+                  ? Icon(
+                      Icons.check_rounded,
+                      color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      size: 20,
+                    )
+                  : null,
+            ),
+            const SizedBox(width: 12),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                color: isSelected
+                    ? (isDark ? Colors.white : const Color(0xFF0F172A))
+                    : (isDark ? const Color(0xFF71717A) : const Color(0xFF64748B)),
+                fontFamily: 'Outfit',
               ),
             ),
           ],

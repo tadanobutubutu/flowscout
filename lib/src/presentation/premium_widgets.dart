@@ -160,9 +160,11 @@ class _PremiumSpringButtonState extends State<PremiumSpringButton> with SingleTi
           onTapUp: (details) => _handleTapUp(details, ref),
           onTapCancel: () => _handleTapCancel(ref),
           behavior: HitTestBehavior.opaque,
-          child: ScaleTransition(
-            scale: _scaleAnimation,
-            child: widget.child,
+          child: RepaintBoundary(
+            child: ScaleTransition(
+              scale: _scaleAnimation,
+              child: widget.child,
+            ),
           ),
         );
       },
@@ -188,20 +190,23 @@ class PremiumShimmerContainer extends StatefulWidget {
 }
 
 class _PremiumShimmerContainerState extends State<PremiumShimmerContainer> with SingleTickerProviderStateMixin {
-  late AnimationController _shimmerController;
+  AnimationController? _shimmerController;
 
-  @override
-  void initState() {
-    super.initState();
-    _shimmerController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1500),
-    )..repeat();
+  void _initControllerIfNeeded(bool enabled) {
+    if (enabled && _shimmerController == null) {
+      _shimmerController = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 1500),
+      )..repeat();
+    } else if (!enabled && _shimmerController != null) {
+      _shimmerController!.dispose();
+      _shimmerController = null;
+    }
   }
 
   @override
   void dispose() {
-    _shimmerController.dispose();
+    _shimmerController?.dispose();
     super.dispose();
   }
 
@@ -215,9 +220,12 @@ class _PremiumShimmerContainerState extends State<PremiumShimmerContainer> with 
       builder: (context, ref, child) {
         final isLowSpec = ref.watch(lowSpecModeProvider);
         final shimmerEnabled = ref.watch(shimmerLoadingEnabledProvider);
+        final shouldAnimate = !isLowSpec && shimmerEnabled;
 
-        // 低スペックまたはシマー無効時はアニメーションなしのフラットなスケルトンを表示
-        if (isLowSpec || !shimmerEnabled) {
+        _initControllerIfNeeded(shouldAnimate);
+
+        // 低スペックまたはシマー無効時はアニメーションなしのフラットなスケルトンを表示 (コントローラーは完全停止)
+        if (!shouldAnimate || _shimmerController == null) {
           return Container(
             width: widget.width,
             height: widget.height,
@@ -230,38 +238,40 @@ class _PremiumShimmerContainerState extends State<PremiumShimmerContainer> with 
 
         // アニメーション速度をカスタム速度設定から同期
         final speedMs = ref.watch(shimmerSpeedMsProvider);
-        if (_shimmerController.duration?.inMilliseconds != speedMs) {
-          _shimmerController.duration = Duration(milliseconds: speedMs);
-          if (!_shimmerController.isAnimating) {
-            _shimmerController.repeat();
+        if (_shimmerController!.duration?.inMilliseconds != speedMs) {
+          _shimmerController!.duration = Duration(milliseconds: speedMs);
+          if (!_shimmerController!.isAnimating) {
+            _shimmerController!.repeat();
           }
         }
 
-        return AnimatedBuilder(
-          animation: _shimmerController,
-          builder: (context, child) {
-            return Container(
-              width: widget.width,
-              height: widget.height,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(widget.borderRadius),
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    baseColor,
-                    highlightColor,
-                    baseColor,
-                  ],
-                  stops: [
-                    _shimmerController.value - 0.3,
-                    _shimmerController.value,
-                    _shimmerController.value + 0.3,
-                  ],
+        return RepaintBoundary(
+          child: AnimatedBuilder(
+            animation: _shimmerController!,
+            builder: (context, child) {
+              return Container(
+                width: widget.width,
+                height: widget.height,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(widget.borderRadius),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      baseColor,
+                      highlightColor,
+                      baseColor,
+                    ],
+                    stops: [
+                      _shimmerController!.value - 0.3,
+                      _shimmerController!.value,
+                      _shimmerController!.value + 0.3,
+                    ],
+                  ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         );
       },
     );

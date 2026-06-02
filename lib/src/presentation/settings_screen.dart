@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'premium_widgets.dart';
+import 'login_screen.dart';
+import 'home_screen.dart';
 
 // アップデート通知設定を保持するStateProvider
 final updateNotifyEnabledProvider = StateProvider<bool>((ref) => true);
@@ -16,11 +18,19 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final notifyEnabled = ref.watch(updateNotifyEnabledProvider);
     final isLowSpec = ref.watch(lowSpecModeProvider);
-    final showAdvanced = ref.watch(showAdvancedSettingsProvider);
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Theme.of(context).brightness == Brightness.dark
+              ? Brightness.light
+              : Brightness.dark,
+          statusBarBrightness: Theme.of(context).brightness == Brightness.dark
+              ? Brightness.dark
+              : Brightness.light,
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: const Text('詳細設定', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -42,7 +52,7 @@ class SettingsScreen extends ConsumerWidget {
               ref.read(lowSpecModeProvider.notifier).state = value;
             },
           ),
-          
+
           if (!isLowSpec) ...[
             const Divider(indent: 16, endIndent: 16),
             // スプリングアニメーション（基本項目: ON/OFF）
@@ -104,124 +114,27 @@ class SettingsScreen extends ConsumerWidget {
           // アドバンスド・プロパティ (高度な設定) ── トグルによる開閉
           // --------------------------------------------------
           if (!isLowSpec) ...[
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              child: Card(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? const Color(0xFF131B2E)
-                    : const Color(0xFFF1F5F9),
-                child: ExpansionTile(
-                  shape: const Border(),
-                  title: const Text(
-                    '⚙️ 高度な微調整（アドバンス項目）',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                      color: Color(0xFF6366F1),
-                    ),
-                  ),
-                  subtitle: const Text('スライダーや詳細パラメータによる挙動調整を行います。'),
-                  children: [
-                    const Divider(height: 1),
-                    // アニメーション縮小率スライダー
-                    if (ref.watch(springAnimationEnabledProvider))
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text('タップ時の縮小率', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                                Text('${(ref.watch(springScaleFactorProvider) * 100).toInt()}%', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF6366F1))),
-                              ],
-                            ),
-                            Slider(
-                              value: ref.watch(springScaleFactorProvider),
-                              min: 0.90,
-                              max: 0.98,
-                              divisions: 8,
-                              activeColor: const Color(0xFF6366F1),
-                              onChanged: (value) {
-                                ref.read(springScaleFactorProvider.notifier).state = value;
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    
-                    // シマースピードスライダー
-                    if (ref.watch(shimmerLoadingEnabledProvider))
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text('シマーアニメーション速度', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                                Text('${ref.watch(shimmerSpeedMsProvider)} ms', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF6366F1))),
-                              ],
-                            ),
-                            Slider(
-                              value: ref.watch(shimmerSpeedMsProvider).toDouble(),
-                              min: 800,
-                              max: 2500,
-                              divisions: 17,
-                              activeColor: const Color(0xFF6366F1),
-                              onChanged: (value) {
-                                ref.read(shimmerSpeedMsProvider.notifier).state = value.toInt();
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    
-                    // ハプティクス強度詳細ドロップダウン
-                    if (ref.watch(hapticFeedbackProvider))
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text('バイブレーション強度', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                            DropdownButton<HapticStrength>(
-                              value: ref.watch(hapticStrengthProvider),
-                              dropdownColor: Theme.of(context).cardColor,
-                              onChanged: (strength) {
-                                if (strength != null) {
-                                  ref.read(hapticStrengthProvider.notifier).state = strength;
-                                  switch (strength) {
-                                    case HapticStrength.light:
-                                      HapticFeedback.lightImpact();
-                                      break;
-                                    case HapticStrength.medium:
-                                      HapticFeedback.mediumImpact();
-                                      break;
-                                    case HapticStrength.heavy:
-                                      HapticFeedback.heavyImpact();
-                                      break;
-                                    case HapticStrength.selection:
-                                      HapticFeedback.selectionClick();
-                                      break;
-                                  }
-                                }
-                              },
-                              items: const [
-                                DropdownMenuItem(value: HapticStrength.light, child: Text('Light (繊細)')),
-                                DropdownMenuItem(value: HapticStrength.medium, child: Text('Medium (通常)')),
-                                DropdownMenuItem(value: HapticStrength.heavy, child: Text('Heavy (強力)')),
-                                DropdownMenuItem(value: HapticStrength.selection, child: Text('Selection (クリック感)')),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                  ],
+            ExpansionTile(
+              shape: const Border(),
+              title: const Text(
+                '高度な微調整',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
               ),
+              subtitle: const Text('各演出の詳細パラメータを調整します。'),
+              children: [
+                const Divider(height: 1),
+                // アニメーション縮小率スライダー
+                _SpringScaleSlider(),
+                const Divider(height: 1, indent: 16, endIndent: 16),
+                // シマースピードスライダー
+                _ShimmerSpeedSlider(),
+                const Divider(height: 1, indent: 16, endIndent: 16),
+                // ハプティクス強度詳細ドロップダウン
+                _HapticStrengthDropdown(),
+              ],
             ),
             const Divider(),
           ],
@@ -240,55 +153,13 @@ class SettingsScreen extends ConsumerWidget {
               ref.read(updateNotifyEnabledProvider.notifier).state = value;
             },
           ),
-          
+
           const Divider(),
           // --------------------------------------------------
           // セクション：GitHub 連携
           // --------------------------------------------------
           _buildSectionHeader(context, 'GitHub 連携'),
-          Semantics(
-            button: true,
-            label: 'GitHub接続解除ボタン',
-            child: ListTile(
-              leading: const Icon(Icons.account_circle_outlined, size: 28),
-              title: const Text('GitHub 接続解除'),
-              subtitle: const Text('現在のアカウントとの連携を解除し、ログアウトします。'),
-              trailing: const Icon(Icons.chevron_right_rounded),
-              onTap: () {
-                showDialog<void>(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text('連携を解除しますか？'),
-                    content: const Text('接続を解除すると、リポジトリやCI/CDの実行状況が見られなくなります。'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text('キャンセル'),
-                      ),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red),
-                        onPressed: () {
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Semantics(
-                                liveRegion: true,
-                                label: 'GitHubとの連携を解除しました',
-                                child: const Text('GitHubとの連携を解除しました。'),
-                              ),
-                            ),
-                          );
-                        },
-                        child: const Text('解除',
-                            style: TextStyle(color: Colors.white)),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
+          const _GitHubAccountTile(),
           const Divider(),
           _buildSectionHeader(context, 'このアプリについて'),
           const ListTile(
@@ -318,6 +189,310 @@ class SettingsScreen extends ConsumerWidget {
           fontSize: 14,
         ),
       ),
+    );
+  }
+}
+
+// ── アドバンス設定の各ウィジェットをクラスに分離 ──
+
+class _SpringScaleSlider extends ConsumerWidget {
+  const _SpringScaleSlider();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isEnabled = ref.watch(springAnimationEnabledProvider);
+    return IgnorePointer(
+      ignoring: !isEnabled,
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 250),
+        opacity: isEnabled ? 1.0 : 0.4,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      isEnabled
+                          ? 'タップ時の縮小率'
+                          : 'タップ時の縮小率 (上のスイッチを有効にすると調整可能)',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: isEnabled ? null : Theme.of(context).disabledColor,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${(ref.watch(springScaleFactorProvider) * 100).toInt()}%',
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                        color: Color(0xFF6366F1)),
+                  ),
+                ],
+              ),
+              Slider(
+                value: ref.watch(springScaleFactorProvider),
+                min: 0.90,
+                max: 0.98,
+                divisions: 8,
+                activeColor: const Color(0xFF6366F1),
+                onChanged: (value) {
+                  ref.read(springScaleFactorProvider.notifier).state = value;
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ShimmerSpeedSlider extends ConsumerWidget {
+  const _ShimmerSpeedSlider();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isEnabled = ref.watch(shimmerLoadingEnabledProvider);
+    return IgnorePointer(
+      ignoring: !isEnabled,
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 250),
+        opacity: isEnabled ? 1.0 : 0.4,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      isEnabled
+                          ? 'シマーアニメーション速度'
+                          : 'シマーアニメーション速度 (上のスイッチを有効にすると調整可能)',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: isEnabled ? null : Theme.of(context).disabledColor,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${ref.watch(shimmerSpeedMsProvider)} ms',
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                        color: Color(0xFF6366F1)),
+                  ),
+                ],
+              ),
+              Slider(
+                value: ref.watch(shimmerSpeedMsProvider).toDouble(),
+                min: 800,
+                max: 2500,
+                divisions: 17,
+                activeColor: const Color(0xFF6366F1),
+                onChanged: (value) {
+                  ref.read(shimmerSpeedMsProvider.notifier).state = value.toInt();
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _HapticStrengthDropdown extends ConsumerWidget {
+  const _HapticStrengthDropdown();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isEnabled = ref.watch(hapticFeedbackProvider);
+    return IgnorePointer(
+      ignoring: !isEnabled,
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 250),
+        opacity: isEnabled ? 1.0 : 0.4,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  isEnabled
+                      ? 'バイブレーション強度'
+                      : 'バイブレーション強度 (上のスイッチを有効にすると調整可能)',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: isEnabled ? null : Theme.of(context).disabledColor,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              DropdownButton<HapticStrength>(
+                value: ref.watch(hapticStrengthProvider),
+                dropdownColor: Theme.of(context).cardColor,
+                onChanged: isEnabled
+                    ? (strength) {
+                        if (strength != null) {
+                          ref.read(hapticStrengthProvider.notifier).state =
+                              strength;
+                          switch (strength) {
+                            case HapticStrength.light:
+                              HapticFeedback.lightImpact();
+                            case HapticStrength.medium:
+                              HapticFeedback.mediumImpact();
+                            case HapticStrength.heavy:
+                              HapticFeedback.heavyImpact();
+                            case HapticStrength.selection:
+                              HapticFeedback.selectionClick();
+                          }
+                        }
+                      }
+                    : null,
+                items: const [
+                  DropdownMenuItem(
+                      value: HapticStrength.light,
+                      child: Text('Light (繊細)')),
+                  DropdownMenuItem(
+                      value: HapticStrength.medium,
+                      child: Text('Medium (通常)')),
+                  DropdownMenuItem(
+                      value: HapticStrength.heavy,
+                      child: Text('Heavy (強力)')),
+                  DropdownMenuItem(
+                      value: HapticStrength.selection,
+                      child: Text('Selection (クリック感)')),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// GitHubアカウント表示 & 接続解除タイル
+class _GitHubAccountTile extends ConsumerWidget {
+  const _GitHubAccountTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userInfo = ref.watch(loggedInUserProvider);
+    final service = ref.read(gitHubServiceProvider);
+
+    final login = userInfo?['login'] as String? ?? '';
+    final name = userInfo?['name'] as String? ?? '';
+    final avatarUrl = userInfo?['avatar_url'] as String? ?? '';
+
+    return Column(
+      children: [
+        // ユーザー情報表示
+        if (login.isNotEmpty)
+          ListTile(
+            leading: CircleAvatar(
+              radius: 22,
+              backgroundImage:
+                  avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+              child: avatarUrl.isEmpty
+                  ? const Icon(Icons.person_rounded)
+                  : null,
+            ),
+            title: Text(
+              name.isNotEmpty ? name : login,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            subtitle: Text('@$login'),
+            trailing: Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: const Color(0xFF10B981).withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.circle, color: Color(0xFF10B981), size: 8),
+                  SizedBox(width: 4),
+                  Text(
+                    '接続中',
+                    style: TextStyle(
+                      color: Color(0xFF10B981),
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        // 接続解除ボタン
+        Semantics(
+          button: true,
+          label: 'GitHub接続解除ボタン',
+          child: ListTile(
+            leading: const Icon(Icons.logout_rounded,
+                color: Color(0xFFEF4444), size: 26),
+            title: const Text(
+              'GitHub 接続解除',
+              style: TextStyle(color: Color(0xFFEF4444)),
+            ),
+            subtitle: const Text('現在のアカウントとの連携を解除し、ログアウトします。'),
+            onTap: () {
+              showDialog<void>(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: const Text('連携を解除しますか？'),
+                  content: const Text(
+                    '接続を解除すると、リポジトリやCI/CDの実行状況が見られなくなります。',
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: const Text('キャンセル'),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFEF4444)),
+                      onPressed: () async {
+                        Navigator.pop(ctx);
+                        await service.deleteToken();
+                        ref.read(isLoggedInProvider.notifier).state = false;
+                        ref.read(loggedInUserProvider.notifier).state = null;
+                        if (context.mounted) {
+                          Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute<void>(
+                              builder: (_) => const LoginScreen(),
+                            ),
+                            (route) => false,
+                          );
+                        }
+                      },
+                      child: const Text('解除',
+                          style: TextStyle(color: Colors.white)),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
