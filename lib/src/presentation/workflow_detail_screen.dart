@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'home_screen.dart';
+import 'premium_widgets.dart';
 
 class WorkflowDetailScreen extends ConsumerWidget {
   final String repoFullName;
@@ -30,12 +31,44 @@ class WorkflowDetailScreen extends ConsumerWidget {
         future: service.getWorkflowRuns(repoFullName),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: Semantics(
-                liveRegion: true,
-                label: 'ワークフロー一覧をロード中',
-                child:
-                    const CircularProgressIndicator(color: Color(0xFF6366F1)),
+            final isDark = Theme.of(context).brightness == Brightness.dark;
+            return ListView.builder(
+              itemCount: 4,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              physics: const NeverScrollableScrollPhysics(),
+              itemBuilder: (context, index) => Container(
+                margin: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardTheme.color,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    const PremiumShimmerContainer(width: 30, height: 30, borderRadius: 15),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          PremiumShimmerContainer(
+                            width: MediaQuery.of(context).size.width * 0.5,
+                            height: 15,
+                          ),
+                          const SizedBox(height: 8),
+                          PremiumShimmerContainer(
+                            width: MediaQuery.of(context).size.width * 0.3,
+                            height: 12,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             );
           }

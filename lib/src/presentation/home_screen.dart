@@ -5,6 +5,7 @@ import '../domain/github_service.dart';
 import '../../main.dart';
 import 'workflow_detail_screen.dart';
 import 'settings_screen.dart';
+import 'premium_widgets.dart';
 
 final gitHubServiceProvider = Provider((ref) => GitHubService());
 
@@ -263,131 +264,186 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         hint: 'ダブルタップしてワークフロー実行状況を表示します',
                         child: Container(
                           margin: const EdgeInsets.only(bottom: 12),
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.push<void>(
-                                context,
-                                MaterialPageRoute<void>(
-                                  builder: (context) => WorkflowDetailScreen(
-                                    repoFullName: repoFullName,
-                                    repoName: repoName,
+                          child: Consumer(
+                            builder: (context, ref, child) {
+                              final isLowSpec = ref.watch(lowSpecModeProvider);
+                              final animationEnabled = ref.watch(listEntranceAnimationEnabledProvider);
+                              
+                              final innerCard = PremiumSpringButton(
+                                onTap: () {
+                                  Navigator.push<void>(
+                                    context,
+                                    MaterialPageRoute<void>(
+                                      builder: (context) => WorkflowDetailScreen(
+                                        repoFullName: repoFullName,
+                                        repoName: repoName,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Card(
+                                  margin: EdgeInsets.zero,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Row(
+                                      children: [
+                                        CircleAvatar(
+                                          backgroundImage:
+                                              NetworkImage(avatarUrl),
+                                          radius: 20,
+                                        ),
+                                        Expanded(
+                                          child: Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 16.0),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: Text(
+                                                        repoName,
+                                                        style: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 16,
+                                                        ),
+                                                        overflow:
+                                                            TextOverflow.ellipsis,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 8),
+                                                    Container(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 8,
+                                                          vertical: 4),
+                                                      decoration: BoxDecoration(
+                                                        color: isPrivate
+                                                            ? const Color(
+                                                                    0xFFEF4444)
+                                                                .withValues(
+                                                                    alpha: 0.1)
+                                                            : const Color(
+                                                                    0xFF10B981)
+                                                                .withValues(
+                                                                    alpha: 0.1),
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                                8),
+                                                      ),
+                                                      child: Text(
+                                                        isPrivate
+                                                            ? 'Private'
+                                                            : 'Public',
+                                                        style: TextStyle(
+                                                          color: isPrivate
+                                                              ? const Color(
+                                                                  0xFFEF4444)
+                                                              : const Color(
+                                                                  0xFF10B981),
+                                                          fontSize: 11,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  description,
+                                                  style: TextStyle(
+                                                    color: Theme.of(context)
+                                                        .hintColor,
+                                                    fontSize: 13,
+                                                  ),
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        const Padding(
+                                          padding:
+                                              EdgeInsets.only(left: 8.0),
+                                          child: ExcludeSemantics(
+                                            child: Icon(
+                                                Icons.chevron_right_rounded),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               );
+
+                              if (isLowSpec || !animationEnabled) {
+                                return innerCard;
+                              }
+
+                              return TweenAnimationBuilder<double>(
+                                tween: Tween<double>(begin: 0.0, end: 1.0),
+                                duration: Duration(milliseconds: 250 + (index * 30).clamp(0, 150)),
+                                curve: Curves.easeOutCubic,
+                                builder: (context, value, child) {
+                                  return Opacity(
+                                    opacity: value,
+                                    child: Transform.translate(
+                                      offset: Offset(0.0, 20.0 * (1.0 - value)),
+                                      child: child,
+                                    ),
+                                  );
+                                },
+                                child: innerCard,
+                              );
                             },
-                            borderRadius: BorderRadius.circular(16),
-                            child: ExcludeSemantics(
-                              child: Card(
-                                margin: EdgeInsets.zero,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: Row(
-                                    children: [
-                                      CircleAvatar(
-                                        backgroundImage:
-                                            NetworkImage(avatarUrl),
-                                        radius: 20,
-                                      ),
-                                      Expanded(
-                                        child: Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 16.0),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: Text(
-                                                      repoName,
-                                                      style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 16,
-                                                      ),
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(width: 8),
-                                                  Container(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 8,
-                                                        vertical: 4),
-                                                    decoration: BoxDecoration(
-                                                      color: isPrivate
-                                                          ? const Color(
-                                                                  0xFFEF4444)
-                                                              .withValues(
-                                                                  alpha: 0.1)
-                                                          : const Color(
-                                                                  0xFF10B981)
-                                                              .withValues(
-                                                                  alpha: 0.1),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              8),
-                                                    ),
-                                                    child: Text(
-                                                      isPrivate
-                                                          ? 'Private'
-                                                          : 'Public',
-                                                      style: TextStyle(
-                                                        color: isPrivate
-                                                            ? const Color(
-                                                                0xFFEF4444)
-                                                            : const Color(
-                                                                0xFF10B981),
-                                                        fontSize: 11,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              const SizedBox(height: 4),
-                                              Text(
-                                                description,
-                                                style: TextStyle(
-                                                  color: Theme.of(context)
-                                                      .hintColor,
-                                                  fontSize: 13,
-                                                ),
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      const Padding(
-                                        padding:
-                                            EdgeInsets.only(left: 8.0),
-                                        child: ExcludeSemantics(
-                                          child: Icon(
-                                              Icons.chevron_right_rounded),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
                           ),
                         ),
                       );
                     },
                   );
                 },
-                loading: () => Center(
-                  child: Semantics(
-                    liveRegion: true,
-                    label: 'リポジトリ一覧をロード中',
-                    child: const CircularProgressIndicator(
-                        color: Color(0xFF6366F1)),
+                loading: () => ListView.builder(
+                  itemCount: 5,
+                  padding: EdgeInsets.zero,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, index) => Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardTheme.color,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0),
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        const PremiumShimmerContainer(width: 40, height: 40, borderRadius: 20),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              PremiumShimmerContainer(
+                                width: MediaQuery.of(context).size.width * 0.4,
+                                height: 16,
+                              ),
+                              const SizedBox(height: 8),
+                              PremiumShimmerContainer(
+                                width: MediaQuery.of(context).size.width * 0.6,
+                                height: 12,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 error: (error, stack) => Center(
