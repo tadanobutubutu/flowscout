@@ -492,11 +492,16 @@ class _GitHubAccountTile extends ConsumerWidget {
           children: users.map((username) {
             final isActive = username == activeUserAsync.value;
             return ListTile(
-              leading: const CircleAvatar(
-                child: Icon(Icons.person_rounded),
+              leading: CircleAvatar(
+                radius: 20,
+                backgroundImage: NetworkImage(
+                  'https://github.com/$username.png?size=80',
+                ),
+                onBackgroundImageError: (_, __) {},
+                child: null,
               ),
               title: Text(
-                username,
+                '@$username',
                 style: TextStyle(
                   fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
                 ),

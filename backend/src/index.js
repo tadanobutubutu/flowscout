@@ -4,7 +4,8 @@ export default {
 
     // 1. OAuthログイン開始エンドポイント
     if (url.pathname === '/login') {
-      const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${env.GITHUB_CLIENT_ID}&scope=repo,read:org`;
+      const redirectUri = `https://flowscout-oauth.tadanobutubutu.workers.dev/callback`;
+      const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${env.GITHUB_CLIENT_ID}&scope=repo,read:org&redirect_uri=${encodeURIComponent(redirectUri)}`;
       return Response.redirect(githubAuthUrl, 302);
     }
 

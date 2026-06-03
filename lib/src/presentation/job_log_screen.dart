@@ -64,11 +64,15 @@ class _JobLogScreenState extends ConsumerState<JobLogScreen> {
         _isLoading = false;
       });
 
-      // エラーキーワード指定がある場合は自動で検索を走らせる
+      // キーワード指定がある場合は自動で該当箇所に飛ぶ
       if (widget.highlightKeyword != null) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          _searchController.text = widget.highlightKeyword!;
-          _performSearch(widget.highlightKeyword!);
+          _autoJumpToRelevantLine(widget.highlightKeyword!);
+        });
+      } else {
+        // キーワード未指定でも、エラーがあれば自動で最初のエラー行へ飛ぶ
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _autoJumpToFirstError();
         });
       }
     } else {
@@ -77,6 +81,27 @@ class _JobLogScreenState extends ConsumerState<JobLogScreen> {
         _errorMessage = 'ログの取得に失敗しました。時間をおいて再度お試しください。';
       });
     }
+  }
+
+  // エラー行を優先検出して自動ジャンプ
+  void _autoJumpToFirstError() {
+    if (!_scrollController.hasClients) return;
+    for (int i = 0; i < _logLines.length; i++) {
+      final line = _logLines[i].toLowerCase();
+      if (line.contains('##[error]') || line.contains('error:') || 
+          (line.contains('error') && !line.contains('no error'))) {
+        _scrollToLine(i);
+        return;
+      }
+    }
+    // エラーなければ先頭
+    _scrollController.jumpTo(0);
+  }
+
+  // キーワードに対してエラー→スキップ→成功の優先順でジャンプ
+  void _autoJumpToRelevantLine(String keyword) {
+    _searchController.text = keyword;
+    _performSearch(keyword);
   }
 
   // 検索処理 (ステップ開始グループ等を優先検出するスマートサーチ)

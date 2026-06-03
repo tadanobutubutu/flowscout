@@ -165,17 +165,20 @@ class WorkflowDetailScreen extends ConsumerWidget {
                           const SizedBox(height: 4),
                           Row(
                             children: [
-                              const Text('Triggered by: '),
+                              const Text('Triggered by: ', style: TextStyle(fontSize: 12)),
                               if (run['actor_avatar_url'] != null && (run['actor_avatar_url'] as String).isNotEmpty) ...[
                                 CircleAvatar(
-                                  radius: 8,
+                                  radius: 7,
                                   backgroundImage: NetworkImage(run['actor_avatar_url'] as String),
                                 ),
                                 const SizedBox(width: 4),
                               ],
-                              Text(
-                                '@${run['actor_login']}',
-                                style: const TextStyle(fontWeight: FontWeight.bold),
+                              Flexible(
+                                child: Text(
+                                  '@${run['actor_login']}',
+                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                             ],
                           ),
@@ -291,6 +294,9 @@ class WorkflowDetailScreen extends ConsumerWidget {
 
                                         return InkWell(
                                           onTap: () {
+                                            final keyword = isStepFailure
+                                                ? '##[error]'
+                                                : stepName;
                                             Navigator.push<void>(
                                               context,
                                               MaterialPageRoute<void>(
@@ -298,7 +304,7 @@ class WorkflowDetailScreen extends ConsumerWidget {
                                                   repoFullName: repoFullName,
                                                   jobId: jobId,
                                                   jobName: '$jobName - $stepName',
-                                                  highlightKeyword: stepName,
+                                                  highlightKeyword: keyword,
                                                 ),
                                               ),
                                             );
