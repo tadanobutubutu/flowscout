@@ -105,8 +105,11 @@ GoogleService-Info*.plist
 .vscode/tasks.json
 .vscode/settings.json
 .vscode/chrome-devtools.json
-.AppleDouble
-.LSOverride
 Icon
 
 
+
+# Screenshots
+*screenshot*.png
+*screenshot*.jpg
+*screenshot*.jpeg

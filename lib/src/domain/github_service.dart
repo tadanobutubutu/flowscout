@@ -245,13 +245,6 @@ class GitHubService {
     // ソートして返す
     allRepos.sort((a, b) => (b['updated_at'] as String).compareTo(a['updated_at'] as String));
     return allRepos;
-
-
-
-    } catch (e) {
-      debugPrint('Error searching repos (fallback): $e');
-    }
-    return [];
   }
 
   // 3. 直コミットやPRで走ったワークフローラン (Workflow Runs) の一覧取得
@@ -348,12 +341,41 @@ class GitHubService {
   // 5. ジョブのログを取得する (エラーログ詳細の特定用)
   Future<String?> getJobLog(String repoFullName, int jobId) async {
     final headers = await _getHeaders();
-    final url = Uri.parse('https://api.github.com/repos/$repoFullName/actions/jobs/$jobId/logs');
+    final url = Uri.parse(
+        'https://api.github.com/repos/$repoFullName/actions/jobs/$jobId/logs');
 
     try {
-      final response = await http.get(url, headers: headers);
-      if (response.statusCode == 200) {
-        return response.body;
+      // GitHub API は /logs に対して 302 リダイレクトを返す（S3 署名付きURL）
+      // http.Client を使って手動でリダイレクトを追跡する
+      final client = http.Client();
+      try {
+        final request = http.Request('GET', url)
+          ..followRedirects = false
+          ..headers.addAll(headers);
+
+        final streamedResponse = await client.send(request);
+
+        if (streamedResponse.statusCode == 302 ||
+            streamedResponse.statusCode == 301) {
+          final redirectUrl = streamedResponse.headers['location'];
+          if (redirectUrl != null) {
+            // リダイレクト先（S3）へ追加認証なしでリクエスト
+            final redirectResponse =
+                await http.get(Uri.parse(redirectUrl));
+            if (redirectResponse.statusCode == 200) {
+              return redirectResponse.body;
+            }
+            debugPrint(
+                'Error fetching log from redirect: ${redirectResponse.statusCode}');
+          }
+        } else if (streamedResponse.statusCode == 200) {
+          return await streamedResponse.stream.bytesToString();
+        } else {
+          debugPrint(
+              'Unexpected status fetching job log: ${streamedResponse.statusCode}');
+        }
+      } finally {
+        client.close();
       }
     } catch (e) {
       debugPrint('Error fetching job log: $e');
