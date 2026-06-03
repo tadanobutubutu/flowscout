@@ -13,6 +13,12 @@ final updateNotifyEnabledProvider = StateProvider<bool>((ref) => true);
 // 「高度な設定（アドバンス項目）」の表示状態を管理するStateProvider
 final showAdvancedSettingsProvider = StateProvider<bool>((ref) => false);
 
+// アクティブユーザー名を監視するProvider
+final activeUserProvider = FutureProvider<String?>((ref) async {
+  final service = ref.watch(gitHubServiceProvider);
+  return await service.getActiveUser();
+});
+
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
@@ -194,6 +200,25 @@ class SettingsScreen extends ConsumerWidget {
           // --------------------------------------------------
           _buildSectionHeader(context, 'GitHub 連携'),
           const _GitHubAccountTile(),
+
+          ListTile(
+            leading: const Icon(Icons.add_circle_outline_rounded, color: Color(0xFF6366F1)),
+            title: const Text('新しいアカウントを追加'),
+            subtitle: const Text(
+              '別のGitHubアカウントを接続します。\n※ブラウザ側で追加したいアカウントに事前ログインしておくとスムーズです。',
+              style: TextStyle(fontSize: 12),
+            ),
+            trailing: const Icon(Icons.open_in_new_rounded),
+            onTap: () async {
+              final url = Uri.parse('https://flowscout-oauth.tadanobutubutu.workers.dev/login');
+              try {
+                await launchUrl(url, mode: LaunchMode.externalApplication);
+              } catch (e) {
+                debugPrint('Error launching url: $e');
+              }
+            },
+          ),
+          const Divider(),
 
           ListTile(
             leading: const Icon(Icons.person_add_alt_1_rounded, color: Color(0xFF6366F1)),
@@ -443,68 +468,132 @@ class _HapticStrengthDropdown extends ConsumerWidget {
   }
 }
 
-/// GitHubアカウント表示タイル
+/// GitHubアカウント表示タイル (マルチアカウント対応)
 class _GitHubAccountTile extends ConsumerWidget {
   const _GitHubAccountTile();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userInfo = ref.watch(loggedInUserProvider);
+    final service = ref.read(gitHubServiceProvider);
+    final activeUserAsync = ref.watch(activeUserProvider);
 
-    final login = userInfo?['login'] as String? ?? '';
-    final name = userInfo?['name'] as String? ?? '';
-    final avatarUrl = userInfo?['avatar_url'] as String? ?? '';
+    return FutureBuilder<List<String>>(
+      future: service.getRegisteredUsers(),
+      builder: (context, snapshot) {
+        final users = snapshot.data ?? [];
+        if (users.isEmpty) {
+          return const ListTile(
+            leading: Icon(Icons.person_off_rounded),
+            title: Text('アカウントが登録されていません'),
+          );
+        }
 
-    return Column(
-      children: [
-        // ユーザー情報表示
-        if (login.isNotEmpty)
-          ListTile(
-            leading: CircleAvatar(
-              radius: 22,
-              backgroundImage:
-                  avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
-              child: avatarUrl.isEmpty
-                  ? const Icon(Icons.person_rounded)
+        return Column(
+          children: users.map((username) {
+            final isActive = username == activeUserAsync.value;
+            return ListTile(
+              leading: const CircleAvatar(
+                child: Icon(Icons.person_rounded),
+              ),
+              title: Text(
+                username,
+                style: TextStyle(
+                  fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+              subtitle: Text(isActive ? '現在使用中 (アクティブ)' : 'タップして切り替え'),
+              trailing: isActive
+                  ? const Icon(Icons.check_circle_rounded, color: Color(0xFF10B981))
                   : null,
-            ),
-            title: Text(
-              name.isNotEmpty ? name : login,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            subtitle: Text('@$login'),
-            trailing: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: const Color(0xFF10B981).withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.circle, color: Color(0xFF10B981), size: 8),
-                  SizedBox(width: 4),
-                  Text(
-                    '接続中',
-                    style: TextStyle(
-                      color: Color(0xFF10B981),
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-      ],
+              onTap: isActive
+                  ? null
+                  : () async {
+                      await service.setActiveUser(username);
+                      // キャッシュクリアして状態更新
+                      ref.invalidate(activeUserProvider);
+                      ref.invalidate(repositoriesProvider);
+                      ref.invalidate(allRawRepositoriesProvider);
+                      
+                      // loggedInUserProvider も同期更新
+                      final userInfo = await service.getCurrentUser();
+                      ref.read(loggedInUserProvider.notifier).state = userInfo;
+                    },
+            );
+          }).toList(),
+        );
+      },
     );
   }
 }
 
-/// 危険な操作を行うデンジャーゾーンのタイル
+/// 危険な操作を行うデンジャーゾーンのタイル (マルチアカウント対応)
 class _DangerZoneTile extends ConsumerWidget {
   const _DangerZoneTile();
+
+  Future<void> _confirmDisconnect(
+    BuildContext context,
+    WidgetRef ref,
+    GitHubService service, {
+    required bool all,
+  }) async {
+    final activeUser = await service.getActiveUser();
+    if (!context.mounted) return;
+
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(all ? 'すべてのアカウントを解除しますか？' : 'アカウントの接続を解除しますか？'),
+        content: Text(
+          all
+              ? 'すべてのGitHubアカウントとの連携を解除し、完全にログアウトします。'
+              : '現在のアカウント (@$activeUser) との連携を解除します。',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('キャンセル'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFEF4444)),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              if (all) {
+                await service.deleteAllTokens();
+              } else if (activeUser != null) {
+                await service.deleteUserToken(activeUser);
+              }
+
+              // アクティブなアカウントが他にあるかチェック
+              final nextActive = await service.getActiveUser();
+              if (nextActive != null) {
+                // 切り替え
+                ref.invalidate(activeUserProvider);
+                ref.invalidate(repositoriesProvider);
+                ref.invalidate(allRawRepositoriesProvider);
+                final userInfo = await service.getCurrentUser();
+                ref.read(loggedInUserProvider.notifier).state = userInfo;
+              } else {
+                // すべて削除された場合はログイン画面へ
+                ref.read(isLoggedInProvider.notifier).state = false;
+                ref.read(loggedInUserProvider.notifier).state = null;
+                if (context.mounted) {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute<void>(
+                      builder: (_) => const LoginScreen(),
+                    ),
+                    (route) => false,
+                  );
+                }
+              }
+            },
+            child: const Text('解除',
+                style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -523,53 +612,33 @@ class _DangerZoneTile extends ConsumerWidget {
             children: [
               Semantics(
                 button: true,
-                label: 'GitHub接続解除ボタン',
+                label: '現在のアカウントの接続解除ボタン',
                 child: ListTile(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   leading: const Icon(Icons.logout_rounded,
                       color: Color(0xFFEF4444), size: 26),
                   title: const Text(
-                    'GitHub 接続解除 (ログアウト)',
+                    '現在のアカウントの接続解除',
                     style: TextStyle(color: Color(0xFFEF4444), fontWeight: FontWeight.bold),
                   ),
-                  subtitle: const Text('現在のアカウントとの連携を解除し、デバイス上の認証情報を破棄してログアウトします。'),
-                  onTap: () {
-                    showDialog<void>(
-                      context: context,
-                      builder: (ctx) => AlertDialog(
-                        title: const Text('連携を解除しますか？'),
-                        content: const Text(
-                          '接続を解除すると、リポジトリやCI/CDの実行状況が見られなくなります。',
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(ctx),
-                            child: const Text('キャンセル'),
-                          ),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFEF4444)),
-                            onPressed: () async {
-                              Navigator.pop(ctx);
-                              await service.deleteToken();
-                              ref.read(isLoggedInProvider.notifier).state = false;
-                              ref.read(loggedInUserProvider.notifier).state = null;
-                              if (context.mounted) {
-                                Navigator.of(context).pushAndRemoveUntil(
-                                  MaterialPageRoute<void>(
-                                    builder: (_) => const LoginScreen(),
-                                  ),
-                                  (route) => false,
-                                );
-                              }
-                            },
-                            child: const Text('解除',
-                                style: TextStyle(color: Colors.white)),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
+                  subtitle: const Text('選択中のアカウントのみ、このデバイスから接続を解除します。'),
+                  onTap: () => _confirmDisconnect(context, ref, service, all: false),
+                ),
+              ),
+              const Divider(height: 1, color: Color(0x22EF4444)),
+              Semantics(
+                button: true,
+                label: 'すべてのアカウントの接続解除ボタン',
+                child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  leading: const Icon(Icons.delete_forever_rounded,
+                      color: Color(0xFFEF4444), size: 26),
+                  title: const Text(
+                    'すべてのアカウントを解除してログアウト',
+                    style: TextStyle(color: Color(0xFFEF4444), fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: const Text('登録されている全てのアカウント情報をデバイスから削除します。'),
+                  onTap: () => _confirmDisconnect(context, ref, service, all: true),
                 ),
               ),
             ],

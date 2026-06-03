@@ -7,19 +7,127 @@ import 'package:package_info_plus/package_info_plus.dart';
 class GitHubService {
   static const String clientId = 'Iv23limzxSsYeKcuUopY';
   static const _secureStorage = FlutterSecureStorage();
-  static const _tokenKey = 'github_oauth_token';
+  static const _activeUserKey = 'active_github_username';
+  static const _registeredUsersKey = 'github_registered_users';
+  static const _tokenPrefix = 'github_oauth_token_';
 
-  // 1. セキュアトークンの保存と取得
-  Future<void> saveToken(String token) async {
-    await _secureStorage.write(key: _tokenKey, value: token);
-  }
-
+  // 1. セキュアトークンの保存と取得 (アクティブなアカウント用)
   Future<String?> getToken() async {
-    return await _secureStorage.read(key: _tokenKey);
+    final activeUser = await _secureStorage.read(key: _activeUserKey);
+    if (activeUser == null) {
+      // 互換性維持：もし古いシングルアカウントのトークンがあればそれを返す
+      final legacyToken = await _secureStorage.read(key: 'github_oauth_token');
+      if (legacyToken != null) {
+        return legacyToken;
+      }
+      return null;
+    }
+    return await _secureStorage.read(key: '$_tokenPrefix$activeUser');
   }
 
+  // 互換性のための既存のsaveToken (基本使用せず、saveTokenForUserを推奨)
+  Future<void> saveToken(String token) async {
+    await _secureStorage.write(key: 'github_oauth_token', value: token);
+  }
+
+  // 指定ユーザー名でトークンを保存し、アクティブ化
+  Future<void> saveTokenForUser(String token, String username) async {
+    // トークンを保存
+    await _secureStorage.write(key: '$_tokenPrefix$username', value: token);
+    
+    // 互換性維持：単一アカウント用キーにも書き込んでおく（他の単純参照箇所のフォールバック用）
+    await _secureStorage.write(key: 'github_oauth_token', value: token);
+
+    // 登録ユーザーリストの更新
+    final usersStr = await _secureStorage.read(key: _registeredUsersKey) ?? '';
+    final users = usersStr.isEmpty ? <String>[] : usersStr.split(',');
+    if (!users.contains(username)) {
+      users.add(username);
+      await _secureStorage.write(key: _registeredUsersKey, value: users.join(','));
+    }
+
+    // アクティブユーザーに設定
+    await _secureStorage.write(key: _activeUserKey, value: username);
+  }
+
+  // 登録されているユーザー名のリストを取得
+  Future<List<String>> getRegisteredUsers() async {
+    final usersStr = await _secureStorage.read(key: _registeredUsersKey) ?? '';
+    if (usersStr.isEmpty) {
+      // 互換性維持：もし古いシングルアカウントでログイン中なら、そのアカウント情報を取得して追加する
+      final legacyToken = await _secureStorage.read(key: 'github_oauth_token');
+      if (legacyToken != null) {
+        // トークンが有効か検証を兼ねてユーザー名を取得
+        final userMap = await getCurrentUser();
+        if (userMap != null) {
+          final login = userMap['login'] as String;
+          await saveTokenForUser(legacyToken, login);
+          return [login];
+        }
+      }
+      return [];
+    }
+    return usersStr.split(',');
+  }
+
+  // 現在アクティブなユーザー名を取得
+  Future<String?> getActiveUser() async {
+    return await _secureStorage.read(key: _activeUserKey);
+  }
+
+  // アクティブなユーザーを切り替える
+  Future<void> setActiveUser(String username) async {
+    await _secureStorage.write(key: _activeUserKey, value: username);
+    
+    // 互換性維持：単一アカウント用キーにも同期
+    final token = await _secureStorage.read(key: '$_tokenPrefix$username');
+    if (token != null) {
+      await _secureStorage.write(key: 'github_oauth_token', value: token);
+    }
+  }
+
+  // 特定ユーザーのトークンを削除
+  Future<void> deleteUserToken(String username) async {
+    await _secureStorage.delete(key: '$_tokenPrefix$username');
+
+    final usersStr = await _secureStorage.read(key: _registeredUsersKey) ?? '';
+    final users = usersStr.isEmpty ? <String>[] : usersStr.split(',');
+    if (users.contains(username)) {
+      users.remove(username);
+      await _secureStorage.write(key: _registeredUsersKey, value: users.join(','));
+    }
+
+    // アクティブユーザーが削除された場合、他のユーザーがいればそちらをアクティブにし、いなければクリアする
+    final activeUser = await getActiveUser();
+    if (activeUser == username) {
+      if (users.isNotEmpty) {
+        await setActiveUser(users.first);
+      } else {
+        await _secureStorage.delete(key: _activeUserKey);
+        await _secureStorage.delete(key: 'github_oauth_token');
+      }
+    }
+  }
+
+  // 全てのアカウントをログアウト
+  Future<void> deleteAllTokens() async {
+    final users = await getRegisteredUsers();
+    for (final user in users) {
+      await _secureStorage.delete(key: '$_tokenPrefix$user');
+    }
+    await _secureStorage.delete(key: _activeUserKey);
+    await _secureStorage.delete(key: _registeredUsersKey);
+    await _secureStorage.delete(key: 'github_oauth_token');
+  }
+
+  // 互換性のための既存メソッド（単一削除）
   Future<void> deleteToken() async {
-    await _secureStorage.delete(key: _tokenKey);
+    final activeUser = await getActiveUser();
+    if (activeUser != null) {
+      await deleteUserToken(activeUser);
+    } else {
+      await _secureStorage.delete(key: 'github_oauth_token');
+    }
   }
 
   // デバイスコードのリクエスト

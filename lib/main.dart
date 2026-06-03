@@ -197,9 +197,13 @@ class _AppStartupRouterState extends ConsumerState<_AppStartupRouter> {
         final service = ref.read(gitHubServiceProvider);
         final userInfo = await service.validateToken(token);
         if (userInfo != null && mounted) {
-          await service.saveToken(token);
+          final loginName = userInfo['login'] as String? ?? 'Unknown';
+          await service.saveTokenForUser(token, loginName);
           ref.read(isLoggedInProvider.notifier).state = true;
           ref.read(loggedInUserProvider.notifier).state = userInfo;
+          // 新しいアカウント追加に伴うリポジトリ一覧の再フェッチ
+          ref.invalidate(repositoriesProvider);
+          ref.invalidate(allRawRepositoriesProvider);
         }
         if (mounted) {
           setState(() => _checking = false);
