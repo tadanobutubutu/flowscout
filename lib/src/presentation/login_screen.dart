@@ -65,7 +65,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     try {
       // Android 11以降の package visibility 制限などで canLaunchUrl が false を返すことがあるため、
       // 直接 launchUrl を実行して成否を確認します。
-      final launched = await launchUrl(url, mode: LaunchMode.externalApplication);
+      final launched = await launchUrl(url);
       if (!launched) {
         setState(() {
           _isLoading = false;
@@ -122,15 +122,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
-        systemOverlayStyle: SystemUiOverlayStyle(
-          statusBarColor: Colors.transparent,
-          statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
-          statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
+
       body: FadeTransition(
         opacity: _fadeAnim,
         child: SlideTransition(
@@ -397,7 +389,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                     'https://github.com/settings/tokens/new?scopes=repo,read:user,workflow&description=Flowscout+App',
                                   );
                                   if (await canLaunchUrl(url)) {
-                                    await launchUrl(url, mode: LaunchMode.externalApplication);
+                                    await launchUrl(url);
                                   }
                                 },
                                 icon: const Icon(Icons.open_in_new_rounded, size: 14,

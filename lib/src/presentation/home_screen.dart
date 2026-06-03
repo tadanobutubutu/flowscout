@@ -739,11 +739,12 @@ class _FilterSelectorArea extends ConsumerWidget {
                 ),
               ],
             ),
-            padding: const EdgeInsets.fromLTRB(24, 16, 24, 34),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+            padding: EdgeInsets.fromLTRB(24, 16, 24, MediaQuery.of(context).padding.bottom + 16),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                 // ハンドル
                 Center(
                   child: Container(
@@ -805,7 +806,7 @@ class _FilterSelectorArea extends ConsumerWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
 
                 // ── タイプ ──
                 Text(
@@ -817,7 +818,7 @@ class _FilterSelectorArea extends ConsumerWidget {
                     letterSpacing: 0.5,
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 4),
                 Wrap(
                   spacing: 10,
                   children: [
@@ -832,7 +833,7 @@ class _FilterSelectorArea extends ConsumerWidget {
                         onTap: () => setLocalState(() => localTypeFilter = 'private')),
                   ],
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
 
                 // ── オーナータイプ ──
                 Text(
@@ -844,7 +845,7 @@ class _FilterSelectorArea extends ConsumerWidget {
                     letterSpacing: 0.5,
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 4),
                 Wrap(
                   spacing: 10,
                   children: [
@@ -862,7 +863,7 @@ class _FilterSelectorArea extends ConsumerWidget {
 
                 // ── アカウント名 ──
                 if (owners.isNotEmpty) ...[
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
                   Text(
                     'アカウント',
                     style: TextStyle(
@@ -872,7 +873,7 @@ class _FilterSelectorArea extends ConsumerWidget {
                       letterSpacing: 0.5,
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 4),
                   Wrap(
                     spacing: 10,
                     runSpacing: 10,
@@ -934,6 +935,7 @@ class _FilterSelectorArea extends ConsumerWidget {
                   ),
                 ),
               ],
+            ),
             ),
           );
         },

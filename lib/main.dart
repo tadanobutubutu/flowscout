@@ -14,14 +14,6 @@ import 'src/presentation/premium_widgets.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // ステータスバーとナビゲーションバーのスタイル設定
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarColor: Colors.transparent,
-    statusBarIconBrightness: Brightness.light,
-    statusBarBrightness: Brightness.dark,
-    systemNavigationBarColor: Colors.transparent,
-    systemNavigationBarIconBrightness: Brightness.light,
-  ));
 
   runApp(
     const ProviderScope(
@@ -40,23 +32,18 @@ class FlowscoutApp extends ConsumerWidget {
         (themeMode == ThemeMode.system &&
             MediaQuery.platformBrightnessOf(context) == Brightness.dark);
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
-        statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
-        systemNavigationBarColor:
-            isDark ? const Color(0xFF090D16) : const Color(0xFFF8FAFC),
-        systemNavigationBarIconBrightness:
-            isDark ? Brightness.light : Brightness.dark,
-        systemNavigationBarDividerColor:
-            isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0),
-      ),
-      child: MaterialApp(
+    return MaterialApp(
       title: 'Flowscout',
       debugShowCheckedModeBanner: false,
         scrollBehavior: const MyCustomScrollBehavior(),
       themeMode: themeMode,
+      onGenerateRoute: (settings) {
+        // AppLinksがディープリンクを処理するため、Flutter標準のルーティングは無視して現在の画面を維持する
+        return null;
+      },
+      onUnknownRoute: (settings) {
+        return MaterialPageRoute(builder: (_) => const Scaffold(backgroundColor: Colors.transparent));
+      },
       locale: ref.watch(localOverrideProvider),
       localizationsDelegates: const [
         AppLocalizations.delegate,
@@ -133,8 +120,7 @@ class FlowscoutApp extends ConsumerWidget {
 
         // 起動時のルーティング: トークンがあれば HomeScreen、なければ LoginScreen
         home: const _AppStartupRouter(),
-      ),
-    );
+      );
   }
 }
 
@@ -191,6 +177,7 @@ class _AppStartupRouterState extends ConsumerState<_AppStartupRouter> {
   Future<void> _handleDeepLink(Uri uri) async {
     // flowscout://oauth-callback?token=xxx の形式を解析
     if (uri.scheme == 'flowscout' && uri.host == 'oauth-callback') {
+      closeInAppWebView();
       final token = uri.queryParameters['token'];
       if (token != null && token.isNotEmpty) {
         setState(() => _checking = true);
@@ -213,7 +200,7 @@ class _AppStartupRouterState extends ConsumerState<_AppStartupRouter> {
       // GitHub Appインストール完了後に戻ってきた場合、自動的にOAuthログインを再開する
       final url = Uri.parse('https://flowscout-oauth.tadanobutubutu.workers.dev/login');
       try {
-        await launchUrl(url, mode: LaunchMode.externalApplication);
+        await launchUrl(url);
       } catch (e) {
         debugPrint('Error launching oauth flow after installation: $e');
       }

@@ -247,16 +247,20 @@ class WorkflowDetailScreen extends ConsumerWidget {
                                           child: Row(
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Semantics(
-                                                label: 'ジョブ名: $jobName',
-                                                child: Text(
-                                                  'Job: $jobName',
-                                                  style: const TextStyle(
-                                                      fontWeight: FontWeight.bold,
-                                                      fontSize: 14,
-                                                      color: Color(0xFF6366F1)),
+                                              Expanded(
+                                                child: Semantics(
+                                                  label: 'ジョブ名: $jobName',
+                                                  child: Text(
+                                                    'Job: $jobName',
+                                                    style: const TextStyle(
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 14,
+                                                        color: Color(0xFF6366F1)),
+                                                    overflow: TextOverflow.ellipsis,
+                                                  ),
                                                 ),
                                               ),
+                                              const SizedBox(width: 8),
                                               const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: Colors.grey),
                                             ],
                                           ),

@@ -613,40 +613,46 @@ class _DangerZoneTile extends ConsumerWidget {
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(16),
-          child: Column(
-            children: [
-              Semantics(
-                button: true,
-                label: '現在のアカウントの接続解除ボタン',
-                child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  leading: const Icon(Icons.logout_rounded,
-                      color: Color(0xFFEF4444), size: 26),
-                  title: const Text(
-                    '現在のアカウントの接続解除',
-                    style: TextStyle(color: Color(0xFFEF4444), fontWeight: FontWeight.bold),
+          child: Theme(
+            data: Theme.of(context).copyWith(
+              splashColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+            ),
+            child: Column(
+              children: [
+                Semantics(
+                  button: true,
+                  label: '現在のアカウントの接続解除ボタン',
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    leading: const Icon(Icons.logout_rounded,
+                        color: Color(0xFFEF4444), size: 26),
+                    title: const Text(
+                      '現在のアカウントの接続解除',
+                      style: TextStyle(color: Color(0xFFEF4444), fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: const Text('選択中のアカウントのみ、このデバイスから接続を解除します。'),
+                    onTap: () => _confirmDisconnect(context, ref, service, all: false),
                   ),
-                  subtitle: const Text('選択中のアカウントのみ、このデバイスから接続を解除します。'),
-                  onTap: () => _confirmDisconnect(context, ref, service, all: false),
                 ),
-              ),
-              const Divider(height: 1, color: Color(0x22EF4444)),
-              Semantics(
-                button: true,
-                label: 'すべてのアカウントの接続解除ボタン',
-                child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  leading: const Icon(Icons.delete_forever_rounded,
-                      color: Color(0xFFEF4444), size: 26),
-                  title: const Text(
-                    'すべてのアカウントを解除してログアウト',
-                    style: TextStyle(color: Color(0xFFEF4444), fontWeight: FontWeight.bold),
+                const Divider(height: 1, color: Color(0x22EF4444)),
+                Semantics(
+                  button: true,
+                  label: 'すべてのアカウントの接続解除ボタン',
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    leading: const Icon(Icons.delete_forever_rounded,
+                        color: Color(0xFFEF4444), size: 26),
+                    title: const Text(
+                      'すべてのアカウントを解除してログアウト',
+                      style: TextStyle(color: Color(0xFFEF4444), fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: const Text('登録されている全てのアカウント情報をデバイスから削除します。'),
+                    onTap: () => _confirmDisconnect(context, ref, service, all: true),
                   ),
-                  subtitle: const Text('登録されている全てのアカウント情報をデバイスから削除します。'),
-                  onTap: () => _confirmDisconnect(context, ref, service, all: true),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
