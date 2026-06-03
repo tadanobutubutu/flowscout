@@ -716,16 +716,17 @@ class _FilterSelectorArea extends ConsumerWidget {
     List<String> owners,
     bool isDark,
   ) {
+    // 起動時の初期値をローカル変数にコピー
+    String localTypeFilter = ref.read(repositoryTypeFilterProvider);
+    String localOwnerTypeFilter = ref.read(repositoryOwnerTypeFilterProvider);
+    String? localOwnerFilter = ref.read(repositoryOwnerFilterProvider);
+
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => Consumer(
-        builder: (context, ref, _) {
-          final typeFilter = ref.watch(repositoryTypeFilterProvider);
-          final ownerTypeFilter = ref.watch(repositoryOwnerTypeFilterProvider);
-          final ownerFilter = ref.watch(repositoryOwnerFilterProvider);
-
+      builder: (context) => StatefulBuilder(
+        builder: (context, setLocalState) {
           return Container(
             decoration: BoxDecoration(
               color: isDark ? const Color(0xFF0F172A) : Colors.white,
@@ -762,9 +763,9 @@ class _FilterSelectorArea extends ConsumerWidget {
                   children: [
                     Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.tune_rounded,
-                          color: const Color(0xFF6366F1),
+                          color: Color(0xFF6366F1),
                           size: 22,
                         ),
                         const SizedBox(width: 8),
@@ -781,9 +782,11 @@ class _FilterSelectorArea extends ConsumerWidget {
                     ),
                     TextButton.icon(
                       onPressed: () {
-                        ref.read(repositoryTypeFilterProvider.notifier).state = 'all';
-                        ref.read(repositoryOwnerTypeFilterProvider.notifier).state = 'all';
-                        ref.read(repositoryOwnerFilterProvider.notifier).state = null;
+                        setLocalState(() {
+                          localTypeFilter = 'all';
+                          localOwnerTypeFilter = 'all';
+                          localOwnerFilter = null;
+                        });
                       },
                       icon: const Icon(Icons.refresh_rounded, size: 16, color: Color(0xFF6366F1)),
                       label: const Text(
@@ -818,15 +821,15 @@ class _FilterSelectorArea extends ConsumerWidget {
                 Wrap(
                   spacing: 10,
                   children: [
-                    _filterChip(ref, context, isDark, label: 'すべて', value: 'all', groupValue: typeFilter,
+                    _filterChip(ref, context, isDark, label: 'すべて', value: 'all', groupValue: localTypeFilter,
                         icon: Icons.apps_rounded,
-                        onTap: () => ref.read(repositoryTypeFilterProvider.notifier).state = 'all'),
-                    _filterChip(ref, context, isDark, label: 'Public', value: 'public', groupValue: typeFilter,
+                        onTap: () => setLocalState(() => localTypeFilter = 'all')),
+                    _filterChip(ref, context, isDark, label: 'Public', value: 'public', groupValue: localTypeFilter,
                         icon: Icons.public_rounded,
-                        onTap: () => ref.read(repositoryTypeFilterProvider.notifier).state = 'public'),
-                    _filterChip(ref, context, isDark, label: 'Private', value: 'private', groupValue: typeFilter,
+                        onTap: () => setLocalState(() => localTypeFilter = 'public')),
+                    _filterChip(ref, context, isDark, label: 'Private', value: 'private', groupValue: localTypeFilter,
                         icon: Icons.lock_rounded,
-                        onTap: () => ref.read(repositoryTypeFilterProvider.notifier).state = 'private'),
+                        onTap: () => setLocalState(() => localTypeFilter = 'private')),
                   ],
                 ),
                 const SizedBox(height: 24),
@@ -845,15 +848,15 @@ class _FilterSelectorArea extends ConsumerWidget {
                 Wrap(
                   spacing: 10,
                   children: [
-                    _filterChip(ref, context, isDark, label: 'すべて', value: 'all', groupValue: ownerTypeFilter,
+                    _filterChip(ref, context, isDark, label: 'すべて', value: 'all', groupValue: localOwnerTypeFilter,
                         icon: Icons.people_outline_rounded,
-                        onTap: () => ref.read(repositoryOwnerTypeFilterProvider.notifier).state = 'all'),
-                    _filterChip(ref, context, isDark, label: '個人', value: 'user', groupValue: ownerTypeFilter,
+                        onTap: () => setLocalState(() => localOwnerTypeFilter = 'all')),
+                    _filterChip(ref, context, isDark, label: '個人', value: 'user', groupValue: localOwnerTypeFilter,
                         icon: Icons.person_rounded,
-                        onTap: () => ref.read(repositoryOwnerTypeFilterProvider.notifier).state = 'user'),
-                    _filterChip(ref, context, isDark, label: '組織 (Org)', value: 'organization', groupValue: ownerTypeFilter,
+                        onTap: () => setLocalState(() => localOwnerTypeFilter = 'user')),
+                    _filterChip(ref, context, isDark, label: '組織 (Org)', value: 'organization', groupValue: localOwnerTypeFilter,
                         icon: Icons.business_rounded,
-                        onTap: () => ref.read(repositoryOwnerTypeFilterProvider.notifier).state = 'organization'),
+                        onTap: () => setLocalState(() => localOwnerTypeFilter = 'organization')),
                   ],
                 ),
 
@@ -874,16 +877,16 @@ class _FilterSelectorArea extends ConsumerWidget {
                     spacing: 10,
                     runSpacing: 10,
                     children: [
-                      _filterChip(ref, context, isDark, label: 'すべて', value: 'ALL_NULL', groupValue: ownerFilter ?? 'ALL_NULL',
+                      _filterChip(ref, context, isDark, label: 'すべて', value: 'ALL_NULL', groupValue: localOwnerFilter ?? 'ALL_NULL',
                           icon: Icons.alternate_email_rounded,
-                          onTap: () => ref.read(repositoryOwnerFilterProvider.notifier).state = null),
+                          onTap: () => setLocalState(() => localOwnerFilter = null)),
                       ...owners.map((owner) => _filterChip(
                         ref, context, isDark,
                         label: '@$owner',
                         value: owner,
-                        groupValue: ownerFilter ?? 'ALL_NULL',
+                        groupValue: localOwnerFilter ?? 'ALL_NULL',
                         avatarUrl: 'https://github.com/$owner.png?size=40',
-                        onTap: () => ref.read(repositoryOwnerFilterProvider.notifier).state = owner,
+                        onTap: () => setLocalState(() => localOwnerFilter = owner),
                       )),
                     ],
                   ),
@@ -892,7 +895,13 @@ class _FilterSelectorArea extends ConsumerWidget {
                 
                 // 適用ボタン
                 GestureDetector(
-                  onTap: () => Navigator.pop(context),
+                  onTap: () {
+                    // 適用ボタンを押した瞬間にProviderを更新する
+                    ref.read(repositoryTypeFilterProvider.notifier).state = localTypeFilter;
+                    ref.read(repositoryOwnerTypeFilterProvider.notifier).state = localOwnerTypeFilter;
+                    ref.read(repositoryOwnerFilterProvider.notifier).state = localOwnerFilter;
+                    Navigator.pop(context);
+                  },
                   child: Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 15),
