@@ -6,6 +6,6 @@ class MyCustomScrollBehavior extends MaterialScrollBehavior {
   @override
   ScrollPhysics getScrollPhysics(BuildContext context) {
     // Use ClampingScrollPhysics for Android, BouncingScrollPhysics for iOS, with smooth acceleration
-    return const ClampingScrollPhysics(parent: const BouncingScrollPhysics());
+    return const ClampingScrollPhysics(parent: BouncingScrollPhysics());
   }
 }

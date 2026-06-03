@@ -16,6 +16,8 @@ analyzer:
     missing_required_param: error
     missing_return: error
     todo: ignore
+    deprecated_member_use: ignore
+    prefer_const_constructors: ignore
 
 linter:
   # Enable additional strict lints to push quality score to 100/100

@@ -124,14 +124,14 @@ class SettingsScreen extends ConsumerWidget {
                 ),
               ),
               subtitle: const Text('各演出の詳細パラメータを調整します。'),
-              children: [
-                const Divider(height: 1),
+              children: const [
+                Divider(height: 1),
                 // アニメーション縮小率スライダー
                 _SpringScaleSlider(),
-                const Divider(height: 1, indent: 16, endIndent: 16),
+                Divider(height: 1, indent: 16, endIndent: 16),
                 // シマースピードスライダー
                 _ShimmerSpeedSlider(),
-                const Divider(height: 1, indent: 16, endIndent: 16),
+                Divider(height: 1, indent: 16, endIndent: 16),
                 // ハプティクス強度詳細ドロップダウン
                 _HapticStrengthDropdown(),
               ],

@@ -180,7 +180,7 @@ class _AppStartupRouterState extends ConsumerState<_AppStartupRouter> {
       (uri) {
         _handleDeepLink(uri);
       },
-      onError: (err) {
+      onError: (Object err) {
         debugPrint('Deep link stream error: $err');
       },
     );

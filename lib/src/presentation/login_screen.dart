@@ -24,12 +24,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   bool _obscureToken = true;
   String? _errorMessage;
 
-  // Device Flow 関連のステート
-  bool _isDeviceFlowLoading = false;
-  String? _userCode;
-  String? _verificationUri;
-  String? _deviceCode;
-  int _interval = 5;
   Timer? _pollingTimer;
   bool _showPatOption = false;
 

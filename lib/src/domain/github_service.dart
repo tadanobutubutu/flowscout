@@ -207,7 +207,7 @@ class GitHubService {
 
     // ── 2. フォールバック (PATログイン、またはApp経由での取得に失敗した場合) ──
     int page = 1;
-    List<Map<String, dynamic>> allRepos = [];
+    final List<Map<String, dynamic>> allRepos = [];
     while (true) {
       final fallbackUrl = Uri.parse(
         query.isEmpty

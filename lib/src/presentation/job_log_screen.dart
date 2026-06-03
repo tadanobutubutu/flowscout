@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'home_screen.dart'; // gitHubServiceProvider をインポートするため
 
@@ -23,7 +22,6 @@ class JobLogScreen extends ConsumerStatefulWidget {
 
 class _JobLogScreenState extends ConsumerState<JobLogScreen> {
   bool _isLoading = true;
-  String? _logContent;
   String? _errorMessage;
   final List<String> _logLines = [];
   final List<int> _matchedLineIndices = [];
@@ -62,7 +60,6 @@ class _JobLogScreenState extends ConsumerState<JobLogScreen> {
       // ログを行ごとに分割
       final lines = log.split('\n');
       setState(() {
-        _logContent = log;
         _logLines.addAll(lines);
         _isLoading = false;
       });
