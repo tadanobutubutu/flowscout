@@ -19,15 +19,17 @@ Say goodbye to the stress of diagnosing CI/CD build failures when you are away f
 
 ## 🌟 Key Features
 
-1. 🔍 **Lightning-Fast Repository Search**
-   * Real-time search to instantly locate the exact repository (public or private) you own or contribute to. No endless scrolling.
-2. 🚨 **In-Depth Error Log Isolation**
-   * Smartly expands workflow runs using custom UI cards.
-   * Pinpoints exactly which job and step failed, displaying raw error details and highlights on your phone.
-3. 🛡️ **Secure "Smart-Routing" OAuth Authentication**
+1. 👥 **Multi-Account Switching**
+   * Link multiple GitHub accounts inside the app and switch between them instantly (with secure token management).
+2. 🔍 **Advanced Filtering & Sorting**
+   * Fine-tune repository views using a gorgeous bottom sheet filter by repository type (Public/Private), owner type (User/Org), and specific accounts (with GitHub avatar icons).
+   * Dynamic sorting options including "Last CI/CD Run" (default), "Last Updated", "Name", and "Stars".
+3. 🚨 **Intelligent Log Analysis & Auto-Jump**
+   * Visualize CI/CD step statuses. On tap, automatically scroll to the exact line of failure (smart detection for `##[error]`) or step starting points.
+4. 🛡️ **Secure "Smart-Routing" OAuth Authentication**
    * Uses serverless OAuth brokered via Cloudflare Workers to eliminate Client Secret leakage risks.
    * Seamless "Smart-Routing" UX that automatically redirects users to the GitHub App installation screen if not yet installed, regardless of whether they log in or install first.
-4. 🔄 **Automated Update Alerts**
+5. 🔄 **Automated Update Alerts**
    * Auto-detects the latest release from GitHub Releases upon startup and prompts the user to update (can be disabled in Settings).
 
 ---
