@@ -147,6 +147,8 @@ class GitHubService {
   Future<List<Map<String, dynamic>>> searchRepositories(
       {String query = ''}) async {
     final headers = await _getHeaders();
+    final List<Map<String, dynamic>> allRepos = [];
+    final Set<int> seenRepoIds = {};
 
     try {
       // 1. まずはGitHub Appとしてのインストール一覧を取得してみる
@@ -160,42 +162,56 @@ class GitHubService {
         final List<dynamic> installations = instData['installations'] as List<dynamic>? ?? [];
 
         if (installations.isNotEmpty) {
-          final List<Map<String, dynamic>> allRepos = [];
           for (final inst in installations) {
             final instMap = inst as Map<String, dynamic>;
             final int instId = instMap['id'] as int;
 
-            final rUrl = Uri.parse('https://api.github.com/user/installations/$instId/repositories?per_page=100');
-            final repoResponse = await http.get(rUrl, headers: headers);
-            if (repoResponse.statusCode == 200) {
-              final Map<String, dynamic> repoData = json.decode(repoResponse.body) as Map<String, dynamic>;
-              final List<dynamic> repos = repoData['repositories'] as List<dynamic>? ?? [];
-              for (final repo in repos) {
-                final repoMap = repo as Map<String, dynamic>;
-                final ownerMap = repoMap['owner'] as Map<String, dynamic>;
-                
-                // クエリが指定されている場合、リポジトリ名に含まれているかフィルタ
-                if (query.isNotEmpty &&
-                    !(repoMap['name'] as String).toLowerCase().contains(query.toLowerCase()) &&
-                    !(repoMap['full_name'] as String).toLowerCase().contains(query.toLowerCase())) {
-                  continue;
+            int page = 1;
+            while (true) {
+              final rUrl = Uri.parse('https://api.github.com/user/installations/$instId/repositories?per_page=100&page=$page');
+              final repoResponse = await http.get(rUrl, headers: headers);
+              if (repoResponse.statusCode == 200) {
+                final Map<String, dynamic> repoData = json.decode(repoResponse.body) as Map<String, dynamic>;
+                final List<dynamic> repos = repoData['repositories'] as List<dynamic>? ?? [];
+                if (repos.isEmpty) break;
+
+                for (final repo in repos) {
+                  final repoMap = repo as Map<String, dynamic>;
+                  final int repoId = repoMap['id'] as int;
+                  if (seenRepoIds.contains(repoId)) continue;
+                  seenRepoIds.add(repoId);
+
+                  final ownerMap = repoMap['owner'] as Map<String, dynamic>;
+
+                  // クエリが指定されている場合、フィルタリング
+                  if (query.isNotEmpty &&
+                      !(repoMap['name'] as String).toLowerCase().contains(query.toLowerCase()) &&
+                      !(repoMap['full_name'] as String).toLowerCase().contains(query.toLowerCase())) {
+                    continue;
+                  }
+
+                  allRepos.add({
+                    'id': repoId,
+                    'name': repoMap['name'],
+                    'full_name': repoMap['full_name'],
+                    'private': repoMap['private'],
+                    'description': repoMap['description'] ?? 'No description',
+                    'stargazers_count': repoMap['stargazers_count'],
+                    'updated_at': repoMap['updated_at'],
+                    'owner': ownerMap['login'],
+                    'avatar_url': ownerMap['avatar_url'],
+                    'owner_type': ownerMap['type'] ?? 'User',
+                  });
                 }
 
-                allRepos.add({
-                  'id': repoMap['id'],
-                  'name': repoMap['name'],
-                  'full_name': repoMap['full_name'],
-                  'private': repoMap['private'],
-                  'description': repoMap['description'] ?? 'No description',
-                  'stargazers_count': repoMap['stargazers_count'],
-                  'updated_at': repoMap['updated_at'],
-                  'owner': ownerMap['login'],
-                  'avatar_url': ownerMap['avatar_url'],
-                });
+                if (repos.length < 100) break;
+                page++;
+              } else {
+                break;
               }
             }
           }
-          
+
           // 更新順にソートして返す
           allRepos.sort((a, b) => (b['updated_at'] as String).compareTo(a['updated_at'] as String));
           return allRepos;
@@ -207,7 +223,6 @@ class GitHubService {
 
     // ── 2. フォールバック (PATログイン、またはApp経由での取得に失敗した場合) ──
     int page = 1;
-    final List<Map<String, dynamic>> allRepos = [];
     while (true) {
       final fallbackUrl = Uri.parse(
         query.isEmpty
@@ -227,9 +242,13 @@ class GitHubService {
       }
       for (final item in items) {
         final Map<String, dynamic> itemMap = item as Map<String, dynamic>;
+        final int repoId = itemMap['id'] as int;
+        if (seenRepoIds.contains(repoId)) continue;
+        seenRepoIds.add(repoId);
+
         final Map<String, dynamic> ownerMap = itemMap['owner'] as Map<String, dynamic>;
         allRepos.add({
-          'id': itemMap['id'],
+          'id': repoId,
           'name': itemMap['name'],
           'full_name': itemMap['full_name'],
           'private': itemMap['private'],
@@ -238,6 +257,7 @@ class GitHubService {
           'updated_at': itemMap['updated_at'],
           'owner': ownerMap['login'],
           'avatar_url': ownerMap['avatar_url'],
+          'owner_type': ownerMap['type'] ?? 'User',
         });
       }
       page++;

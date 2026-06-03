@@ -24,14 +24,51 @@ final searchQueryProvider = StateProvider<String>((ref) => '');
 final repositorySortOrderProvider =
     StateProvider<RepositorySortOrder>((ref) => RepositorySortOrder.lastUpdated);
 
-// リポジトリ一覧を取得するFutureProvider
+// フィルター条件を管理するStateProvider
+final repositoryTypeFilterProvider = StateProvider<String>((ref) => 'all'); // 'all', 'public', 'private'
+final repositoryOwnerTypeFilterProvider = StateProvider<String>((ref) => 'all'); // 'all', 'user', 'organization'
+final repositoryOwnerFilterProvider = StateProvider<String?>((ref) => null); // null = すべて, or 特定のowner名
+
+// フィルタリングやソートをする前の生のリポジトリリストを取得するProvider (オーナー一覧抽出などに使用)
+final allRawRepositoriesProvider =
+    FutureProvider<List<Map<String, dynamic>>>((ref) async {
+  final service = ref.watch(gitHubServiceProvider);
+  return await service.searchRepositories(query: '');
+});
+
+// 最終的に表示するリポジトリ一覧を取得するFutureProvider
 final repositoriesProvider =
     FutureProvider<List<Map<String, dynamic>>>((ref) async {
   final service = ref.watch(gitHubServiceProvider);
   final query = ref.watch(searchQueryProvider);
   final sortOrder = ref.watch(repositorySortOrderProvider);
 
-  final repos = await service.searchRepositories(query: query);
+  // 各種フィルター設定をwatch
+  final typeFilter = ref.watch(repositoryTypeFilterProvider);
+  final ownerTypeFilter = ref.watch(repositoryOwnerTypeFilterProvider);
+  final ownerFilter = ref.watch(repositoryOwnerFilterProvider);
+
+  var repos = await service.searchRepositories(query: query);
+
+  // 1. タイプフィルター (Public / Private)
+  if (typeFilter != 'all') {
+    final isPrivateTarget = typeFilter == 'private';
+    repos = repos.where((r) => (r['private'] as bool? ?? false) == isPrivateTarget).toList();
+  }
+
+  // 2. オーナータイプフィルター (User / Organization)
+  if (ownerTypeFilter != 'all') {
+    final isOrgTarget = ownerTypeFilter == 'organization';
+    repos = repos.where((r) {
+      final ownerType = r['owner_type'] as String? ?? 'User';
+      return ownerType.toLowerCase() == (isOrgTarget ? 'organization' : 'user');
+    }).toList();
+  }
+
+  // 3. アカウント名フィルター (Owner)
+  if (ownerFilter != null) {
+    repos = repos.where((r) => r['owner'] == ownerFilter).toList();
+  }
 
   // クライアント側で並び替えを適用
   switch (sortOrder) {
@@ -267,7 +304,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
+            const _FilterSelectorArea(),
+            const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -278,10 +317,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       .titleMedium
                       ?.copyWith(fontSize: 18),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.sort_rounded, color: Color(0xFF6366F1)),
+                PopupMenuButton<RepositorySortOrder>(
+                  icon: const Icon(Icons.swap_vert_rounded, color: Color(0xFF6366F1), size: 26),
                   tooltip: '並び替え',
-                  onPressed: () => _showSortOrderBottomSheet(context),
+                  onSelected: (order) {
+                    ref.read(repositorySortOrderProvider.notifier).state = order;
+                  },
+                  itemBuilder: (context) {
+                    final l10n = AppLocalizations.of(context)!;
+                    return [
+                      PopupMenuItem(
+                        value: RepositorySortOrder.lastUpdated,
+                        child: Text(l10n.sortLastUpdated),
+                      ),
+                      PopupMenuItem(
+                        value: RepositorySortOrder.name,
+                        child: Text(l10n.sortName),
+                      ),
+                      PopupMenuItem(
+                        value: RepositorySortOrder.stars,
+                        child: Text(l10n.sortStars),
+                      ),
+                    ];
+                  },
                 ),
               ],
             ),
@@ -314,6 +372,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       final repoFullName = repo['full_name'] as String? ?? '';
                       final avatarUrl = repo['avatar_url'] as String? ?? '';
                       final description = repo['description'] as String? ?? 'No description';
+                      final ownerType = repo['owner_type'] as String? ?? 'User';
 
                       return Semantics(
                         button: true,
@@ -374,6 +433,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                                             TextOverflow.ellipsis,
                                                       ),
                                                     ),
+                                                    const SizedBox(width: 8),
+                                                    // Org / User バッジ
+                                                    _buildOwnerTypeBadge(ownerType),
                                                     const SizedBox(width: 8),
                                                     Container(
                                                       padding: const EdgeInsets
@@ -520,132 +582,149 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  void _showSortOrderBottomSheet(BuildContext context) {
-    final currentOrder = ref.read(repositorySortOrderProvider);
-    final l10n = AppLocalizations.of(context)!;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: isDark ? const Color(0xFF0F0F12) : Colors.white, // フラットで洗練された黒/白
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+  Widget _buildOwnerTypeBadge(String ownerType) {
+    final isOrg = ownerType.toLowerCase() == 'organization';
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: isOrg
+            ? const Color(0xFF6366F1).withValues(alpha: 0.1)
+            : const Color(0xFF64748B).withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(6),
       ),
-      builder: (context) {
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // ヘッダー部分
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 16, 16, 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      l10n.selectOrder,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Outfit',
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Icon(
-                        Icons.close_rounded,
-                        color: isDark ? const Color(0xFF71717A) : Colors.black54,
-                        size: 20,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                height: 0.5,
-                color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
-              ),
-              // オプションリスト
-              _buildSortOption(
-                context: context,
-                label: l10n.sortLastUpdated,
-                order: RepositorySortOrder.lastUpdated,
-                isSelected: currentOrder == RepositorySortOrder.lastUpdated,
-              ),
-              _buildSortOption(
-                context: context,
-                label: l10n.sortName,
-                order: RepositorySortOrder.name,
-                isSelected: currentOrder == RepositorySortOrder.name,
-              ),
-              _buildSortOption(
-                context: context,
-                label: l10n.sortStars,
-                order: RepositorySortOrder.stars,
-                isSelected: currentOrder == RepositorySortOrder.stars,
-              ),
-            ],
-          ),
-        );
-      },
+      child: Text(
+        isOrg ? 'Org' : 'User',
+        style: TextStyle(
+          color: isOrg ? const Color(0xFF6366F1) : const Color(0xFF64748B),
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
     );
   }
+}
 
-  Widget _buildSortOption({
-    required BuildContext context,
-    required String label,
-    required RepositorySortOrder order,
-    required bool isSelected,
-  }) {
+class _FilterSelectorArea extends ConsumerWidget {
+  const _FilterSelectorArea();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final typeFilter = ref.watch(repositoryTypeFilterProvider);
+    final ownerTypeFilter = ref.watch(repositoryOwnerTypeFilterProvider);
+    final ownerFilter = ref.watch(repositoryOwnerFilterProvider);
+
+    final rawReposAsync = ref.watch(allRawRepositoriesProvider);
+    
+    // 生のリポジトリ情報からユニークなオーナーリストを抽出
+    final List<String> owners = rawReposAsync.maybeWhen(
+      data: (repos) => repos.map((r) => r['owner'] as String).toSet().toList()..sort(),
+      orElse: () => [],
+    );
+
     final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return InkWell(
-      onTap: () {
-        ref.read(repositorySortOrderProvider.notifier).state = order;
-        Navigator.pop(context);
-      },
-      child: Container(
-        width: double.maxFinite,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? (isDark ? Colors.white.withValues(alpha: 0.02) : Colors.black.withValues(alpha: 0.01))
-              : Colors.transparent,
-          border: Border(
-            bottom: BorderSide(
-              color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
-              width: 0.5,
+    
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          // 1. タイプフィルター (Public/Private)
+          Theme(
+            data: Theme.of(context).copyWith(canvasColor: Theme.of(context).cardColor),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF131B2E) : const Color(0xFFF1F5F9),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  value: typeFilter,
+                  icon: const Icon(Icons.arrow_drop_down_rounded, size: 20),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: isDark ? Colors.white : Colors.black87,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: 'all', child: Text('すべてのタイプ')),
+                    DropdownMenuItem(value: 'public', child: Text('パブリックのみ')),
+                    DropdownMenuItem(value: 'private', child: Text('プライベートのみ')),
+                  ],
+                  onChanged: (val) {
+                    if (val != null) ref.read(repositoryTypeFilterProvider.notifier).state = val;
+                  },
+                ),
+              ),
             ),
           ),
-        ),
-        child: Row(
-          children: [
-            // シンプルで洗練されたチェックマーク
-            SizedBox(
-              width: 24,
-              child: isSelected
-                  ? Icon(
-                      Icons.check_rounded,
-                      color: isDark ? Colors.white : const Color(0xFF0F172A),
-                      size: 20,
-                    )
-                  : null,
+          const SizedBox(width: 8),
+
+          // 2. オーナータイプフィルター (Org/User)
+          Theme(
+            data: Theme.of(context).copyWith(canvasColor: Theme.of(context).cardColor),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF131B2E) : const Color(0xFFF1F5F9),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  value: ownerTypeFilter,
+                  icon: const Icon(Icons.arrow_drop_down_rounded, size: 20),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: isDark ? Colors.white : Colors.black87,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: 'all', child: Text('すべてのオーナー')),
+                    DropdownMenuItem(value: 'user', child: Text('個人アカウント')),
+                    DropdownMenuItem(value: 'organization', child: Text('組織 (Org)')),
+                  ],
+                  onChanged: (val) {
+                    if (val != null) ref.read(repositoryOwnerTypeFilterProvider.notifier).state = val;
+                  },
+                ),
+              ),
             ),
-            const SizedBox(width: 12),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                color: isSelected
-                    ? (isDark ? Colors.white : const Color(0xFF0F172A))
-                    : (isDark ? const Color(0xFF71717A) : const Color(0xFF64748B)),
-                fontFamily: 'Outfit',
+          ),
+          const SizedBox(width: 8),
+
+          // 3. アカウント名フィルター (Owner)
+          if (owners.isNotEmpty) ...[
+            Theme(
+              data: Theme.of(context).copyWith(canvasColor: Theme.of(context).cardColor),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF131B2E) : const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String?>(
+                    value: ownerFilter,
+                    icon: const Icon(Icons.arrow_drop_down_rounded, size: 20),
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: isDark ? Colors.white : Colors.black87,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    items: [
+                      const DropdownMenuItem(value: null, child: Text('すべてのアカウント')),
+                      ...owners.map((owner) => DropdownMenuItem(value: owner, child: Text('@$owner'))),
+                    ],
+                    onChanged: (val) {
+                      ref.read(repositoryOwnerFilterProvider.notifier).state = val;
+                    },
+                  ),
+                ),
               ),
             ),
           ],
-        ),
+        ],
       ),
     );
   }
