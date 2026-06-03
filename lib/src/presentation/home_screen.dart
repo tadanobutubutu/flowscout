@@ -728,10 +728,17 @@ class _FilterSelectorArea extends ConsumerWidget {
 
           return Container(
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF131B2E) : Colors.white,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+              color: isDark ? const Color(0xFF0F172A) : Colors.white,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.3),
+                  blurRadius: 20,
+                  spreadRadius: 2,
+                ),
+              ],
             ),
-            padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 34),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -739,100 +746,182 @@ class _FilterSelectorArea extends ConsumerWidget {
                 // ハンドル
                 Center(
                   child: Container(
-                    width: 40,
-                    height: 4,
+                    width: 36,
+                    height: 5,
                     decoration: BoxDecoration(
-                      color: Colors.grey.withValues(alpha: 0.4),
-                      borderRadius: BorderRadius.circular(2),
+                      color: isDark ? Colors.grey[700] : Colors.grey[300],
+                      borderRadius: BorderRadius.circular(2.5),
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
-                // タイトルとリセット
+                const SizedBox(height: 16),
+                
+                // ヘッダー
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'フィルター',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.tune_rounded,
+                          color: const Color(0xFF6366F1),
+                          size: 22,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'フィルター条件',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.5,
+                            color: isDark ? Colors.white : const Color(0xFF1E293B),
+                          ),
+                        ),
+                      ],
                     ),
-                    TextButton(
+                    TextButton.icon(
                       onPressed: () {
                         ref.read(repositoryTypeFilterProvider.notifier).state = 'all';
                         ref.read(repositoryOwnerTypeFilterProvider.notifier).state = 'all';
                         ref.read(repositoryOwnerFilterProvider.notifier).state = null;
                       },
-                      child: const Text('リセット', style: TextStyle(color: Color(0xFF6366F1))),
+                      icon: const Icon(Icons.refresh_rounded, size: 16, color: Color(0xFF6366F1)),
+                      label: const Text(
+                        'リセット',
+                        style: TextStyle(
+                          color: Color(0xFF6366F1),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        backgroundColor: const Color(0xFF6366F1).withValues(alpha: 0.1),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                      ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 24),
 
                 // ── タイプ ──
-                const Text('リポジトリタイプ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                Text(
+                  'リポジトリタイプ',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                    color: isDark ? Colors.grey[400] : Colors.grey[600],
+                    letterSpacing: 0.5,
+                  ),
+                ),
                 const SizedBox(height: 10),
                 Wrap(
-                  spacing: 8,
+                  spacing: 10,
                   children: [
                     _filterChip(ref, context, isDark, label: 'すべて', value: 'all', groupValue: typeFilter,
+                        icon: Icons.apps_rounded,
                         onTap: () => ref.read(repositoryTypeFilterProvider.notifier).state = 'all'),
                     _filterChip(ref, context, isDark, label: 'Public', value: 'public', groupValue: typeFilter,
+                        icon: Icons.public_rounded,
                         onTap: () => ref.read(repositoryTypeFilterProvider.notifier).state = 'public'),
                     _filterChip(ref, context, isDark, label: 'Private', value: 'private', groupValue: typeFilter,
+                        icon: Icons.lock_rounded,
                         onTap: () => ref.read(repositoryTypeFilterProvider.notifier).state = 'private'),
                   ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 24),
 
                 // ── オーナータイプ ──
-                const Text('オーナータイプ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                Text(
+                  'オーナータイプ',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                    color: isDark ? Colors.grey[400] : Colors.grey[600],
+                    letterSpacing: 0.5,
+                  ),
+                ),
                 const SizedBox(height: 10),
                 Wrap(
-                  spacing: 8,
+                  spacing: 10,
                   children: [
                     _filterChip(ref, context, isDark, label: 'すべて', value: 'all', groupValue: ownerTypeFilter,
+                        icon: Icons.people_outline_rounded,
                         onTap: () => ref.read(repositoryOwnerTypeFilterProvider.notifier).state = 'all'),
                     _filterChip(ref, context, isDark, label: '個人', value: 'user', groupValue: ownerTypeFilter,
+                        icon: Icons.person_rounded,
                         onTap: () => ref.read(repositoryOwnerTypeFilterProvider.notifier).state = 'user'),
-                    _filterChip(ref, context, isDark, label: 'Org', value: 'organization', groupValue: ownerTypeFilter,
+                    _filterChip(ref, context, isDark, label: '組織 (Org)', value: 'organization', groupValue: ownerTypeFilter,
+                        icon: Icons.business_rounded,
                         onTap: () => ref.read(repositoryOwnerTypeFilterProvider.notifier).state = 'organization'),
                   ],
                 ),
 
                 // ── アカウント名 ──
                 if (owners.isNotEmpty) ...[
-                  const SizedBox(height: 20),
-                  const Text('アカウント', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                  const SizedBox(height: 24),
+                  Text(
+                    'アカウント',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                      letterSpacing: 0.5,
+                    ),
+                  ),
                   const SizedBox(height: 10),
                   Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
+                    spacing: 10,
+                    runSpacing: 10,
                     children: [
                       _filterChip(ref, context, isDark, label: 'すべて', value: 'ALL_NULL', groupValue: ownerFilter ?? 'ALL_NULL',
+                          icon: Icons.alternate_email_rounded,
                           onTap: () => ref.read(repositoryOwnerFilterProvider.notifier).state = null),
                       ...owners.map((owner) => _filterChip(
                         ref, context, isDark,
                         label: '@$owner',
                         value: owner,
                         groupValue: ownerFilter ?? 'ALL_NULL',
+                        avatarUrl: 'https://github.com/$owner.png?size=40',
                         onTap: () => ref.read(repositoryOwnerFilterProvider.notifier).state = owner,
                       )),
                     ],
                   ),
                 ],
-                const SizedBox(height: 16),
-                // 閉じるボタン
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF6366F1),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                const SizedBox(height: 32),
+                
+                // 適用ボタン
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF6366F1), Color(0xFF4F46E5)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF6366F1).withOpacity(0.3),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
-                    child: const Text('適用', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    child: const Center(
+                      child: Text(
+                        'フィルターを適用',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 16,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -851,29 +940,75 @@ class _FilterSelectorArea extends ConsumerWidget {
     required String value,
     required String groupValue,
     required VoidCallback onTap,
+    IconData? icon,
+    String? avatarUrl,
   }) {
     final isSelected = value == groupValue;
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
+          gradient: isSelected
+              ? const LinearGradient(
+                  colors: [Color(0xFF6366F1), Color(0xFF4F46E5)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
+              : null,
           color: isSelected
-              ? const Color(0xFF6366F1)
-              : (isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9)),
-          borderRadius: BorderRadius.circular(20),
+              ? null
+              : (isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9)),
+          borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: isSelected ? const Color(0xFF6366F1) : Colors.transparent,
+            color: isSelected
+                ? Colors.transparent
+                : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+            width: 1,
           ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: const Color(0xFF6366F1).withOpacity(0.2),
+                    blurRadius: 6,
+                    offset: const Offset(0, 3),
+                  )
+                ]
+              : null,
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? Colors.white : null,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-            fontSize: 13,
-          ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (avatarUrl != null) ...[
+              CircleAvatar(
+                radius: 8,
+                backgroundImage: NetworkImage(avatarUrl),
+                backgroundColor: Colors.transparent,
+              ),
+              const SizedBox(width: 6),
+            ] else if (icon != null) ...[
+              Icon(
+                icon,
+                size: 15,
+                color: isSelected
+                    ? Colors.white
+                    : (isDark ? Colors.grey[400] : Colors.grey[600]),
+              ),
+              const SizedBox(width: 6),
+            ],
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected
+                    ? Colors.white
+                    : (isDark ? Colors.grey[200] : Colors.grey[800]),
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                fontSize: 13,
+              ),
+            ),
+          ],
         ),
       ),
     );
