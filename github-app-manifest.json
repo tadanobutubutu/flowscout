@@ -1,6 +1,8 @@
 {
   "name": "Flowscout Monitor",
   "url": "https://github.com/tadanobutubutu/flowscout",
+  "description": "Flowscout Monitor is a premium, real-time client app for GitHub Actions. It helps developers track workflows, monitor job logs, receive run alerts, and manage repositories under their organizations instantly.",
+  "public": true,
   "hook_attributes": {
     "active": false
   },

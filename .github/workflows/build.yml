@@ -46,6 +46,7 @@ jobs:
   # 2. ビルド＆デプロイジョブ (テスト成功時のみ実行)
   build-and-deploy:
     name: Build mobile apps
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
     needs: lint-and-test
     runs-on: macos-14
     steps:

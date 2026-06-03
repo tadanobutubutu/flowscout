@@ -3,5 +3,9 @@
   "appTitle": "Flowscout",
   "searchHint": "リポジトリを検索...",
   "myRepositories": "マイリポジトリ",
-  "settings": "設定"
+  "settings": "設定",
+  "selectOrder": "順序",
+  "sortLastUpdated": "更新順",
+  "sortName": "名前順",
+  "sortStars": "スター数順"
 }

@@ -1,0 +1,13 @@
+{
+  "global": {
+    "files": "/src/**/*.*"
+  },
+  "dependencies": [],
+  "syntax": {
+    "version": "v740sp08",
+    "errorSolveRequire": true,
+    "globalConstants": [],
+    "globalMacros": []
+  },
+  "rules": {}
+}

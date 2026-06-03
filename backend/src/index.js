@@ -4,7 +4,8 @@ export default {
 
     // 1. OAuthログイン開始エンドポイント
     if (url.pathname === '/login') {
-      const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${env.GITHUB_CLIENT_ID}&scope=repo,read:org`;
+      const redirectUri = `https://flowscout-oauth.tadanobutubutu.workers.dev/callback`;
+      const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${env.GITHUB_CLIENT_ID}&scope=repo,read:org&redirect_uri=${encodeURIComponent(redirectUri)}`;
       return Response.redirect(githubAuthUrl, 302);
     }
 
@@ -73,7 +74,13 @@ export default {
     // 3. GitHub App Manifest作成成功時のリダイレクト先
     if (url.pathname === '/setup-success') {
       const code = url.searchParams.get('code');
+      const installationId = url.searchParams.get('installation_id');
+
       if (!code) {
+        if (installationId) {
+          // GitHub Appのインストール完了後のリダイレクトの場合、アプリに戻す
+          return Response.redirect(`flowscout://setup-success?installation_id=${installationId}`, 302);
+        }
         return new Response('Setup code missing', { status: 400 });
       }
 

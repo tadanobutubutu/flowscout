@@ -1,0 +1,34 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for Spanish Castilian (`es`).
+class AppLocalizationsEs extends AppLocalizations {
+  AppLocalizationsEs([String locale = 'es']) : super(locale);
+
+  @override
+  String get appTitle => 'Flowscout';
+
+  @override
+  String get searchHint => 'Buscar repositorios...';
+
+  @override
+  String get myRepositories => 'Mis Repositorios';
+
+  @override
+  String get settings => 'Ajustes';
+
+  @override
+  String get selectOrder => 'Order';
+
+  @override
+  String get sortLastUpdated => 'Last updated';
+
+  @override
+  String get sortName => 'Name';
+
+  @override
+  String get sortStars => 'Stars';
+}

@@ -8,11 +8,11 @@ import Flutter
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
     
-    let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
-    let nativeChannel = FlutterMethodChannel(name: "com.example.flowscout/native",
-                                              binaryMessenger: controller.binaryMessenger)
-    
-    nativeChannel.setMethodCallHandler({
+    if let controller = window?.rootViewController as? FlutterViewController {
+      let nativeChannel = FlutterMethodChannel(name: "com.tadanobutubutu.flowscout/native",
+                                                binaryMessenger: controller.binaryMessenger)
+      
+      nativeChannel.setMethodCallHandler({
       (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
       
       switch call.method {
@@ -32,6 +32,7 @@ import Flutter
         result(FlutterMethodNotImplemented)
       }
     })
+    }
 
     GeneratedPluginRegistrant.register(with: self)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
