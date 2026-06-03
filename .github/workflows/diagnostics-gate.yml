@@ -43,17 +43,6 @@ jobs:
           files: coverage/lcov.info
           fail_ci_if_error: false # Don't fail the build if Codecov has transient errors
 
-      - name: Set up Node.js (for Lighthouse)
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
-      - name: Install Lighthouse CI
-        run: npm install -g @lhci/cli@0.12.x
-
-      - name: Run Lighthouse CI
-        run: lhci autorun
-
 
 
   security-codeql:

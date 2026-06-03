@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'premium_widgets.dart';
 import 'login_screen.dart';
 import 'home_screen.dart';
@@ -38,6 +39,38 @@ class SettingsScreen extends ConsumerWidget {
       body: ListView(
         physics: const BouncingScrollPhysics(),
         children: [
+          // --------------------------------------------------
+          // セクション：言語設定
+          // --------------------------------------------------
+          _buildSectionHeader(context, '言語設定'),
+          ListTile(
+            leading: const Icon(Icons.language_rounded, color: Color(0xFF6366F1)),
+            title: const Text('表示言語 / Display Language'),
+            trailing: DropdownButton<Locale?>(
+              value: ref.watch(localOverrideProvider),
+              dropdownColor: Theme.of(context).cardColor,
+              underline: const SizedBox(),
+              items: const [
+                DropdownMenuItem(
+                  value: null,
+                  child: Text('システムデフォルト'),
+                ),
+                DropdownMenuItem(
+                  value: Locale('ja'),
+                  child: Text('日本語'),
+                ),
+                DropdownMenuItem(
+                  value: Locale('en'),
+                  child: Text('English'),
+                ),
+              ],
+              onChanged: (locale) {
+                ref.read(localOverrideProvider.notifier).state = locale;
+              },
+            ),
+          ),
+          const Divider(),
+
           // --------------------------------------------------
           // セクション：省電力 & パフォーマンス (基本項目)
           // --------------------------------------------------
@@ -160,7 +193,30 @@ class SettingsScreen extends ConsumerWidget {
           // --------------------------------------------------
           _buildSectionHeader(context, 'GitHub 連携'),
           const _GitHubAccountTile(),
+
+          ListTile(
+            leading: const Icon(Icons.person_add_alt_1_rounded, color: Color(0xFF6366F1)),
+            title: const Text('アカウントを追加・管理'),
+            subtitle: const Text('GitHub Appを新しいOrganizationや個人アカウントにインストール・管理します。'),
+            trailing: const Icon(Icons.open_in_new_rounded),
+            onTap: () async {
+              final url = Uri.parse('https://github.com/apps/flowscout-monitor/installations/new');
+              try {
+                await launchUrl(url, mode: LaunchMode.externalApplication);
+              } catch (e) {
+                debugPrint('Error launching url: $e');
+              }
+            },
+          ),
           const Divider(),
+
+          // --------------------------------------------------
+          // セクション：デンジャーゾーン
+          // --------------------------------------------------
+          _buildSectionHeader(context, '危険ゾーン (Danger Zone)', isDanger: true),
+          const _DangerZoneTile(),
+          const Divider(),
+
           _buildSectionHeader(context, 'このアプリについて'),
           const ListTile(
             leading: Icon(Icons.info_outline_rounded),
@@ -178,13 +234,13 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSectionHeader(BuildContext context, String title) {
+  Widget _buildSectionHeader(BuildContext context, String title, {bool isDanger = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       child: Text(
         title.toUpperCase(),
-        style: const TextStyle(
-          color: Color(0xFF6366F1),
+        style: TextStyle(
+          color: isDanger ? const Color(0xFFEF4444) : const Color(0xFF6366F1),
           fontWeight: FontWeight.bold,
           fontSize: 14,
         ),
@@ -386,14 +442,13 @@ class _HapticStrengthDropdown extends ConsumerWidget {
   }
 }
 
-/// GitHubアカウント表示 & 接続解除タイル
+/// GitHubアカウント表示タイル
 class _GitHubAccountTile extends ConsumerWidget {
   const _GitHubAccountTile();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userInfo = ref.watch(loggedInUserProvider);
-    final service = ref.read(gitHubServiceProvider);
 
     final login = userInfo?['login'] as String? ?? '';
     final name = userInfo?['name'] as String? ?? '';
@@ -441,58 +496,86 @@ class _GitHubAccountTile extends ConsumerWidget {
               ),
             ),
           ),
-        // 接続解除ボタン
-        Semantics(
-          button: true,
-          label: 'GitHub接続解除ボタン',
-          child: ListTile(
-            leading: const Icon(Icons.logout_rounded,
-                color: Color(0xFFEF4444), size: 26),
-            title: const Text(
-              'GitHub 接続解除',
-              style: TextStyle(color: Color(0xFFEF4444)),
-            ),
-            subtitle: const Text('現在のアカウントとの連携を解除し、ログアウトします。'),
-            onTap: () {
-              showDialog<void>(
-                context: context,
-                builder: (ctx) => AlertDialog(
-                  title: const Text('連携を解除しますか？'),
-                  content: const Text(
-                    '接続を解除すると、リポジトリやCI/CDの実行状況が見られなくなります。',
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(ctx),
-                      child: const Text('キャンセル'),
-                    ),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFEF4444)),
-                      onPressed: () async {
-                        Navigator.pop(ctx);
-                        await service.deleteToken();
-                        ref.read(isLoggedInProvider.notifier).state = false;
-                        ref.read(loggedInUserProvider.notifier).state = null;
-                        if (context.mounted) {
-                          Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute<void>(
-                              builder: (_) => const LoginScreen(),
-                            ),
-                            (route) => false,
-                          );
-                        }
-                      },
-                      child: const Text('解除',
-                          style: TextStyle(color: Colors.white)),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ),
       ],
     );
   }
 }
+
+/// 危険な操作を行うデンジャーゾーンのタイル
+class _DangerZoneTile extends ConsumerWidget {
+  const _DangerZoneTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final service = ref.read(gitHubServiceProvider);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: const Color(0xFFEF4444).withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFFEF4444).withValues(alpha: 0.3), width: 1.5),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Column(
+            children: [
+              Semantics(
+                button: true,
+                label: 'GitHub接続解除ボタン',
+                child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  leading: const Icon(Icons.logout_rounded,
+                      color: Color(0xFFEF4444), size: 26),
+                  title: const Text(
+                    'GitHub 接続解除 (ログアウト)',
+                    style: TextStyle(color: Color(0xFFEF4444), fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: const Text('現在のアカウントとの連携を解除し、デバイス上の認証情報を破棄してログアウトします。'),
+                  onTap: () {
+                    showDialog<void>(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        title: const Text('連携を解除しますか？'),
+                        content: const Text(
+                          '接続を解除すると、リポジトリやCI/CDの実行状況が見られなくなります。',
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(ctx),
+                            child: const Text('キャンセル'),
+                          ),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFFEF4444)),
+                            onPressed: () async {
+                              Navigator.pop(ctx);
+                              await service.deleteToken();
+                              ref.read(isLoggedInProvider.notifier).state = false;
+                              ref.read(loggedInUserProvider.notifier).state = null;
+                              if (context.mounted) {
+                                Navigator.of(context).pushAndRemoveUntil(
+                                  MaterialPageRoute<void>(
+                                    builder: (_) => const LoginScreen(),
+                                  ),
+                                  (route) => false,
+                                );
+                              }
+                            },
+                            child: const Text('解除',
+                                style: TextStyle(color: Colors.white)),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+

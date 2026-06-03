@@ -263,8 +263,11 @@ class GitHubService {
         return runs
             .map((run) {
               final Map<String, dynamic> runMap = run as Map<String, dynamic>;
-              final Map<String, dynamic> headCommit = runMap['head_commit'] as Map<String, dynamic>;
-              final Map<String, dynamic> author = headCommit['author'] as Map<String, dynamic>;
+              final Map<String, dynamic>? headCommit = runMap['head_commit'] as Map<String, dynamic>?;
+              final Map<String, dynamic> author = headCommit != null 
+                  ? (headCommit['author'] as Map<String, dynamic>? ?? {}) 
+                  : {};
+              final Map<String, dynamic>? actor = runMap['actor'] as Map<String, dynamic>?;
               return {
                 'id': runMap['id'],
                 'name': runMap['name'],
@@ -276,9 +279,11 @@ class GitHubService {
                 'run_number': runMap['run_number'],
                 'head_branch': runMap['head_branch'],
                 'head_commit_message':
-                    headCommit['message'] ?? 'No commit message',
+                    headCommit?['message'] ?? 'No commit message',
                 'head_commit_author':
                     author['name'] ?? 'Unknown',
+                'actor_login': actor?['login'] ?? 'Unknown',
+                'actor_avatar_url': actor?['avatar_url'] ?? '',
                 'created_at': runMap['created_at'],
                 'updated_at': runMap['updated_at'],
               };

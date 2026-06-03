@@ -162,6 +162,23 @@ class WorkflowDetailScreen extends ConsumerWidget {
                           Text(
                               'Event: $event • Branch: $headBranch'),
                           Text('Author: $headCommitAuthor'),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              const Text('Triggered by: '),
+                              if (run['actor_avatar_url'] != null && (run['actor_avatar_url'] as String).isNotEmpty) ...[
+                                CircleAvatar(
+                                  radius: 8,
+                                  backgroundImage: NetworkImage(run['actor_avatar_url'] as String),
+                                ),
+                                const SizedBox(width: 4),
+                              ],
+                              Text(
+                                '@${run['actor_login']}',
+                                style: const TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                       children: [

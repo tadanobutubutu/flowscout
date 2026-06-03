@@ -44,6 +44,12 @@ final listEntranceAnimationEnabledProvider = StateProvider<bool>((ref) => true);
 /// アニメーション開始遅延（マウント直後のジャンプ抑制：Skip Entering 制御用）
 final skipFirstFrameRenderProvider = StateProvider<bool>((ref) => true);
 
+// ----------------------------------------------------
+// 5. 言語設定プロバイダー
+// ----------------------------------------------------
+/// ユーザーが明示的に選択した言語（nullなら端末のシステム言語を自動使用）
+final localOverrideProvider = StateProvider<Locale?>((ref) => null);
+
 
 // ----------------------------------------------------
 // 4. カスタム UI コンポーネント

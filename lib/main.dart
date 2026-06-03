@@ -9,6 +9,7 @@ import 'src/localization/app_localizations.dart';
 import 'src/presentation/login_screen.dart';
 import 'src/presentation/home_screen.dart';
 import 'src/presentation/scroll_behavior.dart';
+import 'src/presentation/premium_widgets.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -56,6 +57,7 @@ class FlowscoutApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
         scrollBehavior: const MyCustomScrollBehavior(),
       themeMode: themeMode,
+      locale: ref.watch(localOverrideProvider),
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
