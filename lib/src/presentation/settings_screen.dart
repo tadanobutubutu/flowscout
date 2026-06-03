@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'premium_widgets.dart';
 import 'login_screen.dart';
 import 'home_screen.dart';
+import '../domain/github_service.dart';
 
 // アップデート通知設定を保持するStateProvider
 final updateNotifyEnabledProvider = StateProvider<bool>((ref) => true);
@@ -507,7 +508,7 @@ class _DangerZoneTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final service = ref.read(gitHubServiceProvider);
+    final service = ref.read<GitHubService>(gitHubServiceProvider);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Container(

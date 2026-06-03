@@ -653,7 +653,9 @@ class _FilterSelectorArea extends ConsumerWidget {
                     DropdownMenuItem(value: 'private', child: Text('プライベートのみ')),
                   ],
                   onChanged: (val) {
-                    if (val != null) ref.read(repositoryTypeFilterProvider.notifier).state = val;
+                    if (val != null) {
+                      ref.read(repositoryTypeFilterProvider.notifier).state = val;
+                    }
                   },
                 ),
               ),
@@ -685,7 +687,9 @@ class _FilterSelectorArea extends ConsumerWidget {
                     DropdownMenuItem(value: 'organization', child: Text('組織 (Org)')),
                   ],
                   onChanged: (val) {
-                    if (val != null) ref.read(repositoryOwnerTypeFilterProvider.notifier).state = val;
+                    if (val != null) {
+                      ref.read(repositoryOwnerTypeFilterProvider.notifier).state = val;
+                    }
                   },
                 ),
               ),
