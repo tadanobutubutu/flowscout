@@ -9,7 +9,7 @@ import Flutter
   ) -> Bool {
     
     let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
-    let nativeChannel = FlutterMethodChannel(name: "com.example.flowscout/native",
+    let nativeChannel = FlutterMethodChannel(name: "com.tadanobutubutu.flowscout/native",
                                               binaryMessenger: controller.binaryMessenger)
     
     nativeChannel.setMethodCallHandler({
