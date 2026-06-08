@@ -255,6 +255,77 @@ class GitHubService {
   Future<List<Map<String, dynamic>>> searchRepositories(
       {String query = ''}) async {
     final headers = await _getHeaders();
+    final token = await getToken();
+
+    // ゲストモード（トークンなし）の特別処理
+    if (token == null) {
+      final List<Map<String, dynamic>> guestRepos = [];
+      if (query.isEmpty) {
+        // デフォルトでおすすめのパブリックリポジトリ情報を返す（テストが容易になるようにする）
+        final defaultNames = ['tadanobutubutu/flowscout', 'flutter/flutter'];
+        for (final repoFullName in defaultNames) {
+          try {
+            final response = await http.get(
+              Uri.parse('https://api.github.com/repos/$repoFullName'),
+              headers: headers,
+            );
+            if (response.statusCode == 200) {
+              final Map<String, dynamic> repoMap = json.decode(response.body) as Map<String, dynamic>;
+              final Map<String, dynamic> ownerMap = repoMap['owner'] as Map<String, dynamic>;
+              guestRepos.add({
+                'id': repoMap['id'] as int,
+                'name': repoMap['name'] as String,
+                'full_name': repoMap['full_name'] as String,
+                'private': repoMap['private'] as bool? ?? false,
+                'description': repoMap['description'] as String? ?? 'No description',
+                'stargazers_count': repoMap['stargazers_count'] as int? ?? 0,
+                'updated_at': repoMap['updated_at'] as String? ?? '',
+                'pushed_at': repoMap['pushed_at'] as String? ?? '',
+                'owner': ownerMap['login'] as String,
+                'avatar_url': ownerMap['avatar_url'] as String? ?? '',
+                'owner_type': ownerMap['type'] as String? ?? 'User',
+              });
+            }
+          } catch (e) {
+            debugPrint('Error fetching default repo $repoFullName: $e');
+          }
+        }
+        return guestRepos;
+      } else {
+        // パブリック検索APIを使用
+        try {
+          final searchUrl = Uri.parse(
+            'https://api.github.com/search/repositories?q=$query&sort=stars&order=desc&per_page=30',
+          );
+          final resp = await http.get(searchUrl, headers: headers);
+          if (resp.statusCode == 200) {
+            final Map<String, dynamic> searchData = json.decode(resp.body) as Map<String, dynamic>;
+            final List<dynamic> items = searchData['items'] as List<dynamic>? ?? [];
+            for (final item in items) {
+              final Map<String, dynamic> itemMap = item as Map<String, dynamic>;
+              final Map<String, dynamic> ownerMap = itemMap['owner'] as Map<String, dynamic>;
+              guestRepos.add({
+                'id': itemMap['id'] as int,
+                'name': itemMap['name'] as String,
+                'full_name': itemMap['full_name'] as String,
+                'private': itemMap['private'] as bool? ?? false,
+                'description': itemMap['description'] as String? ?? 'No description',
+                'stargazers_count': itemMap['stargazers_count'] as int? ?? 0,
+                'updated_at': itemMap['updated_at'] as String? ?? '',
+                'pushed_at': itemMap['pushed_at'] as String? ?? '',
+                'owner': ownerMap['login'] as String,
+                'avatar_url': ownerMap['avatar_url'] as String? ?? '',
+                'owner_type': ownerMap['type'] as String? ?? 'User',
+              });
+            }
+          }
+        } catch (e) {
+          debugPrint('Error searching public repos: $e');
+        }
+        return guestRepos;
+      }
+    }
+
     final List<Map<String, dynamic>> allRepos = [];
     final Set<int> seenRepoIds = {};
 

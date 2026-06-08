@@ -476,6 +476,15 @@ class _GitHubAccountTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final service = ref.read(gitHubServiceProvider);
     final activeUserAsync = ref.watch(activeUserProvider);
+    final isGuestMode = ref.watch(isGuestModeProvider);
+
+    if (isGuestMode) {
+      return const ListTile(
+        leading: Icon(Icons.face_retouching_natural_rounded, color: Color(0xFF6366F1)),
+        title: Text('ゲストモードで利用中'),
+        subtitle: Text('GitHubアカウントと連携していません (パブリック情報のみ検索可能です)'),
+      );
+    }
 
     return FutureBuilder<List<String>>(
       future: service.getRegisteredUsers(),
@@ -603,6 +612,38 @@ class _DangerZoneTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final service = ref.read<GitHubService>(gitHubServiceProvider);
+    final isGuestMode = ref.watch(isGuestModeProvider);
+
+    if (isGuestMode) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        child: Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFF6366F1).withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: const Color(0xFF6366F1).withValues(alpha: 0.3), width: 1.5),
+          ),
+          child: ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            leading: const Icon(Icons.login_rounded, color: Color(0xFF6366F1), size: 26),
+            title: const Text(
+              'ゲストモードを終了してログイン',
+              style: TextStyle(color: Color(0xFF6366F1), fontWeight: FontWeight.bold),
+            ),
+            subtitle: const Text('ログイン画面へ戻り、GitHubアカウントと連携します。'),
+            onTap: () {
+              ref.read(isLoggedInProvider.notifier).state = false;
+              ref.read(isGuestModeProvider.notifier).state = false;
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute<void>(builder: (_) => const LoginScreen()),
+                (route) => false,
+              );
+            },
+          ),
+        ),
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Container(

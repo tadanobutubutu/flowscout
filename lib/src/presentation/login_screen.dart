@@ -8,6 +8,7 @@ import 'home_screen.dart';
 // ログイン状態のグローバル管理（アプリ全体で使用）
 final isLoggedInProvider = StateProvider<bool>((ref) => false);
 final loggedInUserProvider = StateProvider<Map<String, dynamic>?>((ref) => null);
+final isGuestModeProvider = StateProvider<bool>((ref) => false);
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -403,6 +404,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                           ),
                         ),
                       ],
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+
+                  // ── ゲストモードのスキップボタン ──
+                  TextButton(
+                    onPressed: () {
+                      ref.read(isGuestModeProvider.notifier).state = true;
+                      ref.read(isLoggedInProvider.notifier).state = true;
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute<void>(builder: (_) => const HomeScreen()),
+                        (route) => false,
+                      );
+                    },
+                    child: Text(
+                      'ログインせずにスキップ (デモモード)',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        decoration: TextDecoration.underline,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 40),
