@@ -419,7 +419,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                       );
                     },
                     child: Text(
-                      'ログインせずにスキップ (デモモード)',
+                      'ログインせずにスキップ (ゲストモード)',
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.primary,
                         fontSize: 14,
