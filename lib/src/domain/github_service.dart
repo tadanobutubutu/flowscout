@@ -308,7 +308,7 @@ class GitHubService {
         // パブリック検索APIを使用
         try {
           final searchUrl = Uri.parse(
-            '$_baseUrl/search/repositories?q=$query&sort=stars&order=desc&per_page=30',
+            '$_baseUrl/search/repositories?q=$query+in:name&per_page=30',
           );
           final resp = await http.get(searchUrl, headers: headers);
           if (resp.statusCode == 200) {
