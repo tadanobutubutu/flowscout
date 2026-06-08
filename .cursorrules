@@ -1,0 +1,18 @@
+# AI Coding Agent Rules for Flowscout Project
+
+This file defines strict security and development rules for any AI coding agent operating on this codebase. These rules must be parsed and strictly followed without exception.
+
+## 1. Strict Prohibition of Authentication Alterations
+- **DO NOT** execute any command that alters or overrides the local GitHub CLI (`gh`) authentication state (e.g., `gh auth login`, `gh auth logout`).
+- **DO NOT** register, save, or cache any external or dummy Personal Access Tokens (PAT) into the git configurations or global credential helpers.
+- **NEVER** overwrite the keyring or system-level credential helpers. The user's primary credential configuration (`tadanobutubutu`) must remain completely untouched and active at all times.
+
+## 2. Preventing Token Pollution
+- When running Git operations or `gh` commands within this agent shell environment, **always ensure** that the system-injected or environment-injected dummy `GITHUB_TOKEN` (such as `github_pat_antigravitydummytoken`) is explicitly cleared or unset to prevent authentication conflicts.
+- For all push/pull operations, rely solely on the user's keychain-stored authentication helper.
+
+## 3. Proxy Configuration for PAT
+- If a Personal Access Token (PAT) is supplied for the GitHub proxy API, **NEVER** apply it to the local system git client. 
+- It must only be registered directly on the Cloudflare Worker secret store using:
+  `npx wrangler secret put GITHUB_PAT`
+  or managed purely inside the secure worker environment.
