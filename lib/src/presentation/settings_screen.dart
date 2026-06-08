@@ -122,7 +122,7 @@ class SettingsScreen extends ConsumerWidget {
             // リスト出現アニメーション（基本項目: ON/OFF）
             SwitchListTile(
               title: const Text('リスト出現アニメーション (フェード/スライド)'),
-              subtitle: const Text('マイリポジトリやワークフロー詳細の表示時に、ふわっと浮き上がるように出現させます。'),
+              subtitle: const Text('リポジトリ一覧やワークフロー詳細の表示時に、ふわっと浮き上がるように出現させます。'),
               value: ref.watch(listEntranceAnimationEnabledProvider),
               activeTrackColor: const Color(0xFF6366F1),
               onChanged: (value) {

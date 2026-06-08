@@ -320,7 +320,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'マイリポジトリ',
+                  'リポジトリ',
                   style: Theme.of(context)
                       .textTheme
                       .titleMedium
