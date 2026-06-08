@@ -23,7 +23,6 @@ export default {
     }
 
     const headers = new Headers(request.headers);
-    // Replace User-Agent with something generic or pass it through
     headers.set("User-Agent", "Flowscout-Proxy/1.0");
 
     // Add authentication if token is available
@@ -31,12 +30,12 @@ export default {
       headers.set("Authorization", `Bearer ${env.GITHUB_PAT}`);
     }
 
-    // Forward the request to GitHub
+    // Forward the request to GitHub, do not follow redirects
     const modifiedRequest = new Request(targetUrl, {
       method: request.method,
       headers: headers,
       body: request.body,
-      redirect: "follow",
+      redirect: "manual",
     });
 
     const response = await fetch(modifiedRequest);
