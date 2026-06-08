@@ -241,14 +241,27 @@ class GitHubService {
     return null;
   }
 
+  // Get appropriate base URL
+  String get _baseUrl {
+    return 'https://github-proxy.tadanobutubutu.workers.dev';
+  }
+
   // ヘッダー生成
   Future<Map<String, String>> _getHeaders() async {
     final token = await getToken();
-    return {
+    final headers = {
       'Accept': 'application/vnd.github.v3+json',
-      if (token != null) 'Authorization': 'Bearer $token',
+      'X-GitHub-Api-Version': '2022-11-28',
       'Content-Type': 'application/json',
     };
+    
+    // ゲストモードでプロキシ経由の場合、アプリ側では Authorization ヘッダーを付けない
+    // プロキシ側で PAT を付与する仕組みになっています
+    if (token != null) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+    
+    return headers;
   }
 
   // 2. リポジトリ検索機能 (プライベート/パブリック両対応、ページネーション/検索クエリ対応)
@@ -261,12 +274,12 @@ class GitHubService {
     if (token == null) {
       final List<Map<String, dynamic>> guestRepos = [];
       if (query.isEmpty) {
-        // デフォルトでおすすめのパブリックリポジトリ情報を返す（テストが容易になるようにする）
+        // デフォルトでおすすめのパブリックリポジトリ情報を返す
         final defaultNames = ['tadanobutubutu/flowscout', 'flutter/flutter'];
         for (final repoFullName in defaultNames) {
           try {
             final response = await http.get(
-              Uri.parse('https://api.github.com/repos/$repoFullName'),
+              Uri.parse('$_baseUrl/repos/$repoFullName'),
               headers: headers,
             );
             if (response.statusCode == 200) {
@@ -285,12 +298,9 @@ class GitHubService {
                 'avatar_url': ownerMap['avatar_url'] as String? ?? '',
                 'owner_type': ownerMap['type'] as String? ?? 'User',
               });
-            } else {
-              guestRepos.add(_getMockRepo(repoFullName));
             }
           } catch (e) {
             debugPrint('Error fetching default repo $repoFullName: $e');
-            guestRepos.add(_getMockRepo(repoFullName));
           }
         }
         return guestRepos;
@@ -298,7 +308,7 @@ class GitHubService {
         // パブリック検索APIを使用
         try {
           final searchUrl = Uri.parse(
-            'https://api.github.com/search/repositories?q=$query&sort=stars&order=desc&per_page=30',
+            '$_baseUrl/search/repositories?q=$query&sort=stars&order=desc&per_page=30',
           );
           final resp = await http.get(searchUrl, headers: headers);
           if (resp.statusCode == 200) {
@@ -335,7 +345,7 @@ class GitHubService {
     try {
       // 1. まずはGitHub Appとしてのインストール一覧を取得してみる
       final installationsResponse = await http.get(
-        Uri.parse('https://api.github.com/user/installations'),
+        Uri.parse('$_baseUrl/user/installations'),
         headers: headers,
       );
 
@@ -350,7 +360,7 @@ class GitHubService {
 
             int page = 1;
             while (true) {
-              final rUrl = Uri.parse('https://api.github.com/user/installations/$instId/repositories?per_page=100&page=$page');
+              final rUrl = Uri.parse('$_baseUrl/user/installations/$instId/repositories?per_page=100&page=$page');
               final repoResponse = await http.get(rUrl, headers: headers);
               if (repoResponse.statusCode == 200) {
                 final Map<String, dynamic> repoData = json.decode(repoResponse.body) as Map<String, dynamic>;
@@ -409,8 +419,8 @@ class GitHubService {
     while (true) {
       final fallbackUrl = Uri.parse(
         query.isEmpty
-            ? 'https://api.github.com/user/repos?sort=updated&per_page=100&page=$page'
-            : 'https://api.github.com/search/repositories?q=$query+in:name&sort=updated&order=desc&per_page=100&page=$page',
+            ? '$_baseUrl/user/repos?sort=updated&per_page=100&page=$page'
+            : '$_baseUrl/search/repositories?q=$query+in:name&sort=updated&order=desc&per_page=100&page=$page',
       );
       final resp = await http.get(fallbackUrl, headers: headers);
       if (resp.statusCode != 200) {
@@ -456,7 +466,7 @@ class GitHubService {
       String repoFullName) async {
     final headers = await _getHeaders();
     final url = Uri.parse(
-        'https://api.github.com/repos/$repoFullName/actions/runs?per_page=30');
+        '$_baseUrl/repos/$repoFullName/actions/runs?per_page=30');
 
     try {
       final response = await http.get(url, headers: headers);
@@ -494,12 +504,12 @@ class GitHubService {
             })
             .toList();
       } else {
-        debugPrint('Failed to load workflow runs: ${response.statusCode}. Fallback to mock.');
-        return _getMockWorkflowRuns(repoFullName);
+        debugPrint('Failed to load workflow runs: ${response.statusCode}.');
+        return [];
       }
     } catch (e) {
-      debugPrint('Error fetching workflow runs: $e. Fallback to mock.');
-      return _getMockWorkflowRuns(repoFullName);
+      debugPrint('Error fetching workflow runs: $e.');
+      return [];
     }
   }
 
@@ -508,7 +518,7 @@ class GitHubService {
       String repoFullName, int runId) async {
     final headers = await _getHeaders();
     final url = Uri.parse(
-        'https://api.github.com/repos/$repoFullName/actions/runs/$runId/jobs');
+        '$_baseUrl/repos/$repoFullName/actions/runs/$runId/jobs');
 
     try {
       final response = await http.get(url, headers: headers);
@@ -540,12 +550,12 @@ class GitHubService {
           };
         }).toList();
       } else {
-        debugPrint('Failed to load jobs: ${response.statusCode}. Fallback to mock.');
-        return _getMockJobs(runId);
+        debugPrint('Failed to load jobs: ${response.statusCode}.');
+        return [];
       }
     } catch (e) {
-      debugPrint('Error fetching run jobs: $e. Fallback to mock.');
-      return _getMockJobs(runId);
+      debugPrint('Error fetching run jobs: $e.');
+      return [];
     }
   }
 
@@ -553,7 +563,7 @@ class GitHubService {
   Future<String?> getJobLog(String repoFullName, int jobId) async {
     final headers = await _getHeaders();
     final url = Uri.parse(
-        'https://api.github.com/repos/$repoFullName/actions/jobs/$jobId/logs');
+        '$_baseUrl/repos/$repoFullName/actions/jobs/$jobId/logs');
 
     try {
       // GitHub API は /logs に対して 302 リダイレクトを返す（S3 署名付きURL）
@@ -591,7 +601,7 @@ class GitHubService {
     } catch (e) {
       debugPrint('Error fetching job log: $e');
     }
-    return '--- Mock Log (API rate limit exceeded) ---\n[INFO] Set up job completed.\n[INFO] Checking environment...\n[SUCCESS] Build successful.';
+    return '--- Log fetch failed ---\nNo logs available.';
   }
 
   // 6. アプデチェック機能 (GitHub Releases から最新バージョンを取得)
@@ -599,7 +609,7 @@ class GitHubService {
     final headers = await _getHeaders();
     // Flowscout 本体のパブリックリポジトリから最新のリリースを取得する想定
     final url = Uri.parse(
-        'https://api.github.com/repos/tadanobutubutu/flowscout/releases/latest');
+        '$_baseUrl/repos/tadanobutubutu/flowscout/releases/latest');
 
     try {
       final response = await http.get(url, headers: headers);
@@ -644,95 +654,5 @@ class GitHubService {
       }
     } catch (_) {}
     return false;
-  }
-
-  Map<String, dynamic> _getMockRepo(String fullName) {
-    final name = fullName.split('/')[1];
-    final owner = fullName.split('/')[0];
-    return {
-      'id': fullName.hashCode,
-      'name': name,
-      'full_name': fullName,
-      'private': false,
-      'description': 'Offline mock data for $name (API limit fallback)',
-      'stargazers_count': 999,
-      'updated_at': DateTime.now().toIso8601String(),
-      'pushed_at': DateTime.now().toIso8601String(),
-      'owner': owner,
-      'avatar_url': 'https://github.com/$owner.png',
-      'owner_type': 'User',
-    };
-  }
-
-  List<Map<String, dynamic>> _getMockWorkflowRuns(String repoFullName) {
-    return [
-      {
-        'id': 1000000001,
-        'name': 'Flowscout CI/CD Orchestrator',
-        'event': 'push',
-        'status': 'completed',
-        'conclusion': 'success',
-        'html_url': 'https://github.com/$repoFullName/actions/runs/1',
-        'run_number': 42,
-        'head_branch': 'dev',
-        'head_commit_message': 'feat: add guest mode offline fallback support',
-        'head_commit_author': 'tadanobutubutu',
-        'actor_login': 'tadanobutubutu',
-        'actor_avatar_url': 'https://github.com/tadanobutubutu.png',
-        'created_at': DateTime.now().subtract(const Duration(minutes: 10)).toIso8601String(),
-        'updated_at': DateTime.now().subtract(const Duration(minutes: 8)).toIso8601String(),
-      },
-      {
-        'id': 1000000002,
-        'name': '💯 Diagnostics Gate',
-        'event': 'push',
-        'status': 'completed',
-        'conclusion': 'success',
-        'html_url': 'https://github.com/$repoFullName/actions/runs/2',
-        'run_number': 41,
-        'head_branch': 'dev',
-        'head_commit_message': 'feat: add guest mode offline fallback support',
-        'head_commit_author': 'tadanobutubutu',
-        'actor_login': 'tadanobutubutu',
-        'actor_avatar_url': 'https://github.com/tadanobutubutu.png',
-        'created_at': DateTime.now().subtract(const Duration(minutes: 12)).toIso8601String(),
-        'updated_at': DateTime.now().subtract(const Duration(minutes: 11)).toIso8601String(),
-      }
-    ];
-  }
-
-  List<Map<String, dynamic>> _getMockJobs(int runId) {
-    return [
-      {
-        'id': 2000000001,
-        'name': 'Code Quality & Testing',
-        'status': 'completed',
-        'conclusion': 'success',
-        'started_at': DateTime.now().subtract(const Duration(minutes: 10)).toIso8601String(),
-        'completed_at': DateTime.now().subtract(const Duration(minutes: 9)).toIso8601String(),
-        'steps': [
-          {'name': 'Set up job', 'status': 'completed', 'conclusion': 'success', 'number': 1},
-          {'name': 'Checkout Repository', 'status': 'completed', 'conclusion': 'success', 'number': 2},
-          {'name': 'Set up Flutter SDK', 'status': 'completed', 'conclusion': 'success', 'number': 3},
-          {'name': 'Verify Code Formatting', 'status': 'completed', 'conclusion': 'success', 'number': 4},
-          {'name': 'Static Analysis (Linter)', 'status': 'completed', 'conclusion': 'success', 'number': 5},
-          {'name': 'Run Automated Tests', 'status': 'completed', 'conclusion': 'success', 'number': 6},
-        ],
-      },
-      {
-        'id': 2000000002,
-        'name': 'Build mobile apps',
-        'status': 'completed',
-        'conclusion': 'success',
-        'started_at': DateTime.now().subtract(const Duration(minutes: 9)).toIso8601String(),
-        'completed_at': DateTime.now().subtract(const Duration(minutes: 8)).toIso8601String(),
-        'steps': [
-          {'name': 'Set up job', 'status': 'completed', 'conclusion': 'success', 'number': 1},
-          {'name': 'Checkout Repository', 'status': 'completed', 'conclusion': 'success', 'number': 2},
-          {'name': 'Build Android APK', 'status': 'completed', 'conclusion': 'success', 'number': 3},
-          {'name': 'Build iOS App', 'status': 'completed', 'conclusion': 'success', 'number': 4},
-        ],
-      }
-    ];
   }
 }

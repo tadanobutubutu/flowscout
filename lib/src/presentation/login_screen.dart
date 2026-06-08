@@ -411,11 +411,47 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                   // ── ゲストモードのスキップボタン ──
                   TextButton(
                     onPressed: () {
-                      ref.read(isGuestModeProvider.notifier).state = true;
-                      ref.read(isLoggedInProvider.notifier).state = true;
-                      Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute<void>(builder: (_) => const HomeScreen()),
-                        (route) => false,
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Row(
+                              children: [
+                                Icon(Icons.warning_amber_rounded, color: Colors.orange),
+                                SizedBox(width: 8),
+                                Text('ゲストモードの注意'),
+                              ],
+                            ),
+                            content: const Text(
+                              'ゲストモードではAPIの取得回数に厳しい制限（1時間に約60回）があります。\n\nそのため、短時間に何度も画面を開いたり更新したりすると、「取得失敗」などのエラーが表示される場合があります。\n\nすべての機能を制限なく利用するには、ログインしてご利用いただくことを推奨します。',
+                              style: TextStyle(fontSize: 14),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('キャンセル'),
+                              ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                  ref.read(isGuestModeProvider.notifier).state = true;
+                                  ref.read(isLoggedInProvider.notifier).state = true;
+                                  Navigator.of(context).pushAndRemoveUntil(
+                                    MaterialPageRoute<void>(builder: (_) => const HomeScreen()),
+                                    (route) => false,
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Theme.of(context).colorScheme.primary,
+                                  foregroundColor: Colors.white,
+                                ),
+                                child: const Text('同意して進む'),
+                              ),
+                            ],
+                          );
+                        },
                       );
                     },
                     child: Text(
