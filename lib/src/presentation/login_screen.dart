@@ -411,7 +411,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                   // ── ゲストモードのスキップボタン ──
                   TextButton(
                     onPressed: () {
-                      showDialog(
+                      showDialog<void>(
                         context: context,
                         builder: (BuildContext context) {
                           return AlertDialog(
