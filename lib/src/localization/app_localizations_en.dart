@@ -365,4 +365,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get userProfile => 'Profile';
+
+  @override
+  String get searchUsersHint =>
+      'Enter a username or organization name to search';
 }

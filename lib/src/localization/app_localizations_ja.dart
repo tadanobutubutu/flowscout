@@ -352,4 +352,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get userProfile => 'ユーザー情報';
+
+  @override
+  String get searchUsersHint => 'ユーザー名または組織名を入力して検索してください';
 }

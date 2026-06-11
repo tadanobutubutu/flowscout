@@ -109,6 +109,7 @@
   "searchTypeRepos": "リポジトリ",
   "searchTypeUsers": "ユーザー & 組織",
   "userProfile": "ユーザー情報",
+  "searchUsersHint": "ユーザー名または組織名を入力して検索してください",
   "@confirmDisconnectDesc": {
     "placeholders": {
       "username": {

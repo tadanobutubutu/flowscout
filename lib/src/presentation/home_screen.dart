@@ -67,7 +67,26 @@ final usersSearchProvider = FutureProvider<List<Map<String, dynamic>>>((ref) asy
 // フィルター条件を管理するStateProvider
 final repositoryTypeFilterProvider = StateProvider<String>((ref) => 'all'); // 'all', 'public', 'private'
 final repositoryOwnerTypeFilterProvider = StateProvider<String>((ref) => 'all'); // 'all', 'user', 'organization'
-final repositoryOwnerFilterProvider = StateProvider<String?>((ref) => null); // null = すべて, or 特定のowner名
+final repositoryOwnerFilterProvider = StateProvider<String?>((ref) => null); // null = 未設定 (デフォルト), 'all' = すべて
+
+// ログイン状況に応じた実際のアカウント名フィルターを決定するProvider
+final effectiveOwnerFilterProvider = Provider<String?>((ref) {
+  final selected = ref.watch(repositoryOwnerFilterProvider);
+  if (selected == 'all') {
+    return null;
+  }
+  if (selected != null) {
+    return selected;
+  }
+
+  // デフォルトでログイン済みのアカウントがあればそれを使用、ゲストならnull
+  final isGuest = ref.watch(isGuestModeProvider);
+  if (isGuest) {
+    return null;
+  }
+  final loggedInUser = ref.watch(loggedInUserProvider);
+  return loggedInUser?['login'] as String?;
+});
 
 // フィルタリングやソートをする前の生のリポジトリリストを取得するProvider (オーナー一覧抽出などに使用)
 final allRawRepositoriesProvider =
@@ -86,7 +105,7 @@ final repositoriesProvider =
   // 各種フィルター設定をwatch
   final typeFilter = ref.watch(repositoryTypeFilterProvider);
   final ownerTypeFilter = ref.watch(repositoryOwnerTypeFilterProvider);
-  final ownerFilter = ref.watch(repositoryOwnerFilterProvider);
+  final ownerFilter = ref.watch(effectiveOwnerFilterProvider);
 
   var repos = await service.searchRepositories(
     query: query,
@@ -485,7 +504,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   final searchCategory = ref.watch(searchCategoryProvider);
                   final query = ref.watch(searchQueryProvider);
                   
-                  if (query.isNotEmpty && searchCategory == SearchCategory.usersAndOrgs) {
+                  if (searchCategory == SearchCategory.usersAndOrgs) {
+                    if (query.isEmpty) {
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.people_alt_rounded,
+                                size: 64, color: Theme.of(context).hintColor),
+                            const SizedBox(height: 16),
+                            Text(
+                              l10n.searchUsersHint,
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
                     final usersAsync = ref.watch(usersSearchProvider);
                     return usersAsync.when(
                       data: (users) {
@@ -848,9 +883,6 @@ class _FilterSelectorArea extends ConsumerWidget {
     final ownerTypeFilter = ref.watch(repositoryOwnerTypeFilterProvider);
     final ownerFilter = ref.watch(repositoryOwnerFilterProvider);
     final rawReposAsync = ref.watch(allRawRepositoriesProvider);
-    final searchCategory = ref.watch(searchCategoryProvider);
-    final query = ref.watch(searchQueryProvider);
-
     final List<String> owners = rawReposAsync.maybeWhen(
       data: (repos) => repos.map((r) => r['owner'] as String).toSet().toList()..sort(),
       orElse: () => [],
@@ -865,9 +897,6 @@ class _FilterSelectorArea extends ConsumerWidget {
       activeCount++;
     }
     if (ownerFilter != null) {
-      activeCount++;
-    }
-    if (query.isNotEmpty && searchCategory != SearchCategory.repositories) {
       activeCount++;
     }
 
@@ -915,8 +944,8 @@ class _FilterSelectorArea extends ConsumerWidget {
                   width: 20,
                   height: 20,
                   decoration: const BoxDecoration(
-                    color: Color(0xFF6366F1),
-                    shape: BoxShape.circle,
+                     color: Color(0xFF6366F1),
+                     shape: BoxShape.circle,
                   ),
                   child: Center(
                     child: Text(
@@ -946,7 +975,7 @@ class _FilterSelectorArea extends ConsumerWidget {
     // 起動時の初期値をローカル変数にコピー
     String localTypeFilter = ref.read(repositoryTypeFilterProvider);
     String localOwnerTypeFilter = ref.read(repositoryOwnerTypeFilterProvider);
-    String? localOwnerFilter = ref.read(repositoryOwnerFilterProvider);
+    String? localOwnerFilter = ref.read(repositoryOwnerFilterProvider) ?? ref.read(effectiveOwnerFilterProvider);
     SearchCategory localSearchCategory = ref.read(searchCategoryProvider);
     final isGuest = ref.read(isGuestModeProvider);
     final l10n = AppLocalizations.of(context)!;
@@ -1111,14 +1140,14 @@ class _FilterSelectorArea extends ConsumerWidget {
                     spacing: 10,
                     runSpacing: 10,
                     children: [
-                      _filterChip(ref, context, isDark, label: l10n.all, value: 'ALL_NULL', groupValue: localOwnerFilter ?? 'ALL_NULL',
+                      _filterChip(ref, context, isDark, label: l10n.all, value: 'all', groupValue: localOwnerFilter ?? 'all',
                           icon: Icons.alternate_email_rounded,
-                          onTap: () => setLocalState(() => localOwnerFilter = null)),
+                          onTap: () => setLocalState(() => localOwnerFilter = 'all')),
                       ...owners.map((owner) => _filterChip(
                         ref, context, isDark,
                         label: '@$owner',
                         value: owner,
-                        groupValue: localOwnerFilter ?? 'ALL_NULL',
+                        groupValue: localOwnerFilter ?? 'all',
                         avatarUrl: 'https://github.com/$owner.png?size=40',
                         onTap: () => setLocalState(() => localOwnerFilter = owner),
                       )),

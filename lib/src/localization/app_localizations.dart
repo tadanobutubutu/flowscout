@@ -761,6 +761,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Profile'**
   String get userProfile;
+
+  /// No description provided for @searchUsersHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a username or organization name to search'**
+  String get searchUsersHint;
 }
 
 class _AppLocalizationsDelegate

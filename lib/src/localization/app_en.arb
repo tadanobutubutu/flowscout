@@ -109,6 +109,7 @@
   "searchTypeRepos": "Repositories",
   "searchTypeUsers": "Users & Orgs",
   "userProfile": "Profile",
+  "searchUsersHint": "Enter a username or organization name to search",
   "@confirmDisconnectDesc": {
     "placeholders": {
       "username": {

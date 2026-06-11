@@ -356,78 +356,80 @@ class GitHubService {
     final List<Map<String, dynamic>> allRepos = [];
     final Set<int> seenRepoIds = {};
 
-    try {
-      // 1. まずはGitHub Appとしてのインストール一覧を取得してみる
-      final installationsResponse = await http.get(
-        Uri.parse('$_baseUrl/user/installations'),
-        headers: headers,
-      );
+    if (query.isEmpty) {
+      try {
+        // 1. まずはGitHub Appとしてのインストール一覧を取得してみる
+        final installationsResponse = await http.get(
+          Uri.parse('$_baseUrl/user/installations'),
+          headers: headers,
+        );
 
-      if (installationsResponse.statusCode == 200) {
-        final Map<String, dynamic> instData = json.decode(installationsResponse.body) as Map<String, dynamic>;
-        final List<dynamic> installations = instData['installations'] as List<dynamic>? ?? [];
+        if (installationsResponse.statusCode == 200) {
+          final Map<String, dynamic> instData = json.decode(installationsResponse.body) as Map<String, dynamic>;
+          final List<dynamic> installations = instData['installations'] as List<dynamic>? ?? [];
 
-        if (installations.isNotEmpty) {
-          for (final inst in installations) {
-            final instMap = inst as Map<String, dynamic>;
-            final int instId = instMap['id'] as int;
+          if (installations.isNotEmpty) {
+            for (final inst in installations) {
+              final instMap = inst as Map<String, dynamic>;
+              final int instId = instMap['id'] as int;
 
-            int page = 1;
-            while (true) {
-              final rUrl = Uri.parse('$_baseUrl/user/installations/$instId/repositories?per_page=100&page=$page');
-              final repoResponse = await http.get(rUrl, headers: headers);
-              if (repoResponse.statusCode == 200) {
-                final Map<String, dynamic> repoData = json.decode(repoResponse.body) as Map<String, dynamic>;
-                final List<dynamic> repos = repoData['repositories'] as List<dynamic>? ?? [];
-                if (repos.isEmpty) break;
+              int page = 1;
+              while (true) {
+                final rUrl = Uri.parse('$_baseUrl/user/installations/$instId/repositories?per_page=100&page=$page');
+                final repoResponse = await http.get(rUrl, headers: headers);
+                if (repoResponse.statusCode == 200) {
+                  final Map<String, dynamic> repoData = json.decode(repoResponse.body) as Map<String, dynamic>;
+                  final List<dynamic> repos = repoData['repositories'] as List<dynamic>? ?? [];
+                  if (repos.isEmpty) break;
 
-                for (final repo in repos) {
-                  final repoMap = repo as Map<String, dynamic>;
-                  final int repoId = repoMap['id'] as int;
-                  if (seenRepoIds.contains(repoId)) continue;
-                  seenRepoIds.add(repoId);
+                  for (final repo in repos) {
+                    final repoMap = repo as Map<String, dynamic>;
+                    final int repoId = repoMap['id'] as int;
+                    if (seenRepoIds.contains(repoId)) continue;
+                    seenRepoIds.add(repoId);
 
-                  final ownerMap = repoMap['owner'] as Map<String, dynamic>;
+                    final ownerMap = repoMap['owner'] as Map<String, dynamic>;
 
-                  // クエリが指定されている場合、フィルタリング
-                  if (query.isNotEmpty &&
-                      !(repoMap['name'] as String).toLowerCase().contains(query.toLowerCase()) &&
-                      !(repoMap['full_name'] as String).toLowerCase().contains(query.toLowerCase())) {
-                    continue;
+                    // クエリが指定されている場合、フィルタリング（通常query.isEmptyだが念のため残す）
+                    if (query.isNotEmpty &&
+                        !(repoMap['name'] as String).toLowerCase().contains(query.toLowerCase()) &&
+                        !(repoMap['full_name'] as String).toLowerCase().contains(query.toLowerCase())) {
+                      continue;
+                    }
+
+                    allRepos.add({
+                      'id': repoId,
+                      'name': repoMap['name'],
+                      'full_name': repoMap['full_name'],
+                      'private': repoMap['private'],
+                      'description': repoMap['description'] ?? 'No description',
+                      'stargazers_count': repoMap['stargazers_count'],
+                      'updated_at': repoMap['updated_at'],
+                      'pushed_at': repoMap['pushed_at'],
+                      'owner': ownerMap['login'],
+                      'avatar_url': ownerMap['avatar_url'],
+                      'owner_type': ownerMap['type'] ?? 'User',
+                    });
                   }
 
-                  allRepos.add({
-                    'id': repoId,
-                    'name': repoMap['name'],
-                    'full_name': repoMap['full_name'],
-                    'private': repoMap['private'],
-                    'description': repoMap['description'] ?? 'No description',
-                    'stargazers_count': repoMap['stargazers_count'],
-                    'updated_at': repoMap['updated_at'],
-                    'pushed_at': repoMap['pushed_at'],
-                    'owner': ownerMap['login'],
-                    'avatar_url': ownerMap['avatar_url'],
-                    'owner_type': ownerMap['type'] ?? 'User',
-                  });
+                  if (repos.length < 100) break;
+                  page++;
+                } else {
+                  break;
                 }
-
-                if (repos.length < 100) break;
-                page++;
-              } else {
-                break;
               }
             }
-          }
 
-          // ベストマッチ（関連度順）以外の場合のみ、更新順にソートして返す
-          if (sort != 'best_match') {
-            allRepos.sort((a, b) => (b['updated_at'] as String).compareTo(a['updated_at'] as String));
+            // ベストマッチ（関連度順）以外の場合のみ、更新順にソートして返す
+            if (sort != 'best_match') {
+              allRepos.sort((a, b) => (b['updated_at'] as String).compareTo(a['updated_at'] as String));
+            }
+            return allRepos;
           }
-          return allRepos;
         }
+      } catch (e) {
+        debugPrint('Error fetching repos via installations: $e');
       }
-    } catch (e) {
-      debugPrint('Error fetching repos via installations: $e');
     }
 
     // ── 2. フォールバック (PATログイン、またはApp経由での取得に失敗した場合) ──

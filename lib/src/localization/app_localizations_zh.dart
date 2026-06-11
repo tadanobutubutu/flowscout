@@ -349,4 +349,8 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get userProfile => '主页';
+
+  @override
+  String get searchUsersHint =>
+      'Enter a username or organization name to search';
 }

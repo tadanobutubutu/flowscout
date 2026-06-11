@@ -351,4 +351,8 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get userProfile => '프로필';
+
+  @override
+  String get searchUsersHint =>
+      'Enter a username or organization name to search';
 }
