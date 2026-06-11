@@ -36,14 +36,15 @@ final searchQueryProvider = StateProvider<String>((ref) => '');
 final repositorySortOrderProvider =
     StateProvider<RepositorySortOrder>((ref) => RepositorySortOrder.lastCiRun);
 
-// 実質的な並び替え順を決定するProvider
 final effectiveSortOrderProvider = Provider<RepositorySortOrder>((ref) {
   final query = ref.watch(searchQueryProvider);
   final selectedSort = ref.watch(repositorySortOrderProvider);
+  debugPrint('DEBUG_SORT: effectiveSortOrderProvider: query="$query", selectedSort=$selectedSort');
 
   // 検索ワードが入っている場合は、明示的に別を選択していない限り「ベストマッチ」をデフォルトにする
   if (query.isNotEmpty) {
     if (selectedSort == RepositorySortOrder.lastCiRun) {
+      debugPrint('DEBUG_SORT: effectiveSortOrderProvider: returning bestMatch');
       return RepositorySortOrder.bestMatch;
     }
     return selectedSort;
@@ -101,6 +102,7 @@ final repositoriesProvider =
   final service = ref.watch(gitHubServiceProvider);
   final query = ref.watch(searchQueryProvider);
   final sortOrder = ref.watch(effectiveSortOrderProvider);
+  debugPrint('DEBUG_SORT: repositoriesProvider: query="$query", sortOrder=$sortOrder');
 
   // 各種フィルター設定をwatch
   final typeFilter = ref.watch(repositoryTypeFilterProvider);
@@ -111,6 +113,7 @@ final repositoriesProvider =
     query: query,
     sort: sortOrder == RepositorySortOrder.bestMatch ? 'best_match' : 'updated',
   );
+  debugPrint('DEBUG_SORT: searchRepositories returned ${repos.length} items. First item name: ${repos.isNotEmpty ? repos.first['name'] : 'none'}');
 
   // 1. タイプフィルター (Public / Private)
   if (typeFilter != 'all') {
@@ -456,26 +459,45 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       },
                       itemBuilder: (context) {
                         final l10n = AppLocalizations.of(context)!;
+                        final selectedSort = ref.watch(repositorySortOrderProvider);
+                        // Helper to build a menu item with a checkmark for the active sort
+                        PopupMenuItem<RepositorySortOrder> buildItem(
+                            RepositorySortOrder value, Widget child) {
+                          return PopupMenuItem(
+                            value: value,
+                            child: Row(
+                              children: [
+                                if (selectedSort == value)
+                                  const Icon(Icons.check, size: 16, color: Color(0xFF6366F1))
+                                else
+                                  const SizedBox(width: 16), // placeholder for alignment
+                                const SizedBox(width: 8),
+                                child,
+                              ],
+                            ),
+                          );
+                        }
+
                         return [
                           if (query.isNotEmpty)
-                            PopupMenuItem(
-                              value: RepositorySortOrder.bestMatch,
-                              child: Row(
+                            buildItem(
+                              RepositorySortOrder.bestMatch,
+                              Row(
                                 children: [
-                                  const Icon(Icons.sort_rounded, size: 16, color: Color(0xFF6366F1)),
-                                  const SizedBox(width: 8),
+                                  Icon(Icons.sort_rounded, size: 16, color: Color(0xFF6366F1)),
+                                  SizedBox(width: 8),
                                   Text(l10n.sortBestMatch),
                                 ],
                               ),
                             ),
-                          PopupMenuItem(
-                            value: RepositorySortOrder.lastCiRun,
-                            child: Row(
-                              children: [
-                                const Icon(Icons.rocket_launch_rounded, size: 16, color: Color(0xFF6366F1)),
-                                const SizedBox(width: 8),
-                                Text(l10n.sortLastCiRun),
-                              ],
+                          buildItem(
+                            RepositorySortOrder.lastCiRun,
+                            Row(
+                               children: [
+                                 Icon(Icons.rocket_launch_rounded, size: 16, color: Color(0xFF6366F1)),
+                                 SizedBox(width: 8),
+                                 Text(l10n.sortLastCiRun),
+                               ],
                             ),
                           ),
                           PopupMenuItem(
