@@ -3,5 +3,141 @@
   "appTitle": "Flowscout",
   "searchHint": "Rechercher des dépôts...",
   "myRepositories": "Mes Dépôts",
-  "settings": "Paramètres"
+  "settings": "Paramètres",
+  "selectOrder": "Ordre",
+  "sortLastUpdated": "Dernière mise à jour",
+  "sortName": "Nom",
+  "sortStars": "Étoiles",
+  "settingsTitle": "Paramètres avancés",
+  "languageSettings": "Paramètres de langue",
+  "displayLanguage": "Langue d'affichage",
+  "systemDefault": "Par défaut du système",
+  "powerPerformance": "Puissance et performances",
+  "lowSpecMode": "Mode économie d'énergie et performances réduites",
+  "lowSpecModeDesc": "Désactive les animations premium et les effets de scintillement (shimmer), et passe à une interface utilisateur plate pour réduire la consommation de la batterie et la charge de l'appareil.",
+  "springAnimation": "Animation physique de ressort",
+  "springAnimationDesc": "Active le retour physique de ressort lors de l'appui sur les boutons.",
+  "shimmerLoading": "Chargement avec scintillement",
+  "shimmerLoadingDesc": "Affiche un écran squelette scintillant pendant le chargement des données.",
+  "listEntranceAnimation": "Animation d'apparition de la liste (Fondu/Glissement)",
+  "listEntranceAnimationDesc": "Anime l'apparition des éléments de la liste avec un effet de fondu et de glissement lors du chargement.",
+  "hapticsTouch": "Retour haptique",
+  "hapticsFeedback": "Retour haptique",
+  "hapticsFeedbackDesc": "Fournit de légères vibrations lors des interactions pour un retour tactile.",
+  "advancedTuning": "Réglages avancés",
+  "advancedTuningDesc": "Ajuste les paramètres avancés des animations.",
+  "notificationsUpdates": "Notifications et mises à jour",
+  "updateCheckNotify": "Notifications de mise à jour",
+  "updateCheckNotifyDesc": "Vérifie les dernières versions de Flowscout au démarrage et avertit si des mises à jour sont disponibles.",
+  "githubIntegration": "Intégration GitHub",
+  "addNewAccount": "Ajouter un nouveau compte",
+  "addNewAccountDesc": "Connecter un autre compte GitHub.\\n* C'est plus simple si vous êtes déjà connecté à ce compte dans votre navigateur.",
+  "manageAccounts": "Gérer les comptes",
+  "manageAccountsDesc": "Installer et gérer l'application GitHub sur de nouvelles organisations ou comptes personnels.",
+  "dangerZone": "Zone de danger",
+  "aboutApp": "À propos de cette application",
+  "accessibilitySupport": "Prise en charge de l'accessibilité",
+  "accessibilitySupportDesc": "Conçu conformément aux directives WCAG 2.2, Apple HIG Accessibility et Android Build Accessible Apps.",
+  "springScaleFactor": "Facteur d'échelle au toucher",
+  "springScaleFactorDisabled": "Facteur d'échelle au toucher (Activez le commutateur ci-dessus pour ajuster)",
+  "shimmerSpeed": "Vitesse du scintillement",
+  "shimmerSpeedDisabled": "Vitesse du scintillement (Activez le commutateur ci-dessus pour ajuster)",
+  "vibrationStrength": "Force de vibration",
+  "vibrationStrengthDisabled": "Force de vibration (Activez le commutateur ci-dessus pour ajuster)",
+  "hapticLight": "Léger (Subtil)",
+  "hapticMedium": "Moyen (Par défaut)",
+  "hapticHeavy": "Fort (Puissant)",
+  "hapticSelection": "Sélection (Effet de clic)",
+  "guestModeActive": "Utilisation du mode invité",
+  "guestModeDesc": "Non connecté à un compte GitHub (recherche d'informations publiques uniquement).",
+  "noAccountRegistered": "Aucun compte enregistré",
+  "currentlyActive": "Actif",
+  "tapToSwitch": "Appuyer pour basculer",
+  "confirmDisconnectAllTitle": "Déconnecter tous les comptes ?",
+  "confirmDisconnectTitle": "Déconnecter le compte ?",
+  "confirmDisconnectAllDesc": "Tous les comptes GitHub seront déconnectés et vous serez déconnecté.",
+  "confirmDisconnectDesc": "Déconnecter le compte actuel (@{username}).",
+  "cancel": "Annuler",
+  "disconnect": "Déconnecter",
+  "endGuestMode": "Quitter le mode invité et se connecter",
+  "endGuestModeDesc": "Retourner à l'écran de connexion pour lier votre compte GitHub.",
+  "disconnectCurrent": "Déconnecter le compte actuel",
+  "disconnectCurrentDesc": "Déconnecter uniquement le compte sélectionné de cet appareil.",
+  "logoutAll": "Déconnecter tout et se déconnecter",
+  "logoutAllDesc": "Supprimer toutes les informations de compte enregistrées de l'appareil.",
+  "updateInfoTitle": "Avis de mise à jour",
+  "newVersionAvailable": "La nouvelle version {version} est disponible !",
+  "currentVersion": "Version actuelle : {version}",
+  "releaseNotes": "Notes de version :",
+  "releaseNotesFallback": "Corrections de bogues et améliorations des performances.",
+  "later": "Plus tard",
+  "update": "Mettre à jour",
+  "themeToggle": "Changer de thème",
+  "searchHintText": "Entrez le nom du dépôt que vous souhaitez rechercher",
+  "repositories": "Dépôts",
+  "sortOrderTooltip": "Trier",
+  "sortLastCiRun": "Dernière exécution CI/CD",
+  "noRepositoriesFound": "Aucun dépôt trouvé",
+  "errorOccurred": "Une erreur est survenue : {error}",
+  "filter": "Filtrer",
+  "filterConditions": "Conditions de filtrage",
+  "reset": "Réinitialiser",
+  "repositoryType": "Type de dépôt",
+  "ownerType": "Type de propriétaire",
+  "account": "Compte",
+  "all": "Tout",
+  "personal": "Personnel",
+  "organization": "Organisation",
+  "applyFilter": "Appliquer les filtres",
+  "authPageOpenError": "Impossible d'ouvrir la page d'authentification.",
+  "authPageError": "Une erreur est survenue lors de l'ouverture de la page d'authentification : {error}",
+  "invalidTokenError": "Jeton invalide. Veuillez entrer un Personal Access Token valide.",
+  "appSubtitle": "Application de suivi GitHub CI/CD",
+  "connectWithGithub": "Se connecter avec l'application GitHub",
+  "connectWithGithubDesc": "Se connecter de manière sécurisée et rapide à l'aide de l'application GitHub.",
+  "skipGuestMode": "Passer et utiliser le mode invité",
+  "connectWithPat": "Ou se connecter avec un Personal Access Token",
+  "enterToken": "Veuillez entrer votre jeton",
+  "connectWithPatBtn": "Se connecter avec PAT",
+  "generateTokenOnGithub": "Générer un jeton sur GitHub",
+  "whatIsPat": "Qu'est-ce qu'un Personal Access Token ?",
+  "patStep1": "Paramètres GitHub → Developer settings → Personal access tokens → Tokens (classic)",
+  "patStep2": "Cliquez sur « Generate new token (classic) »",
+  "patStep3": "Sélectionnez les portées : repo, read:user, workflow",
+  "patStep4": "Entrez le jeton généré (ghp_...) dans le champ.",
+  "@confirmDisconnectDesc": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "@newVersionAvailable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@currentVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@errorOccurred": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@authPageError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  }
 }

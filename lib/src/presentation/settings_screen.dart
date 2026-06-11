@@ -6,6 +6,7 @@ import 'premium_widgets.dart';
 import 'login_screen.dart';
 import 'home_screen.dart';
 import '../domain/github_service.dart';
+import '../localization/app_localizations.dart';
 
 // アップデート通知設定を保持するStateProvider
 final updateNotifyEnabledProvider = StateProvider<bool>((ref) => true);
@@ -26,6 +27,31 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final notifyEnabled = ref.watch(updateNotifyEnabledProvider);
     final isLowSpec = ref.watch(lowSpecModeProvider);
+    final l10n = AppLocalizations.of(context)!;
+
+    String getLocaleLabel(Locale? locale) {
+      if (locale == null) {
+        return l10n.systemDefault;
+      }
+      switch (locale.languageCode) {
+        case 'de':
+          return 'Deutsch';
+        case 'en':
+          return 'English';
+        case 'es':
+          return 'Español';
+        case 'fr':
+          return 'Français';
+        case 'ja':
+          return '日本語';
+        case 'ko':
+          return '한국어';
+        case 'zh':
+          return '中文';
+        default:
+          return locale.languageCode;
+      }
+    }
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -41,7 +67,7 @@ class SettingsScreen extends ConsumerWidget {
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text('詳細設定', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(l10n.settingsTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
       ),
       body: ListView(
         physics: const BouncingScrollPhysics(),
@@ -49,27 +75,25 @@ class SettingsScreen extends ConsumerWidget {
           // --------------------------------------------------
           // セクション：言語設定
           // --------------------------------------------------
-          _buildSectionHeader(context, '言語設定'),
+          _buildSectionHeader(context, l10n.languageSettings),
           ListTile(
             leading: const Icon(Icons.language_rounded, color: Color(0xFF6366F1)),
-            title: const Text('表示言語 / Display Language'),
+            title: Text(l10n.displayLanguage),
             trailing: DropdownButton<Locale?>(
               value: ref.watch(localOverrideProvider),
               dropdownColor: Theme.of(context).cardColor,
               underline: const SizedBox(),
-              items: const [
+              items: [
                 DropdownMenuItem(
                   value: null,
-                  child: Text('システムデフォルト'),
+                  child: Text(l10n.systemDefault),
                 ),
-                DropdownMenuItem(
-                  value: Locale('ja'),
-                  child: Text('日本語'),
-                ),
-                DropdownMenuItem(
-                  value: Locale('en'),
-                  child: Text('English'),
-                ),
+                ...AppLocalizations.supportedLocales.map((locale) {
+                  return DropdownMenuItem(
+                    value: locale,
+                    child: Text(getLocaleLabel(locale)),
+                  );
+                }),
               ],
               onChanged: (locale) {
                 ref.read(localOverrideProvider.notifier).state = locale;
@@ -81,11 +105,10 @@ class SettingsScreen extends ConsumerWidget {
           // --------------------------------------------------
           // セクション：省電力 & パフォーマンス (基本項目)
           // --------------------------------------------------
-          _buildSectionHeader(context, '省電力・パフォーマンス'),
+          _buildSectionHeader(context, l10n.powerPerformance),
           SwitchListTile(
-            title: const Text('省電力・低スペック優先モード'),
-            subtitle: const Text(
-                '端末への負荷やバッテリー消費を抑えるため、極上演出やシマー効果をすべてオフにし、フラットUIに切り替えます。'),
+            title: Text(l10n.lowSpecMode),
+            subtitle: Text(l10n.lowSpecModeDesc),
             value: isLowSpec,
             activeTrackColor: const Color(0xFF6366F1),
             onChanged: (value) {
@@ -97,8 +120,8 @@ class SettingsScreen extends ConsumerWidget {
             const Divider(indent: 16, endIndent: 16),
             // スプリングアニメーション（基本項目: ON/OFF）
             SwitchListTile(
-              title: const Text('弾むスプリング物理アニメーション'),
-              subtitle: const Text('ボタンタップ時に弾む物理フィードバック演出を有効にします。'),
+              title: Text(l10n.springAnimation),
+              subtitle: Text(l10n.springAnimationDesc),
               value: ref.watch(springAnimationEnabledProvider),
               activeTrackColor: const Color(0xFF6366F1),
               onChanged: (value) {
@@ -109,8 +132,8 @@ class SettingsScreen extends ConsumerWidget {
             const Divider(indent: 16, endIndent: 16),
             // シマーローディング（基本項目: ON/OFF）
             SwitchListTile(
-              title: const Text('シマー（波打つ光）ローディング'),
-              subtitle: const Text('データ読み込み中にキラキラと光るスケルトン画面を表示します。'),
+              title: Text(l10n.shimmerLoading),
+              subtitle: Text(l10n.shimmerLoadingDesc),
               value: ref.watch(shimmerLoadingEnabledProvider),
               activeTrackColor: const Color(0xFF6366F1),
               onChanged: (value) {
@@ -121,8 +144,8 @@ class SettingsScreen extends ConsumerWidget {
             const Divider(indent: 16, endIndent: 16),
             // リスト出現アニメーション（基本項目: ON/OFF）
             SwitchListTile(
-              title: const Text('リスト出現アニメーション (フェード/スライド)'),
-              subtitle: const Text('リポジトリ一覧やワークフロー詳細の表示時に、ふわっと浮き上がるように出現させます。'),
+              title: Text(l10n.listEntranceAnimation),
+              subtitle: Text(l10n.listEntranceAnimationDesc),
               value: ref.watch(listEntranceAnimationEnabledProvider),
               activeTrackColor: const Color(0xFF6366F1),
               onChanged: (value) {
@@ -135,10 +158,10 @@ class SettingsScreen extends ConsumerWidget {
           // --------------------------------------------------
           // セクション：ハプティクス（指先触感）(基本項目)
           // --------------------------------------------------
-          _buildSectionHeader(context, 'ハプティクス（指先触感）'),
+          _buildSectionHeader(context, l10n.hapticsTouch),
           SwitchListTile(
-            title: const Text('ハプティクスフィードバック'),
-            subtitle: const Text('ボタンタップや設定切り替え時に、微小な振動を返して物理的な手応えを感じさせます。'),
+            title: Text(l10n.hapticsFeedback),
+            subtitle: Text(l10n.hapticsFeedbackDesc),
             value: ref.watch(hapticFeedbackProvider),
             activeTrackColor: const Color(0xFF6366F1),
             onChanged: (value) {
@@ -156,14 +179,14 @@ class SettingsScreen extends ConsumerWidget {
           if (!isLowSpec) ...[
             ExpansionTile(
               shape: const Border(),
-              title: const Text(
-                '高度な微調整',
-                style: TextStyle(
+              title: Text(
+                l10n.advancedTuning,
+                style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),
               ),
-              subtitle: const Text('各演出の詳細パラメータを調整します。'),
+              subtitle: Text(l10n.advancedTuningDesc),
               children: const [
                 Divider(height: 1),
                 // アニメーション縮小率スライダー
@@ -182,11 +205,10 @@ class SettingsScreen extends ConsumerWidget {
           // --------------------------------------------------
           // セクション：通知とアップデート
           // --------------------------------------------------
-          _buildSectionHeader(context, '通知とアップデート'),
+          _buildSectionHeader(context, l10n.notificationsUpdates),
           SwitchListTile(
-            title: const Text('アプデチェック通知'),
-            subtitle: const Text(
-                'アプリ起動時にGitHubの最新リリース情報を自動でチェックし、アップデートがある場合に通知します。'),
+            title: Text(l10n.updateCheckNotify),
+            subtitle: Text(l10n.updateCheckNotifyDesc),
             value: notifyEnabled,
             activeTrackColor: const Color(0xFF6366F1),
             onChanged: (value) {
@@ -198,15 +220,15 @@ class SettingsScreen extends ConsumerWidget {
           // --------------------------------------------------
           // セクション：GitHub 連携
           // --------------------------------------------------
-          _buildSectionHeader(context, 'GitHub 連携'),
+          _buildSectionHeader(context, l10n.githubIntegration),
           const _GitHubAccountTile(),
 
           ListTile(
             leading: const Icon(Icons.add_circle_outline_rounded, color: Color(0xFF6366F1)),
-            title: const Text('新しいアカウントを追加'),
-            subtitle: const Text(
-              '別のGitHubアカウントを接続します。\n※ブラウザ側で追加したいアカウントに事前ログインしておくとスムーズです。',
-              style: TextStyle(fontSize: 12),
+            title: Text(l10n.addNewAccount),
+            subtitle: Text(
+              l10n.addNewAccountDesc,
+              style: const TextStyle(fontSize: 12),
             ),
             trailing: const Icon(Icons.open_in_new_rounded),
             onTap: () async {
@@ -222,8 +244,8 @@ class SettingsScreen extends ConsumerWidget {
 
           ListTile(
             leading: const Icon(Icons.person_add_alt_1_rounded, color: Color(0xFF6366F1)),
-            title: const Text('アカウントを追加・管理'),
-            subtitle: const Text('GitHub Appを新しいOrganizationや個人アカウントにインストール・管理します。'),
+            title: Text(l10n.manageAccounts),
+            subtitle: Text(l10n.manageAccountsDesc),
             trailing: const Icon(Icons.open_in_new_rounded),
             onTap: () async {
               final url = Uri.parse('https://github.com/apps/flowscout-monitor/installations/new');
@@ -239,21 +261,20 @@ class SettingsScreen extends ConsumerWidget {
           // --------------------------------------------------
           // セクション：デンジャーゾーン
           // --------------------------------------------------
-          _buildSectionHeader(context, '危険ゾーン (Danger Zone)', isDanger: true),
+          _buildSectionHeader(context, l10n.dangerZone, isDanger: true),
           const _DangerZoneTile(),
           const Divider(),
 
-          _buildSectionHeader(context, 'このアプリについて'),
+          _buildSectionHeader(context, l10n.aboutApp),
           const ListTile(
             leading: Icon(Icons.info_outline_rounded),
             title: Text('Flowscout'),
             subtitle: Text('Version 1.0.0 (Build 1)'),
           ),
-          const ListTile(
-            leading: Icon(Icons.accessibility_new_rounded),
-            title: Text('アクセシビリティ対応'),
-            subtitle: Text(
-                'WCAG 2.2、Apple HIG Accessibility、およびAndroid Build Accessible Apps ガイドラインに準拠して設計されています。'),
+          ListTile(
+            leading: const Icon(Icons.accessibility_new_rounded),
+            title: Text(l10n.accessibilitySupport),
+            subtitle: Text(l10n.accessibilitySupportDesc),
           ),
         ],
       ),
@@ -299,8 +320,8 @@ class _SpringScaleSlider extends ConsumerWidget {
                   Expanded(
                     child: Text(
                       isEnabled
-                          ? 'タップ時の縮小率'
-                          : 'タップ時の縮小率 (上のスイッチを有効にすると調整可能)',
+                          ? AppLocalizations.of(context)!.springScaleFactor
+                          : AppLocalizations.of(context)!.springScaleFactorDisabled,
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -358,8 +379,8 @@ class _ShimmerSpeedSlider extends ConsumerWidget {
                   Expanded(
                     child: Text(
                       isEnabled
-                          ? 'シマーアニメーション速度'
-                          : 'シマーアニメーション速度 (上のスイッチを有効にすると調整可能)',
+                          ? AppLocalizations.of(context)!.shimmerSpeed
+                          : AppLocalizations.of(context)!.shimmerSpeedDisabled,
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -414,8 +435,8 @@ class _HapticStrengthDropdown extends ConsumerWidget {
               Expanded(
                 child: Text(
                   isEnabled
-                      ? 'バイブレーション強度'
-                      : 'バイブレーション強度 (上のスイッチを有効にすると調整可能)',
+                      ? AppLocalizations.of(context)!.vibrationStrength
+                      : AppLocalizations.of(context)!.vibrationStrengthDisabled,
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -445,19 +466,19 @@ class _HapticStrengthDropdown extends ConsumerWidget {
                         }
                       }
                     : null,
-                items: const [
+                items: [
                   DropdownMenuItem(
                       value: HapticStrength.light,
-                      child: Text('Light (繊細)')),
+                      child: Text(AppLocalizations.of(context)!.hapticLight)),
                   DropdownMenuItem(
                       value: HapticStrength.medium,
-                      child: Text('Medium (通常)')),
+                      child: Text(AppLocalizations.of(context)!.hapticMedium)),
                   DropdownMenuItem(
                       value: HapticStrength.heavy,
-                      child: Text('Heavy (強力)')),
+                      child: Text(AppLocalizations.of(context)!.hapticHeavy)),
                   DropdownMenuItem(
                       value: HapticStrength.selection,
-                      child: Text('Selection (クリック感)')),
+                      child: Text(AppLocalizations.of(context)!.hapticSelection)),
                 ],
               ),
             ],
@@ -477,12 +498,13 @@ class _GitHubAccountTile extends ConsumerWidget {
     final service = ref.read(gitHubServiceProvider);
     final activeUserAsync = ref.watch(activeUserProvider);
     final isGuestMode = ref.watch(isGuestModeProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     if (isGuestMode) {
-      return const ListTile(
-        leading: Icon(Icons.face_retouching_natural_rounded, color: Color(0xFF6366F1)),
-        title: Text('ゲストモードで利用中'),
-        subtitle: Text('GitHubアカウントと連携していません (パブリック情報のみ検索可能です)'),
+      return ListTile(
+        leading: const Icon(Icons.face_retouching_natural_rounded, color: Color(0xFF6366F1)),
+        title: Text(l10n.guestModeActive),
+        subtitle: Text(l10n.guestModeDesc),
       );
     }
 
@@ -491,9 +513,9 @@ class _GitHubAccountTile extends ConsumerWidget {
       builder: (context, snapshot) {
         final users = snapshot.data ?? [];
         if (users.isEmpty) {
-          return const ListTile(
-            leading: Icon(Icons.person_off_rounded),
-            title: Text('アカウントが登録されていません'),
+          return ListTile(
+            leading: const Icon(Icons.person_off_rounded),
+            title: Text(l10n.noAccountRegistered),
           );
         }
 
@@ -515,7 +537,7 @@ class _GitHubAccountTile extends ConsumerWidget {
                   fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
                 ),
               ),
-              subtitle: Text(isActive ? '現在使用中 (アクティブ)' : 'タップして切り替え'),
+              subtitle: Text(isActive ? l10n.currentlyActive : l10n.tapToSwitch),
               trailing: isActive
                   ? const Icon(Icons.check_circle_rounded, color: Color(0xFF10B981))
                   : null,
@@ -552,20 +574,21 @@ class _DangerZoneTile extends ConsumerWidget {
   }) async {
     final activeUser = await service.getActiveUser();
     if (!context.mounted) return;
+    final l10n = AppLocalizations.of(context)!;
 
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(all ? 'すべてのアカウントを解除しますか？' : 'アカウントの接続を解除しますか？'),
+        title: Text(all ? l10n.confirmDisconnectAllTitle : l10n.confirmDisconnectTitle),
         content: Text(
           all
-              ? 'すべてのGitHubアカウントとの連携を解除し、完全にログアウトします。'
-              : '現在のアカウント (@$activeUser) との連携を解除します。',
+              ? l10n.confirmDisconnectAllDesc
+              : l10n.confirmDisconnectDesc(activeUser ?? ''),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('キャンセル'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -601,8 +624,8 @@ class _DangerZoneTile extends ConsumerWidget {
                 }
               }
             },
-            child: const Text('解除',
-                style: TextStyle(color: Colors.white)),
+            child: Text(l10n.disconnect,
+                style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -613,6 +636,7 @@ class _DangerZoneTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final service = ref.read<GitHubService>(gitHubServiceProvider);
     final isGuestMode = ref.watch(isGuestModeProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     if (isGuestMode) {
       return Padding(
@@ -626,11 +650,11 @@ class _DangerZoneTile extends ConsumerWidget {
           child: ListTile(
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             leading: const Icon(Icons.login_rounded, color: Color(0xFF6366F1), size: 26),
-            title: const Text(
-              'ゲストモードを終了してログイン',
-              style: TextStyle(color: Color(0xFF6366F1), fontWeight: FontWeight.bold),
+            title: Text(
+              l10n.endGuestMode,
+              style: const TextStyle(color: Color(0xFF6366F1), fontWeight: FontWeight.bold),
             ),
-            subtitle: const Text('ログイン画面へ戻り、GitHubアカウントと連携します。'),
+            subtitle: Text(l10n.endGuestModeDesc),
             onTap: () {
               ref.read(isLoggedInProvider.notifier).state = false;
               ref.read(isGuestModeProvider.notifier).state = false;
@@ -668,11 +692,11 @@ class _DangerZoneTile extends ConsumerWidget {
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     leading: const Icon(Icons.logout_rounded,
                         color: Color(0xFFEF4444), size: 26),
-                    title: const Text(
-                      '現在のアカウントの接続解除',
-                      style: TextStyle(color: Color(0xFFEF4444), fontWeight: FontWeight.bold),
+                    title: Text(
+                      l10n.disconnectCurrent,
+                      style: const TextStyle(color: Color(0xFFEF4444), fontWeight: FontWeight.bold),
                     ),
-                    subtitle: const Text('選択中のアカウントのみ、このデバイスから接続を解除します。'),
+                    subtitle: Text(l10n.disconnectCurrentDesc),
                     onTap: () => _confirmDisconnect(context, ref, service, all: false),
                   ),
                 ),
@@ -684,11 +708,11 @@ class _DangerZoneTile extends ConsumerWidget {
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     leading: const Icon(Icons.delete_forever_rounded,
                         color: Color(0xFFEF4444), size: 26),
-                    title: const Text(
-                      'すべてのアカウントを解除してログアウト',
-                      style: TextStyle(color: Color(0xFFEF4444), fontWeight: FontWeight.bold),
+                    title: Text(
+                      l10n.logoutAll,
+                      style: const TextStyle(color: Color(0xFFEF4444), fontWeight: FontWeight.bold),
                     ),
-                    subtitle: const Text('登録されている全てのアカウント情報をデバイスから削除します。'),
+                    subtitle: Text(l10n.logoutAllDesc),
                     onTap: () => _confirmDisconnect(context, ref, service, all: true),
                   ),
                 ),

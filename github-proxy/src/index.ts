@@ -1,5 +1,5 @@
 export interface Env {
-  GITHUB_PAT: string;
+  GITHUB_PATS: string;
 }
 
 export default {
@@ -26,8 +26,12 @@ export default {
     headers.set("User-Agent", "Flowscout-Proxy/1.0");
 
     // Add authentication if token is available
-    if (env.GITHUB_PAT) {
-      headers.set("Authorization", `Bearer ${env.GITHUB_PAT}`);
+    if (env.GITHUB_PATS) {
+      const tokens = env.GITHUB_PATS.split(',').map(t => t.trim()).filter(t => t.length > 0);
+      if (tokens.length > 0) {
+        const randomToken = tokens[Math.floor(Math.random() * tokens.length)];
+        headers.set("Authorization", `Bearer ${randomToken}`);
+      }
     }
 
     // Forward the request to GitHub, do not follow redirects

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'home_screen.dart';
+import '../localization/app_localizations.dart';
 
 // ログイン状態のグローバル管理（アプリ全体で使用）
 final isLoggedInProvider = StateProvider<bool>((ref) => false);
@@ -57,6 +58,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 
   // OAuthログイン（Web Application Flow）の開始
   Future<void> _startOAuthFlow() async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -70,7 +72,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       if (!launched) {
         setState(() {
           _isLoading = false;
-          _errorMessage = '認証ページを開くことができませんでした。';
+          _errorMessage = l10n.authPageOpenError;
         });
       } else {
         setState(() {
@@ -80,7 +82,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     } catch (e) {
       setState(() {
         _isLoading = false;
-        _errorMessage = '認証ページを開く際にエラーが発生しました: $e';
+        _errorMessage = l10n.authPageError(e.toString());
       });
     }
   }
@@ -89,6 +91,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   Future<void> _loginWithPat() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
+    final l10n = AppLocalizations.of(context)!;
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -112,7 +115,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     } else {
       setState(() {
         _isLoading = false;
-        _errorMessage = 'トークンが無効です。正しいPersonal Access Tokenを入力してください。';
+        _errorMessage = l10n.invalidTokenError;
       });
     }
   }
@@ -120,6 +123,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -186,7 +190,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'GitHub CI/CDモニタリングアプリ',
+                    l10n.appSubtitle,
                     style: TextStyle(
                       fontSize: 15,
                       color: Theme.of(context).hintColor,
@@ -252,14 +256,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                 color: Colors.white,
                               ),
                             )
-                          : const Row(
+                          : Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.login_rounded, size: 20),
-                                SizedBox(width: 8),
+                                const Icon(Icons.login_rounded, size: 20),
+                                const SizedBox(width: 8),
                                 Text(
-                                  'GitHub Appで連携する',
-                                  style: TextStyle(
+                                  l10n.connectWithGithub,
+                                  style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -270,7 +274,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'GitHub App を使用して安全かつ迅速に連携できます。',
+                    l10n.connectWithGithubDesc,
                     style: TextStyle(
                       fontSize: 12,
                       color: Theme.of(context).hintColor,
@@ -280,6 +284,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 
                   const SizedBox(height: 48),
 
+                  // ── ゲストモードのスキップボタン ──
+                  TextButton(
+                    onPressed: () {
+                      ref.read(isGuestModeProvider.notifier).state = true;
+                      ref.read(isLoggedInProvider.notifier).state = true;
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute<void>(builder: (_) => const HomeScreen()),
+                        (route) => false,
+                      );
+                    },
+                    child: Text(
+                      l10n.skipGuestMode,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
                   // ── PAT オプション (アコーディオン) ──
                   Theme(
                     data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
@@ -290,7 +315,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                       },
                       title: Center(
                         child: Text(
-                          'または Personal Access Token で接続',
+                          l10n.connectWithPat,
                           style: TextStyle(
                             fontSize: 14,
                             color: Theme.of(context).hintColor,
@@ -304,7 +329,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                           child: Column(
                             children: [
                               const SizedBox(height: 16),
-                              _buildInfoCard(isDark),
+                              _buildInfoCard(isDark, l10n),
                               const SizedBox(height: 20),
                               TextFormField(
                                 controller: _tokenController,
@@ -353,7 +378,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                 ),
                                 validator: (value) {
                                   if (value == null || value.trim().isEmpty) {
-                                    return 'トークンを入力してください';
+                                    return l10n.enterToken;
                                   }
                                   return null;
                                 },
@@ -380,7 +405,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                             color: Colors.white,
                                           ),
                                         )
-                                      : const Text('PATで接続する'),
+                                      : Text(l10n.connectWithPatBtn),
                                 ),
                               ),
                               const SizedBox(height: 8),
@@ -395,9 +420,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                 },
                                 icon: const Icon(Icons.open_in_new_rounded, size: 14,
                                     color: Color(0xFF6366F1)),
-                                label: const Text(
-                                  'GitHubでトークンを発行する',
-                                  style: TextStyle(color: Color(0xFF6366F1), fontSize: 13),
+                                label: Text(
+                                  l10n.generateTokenOnGithub,
+                                  style: const TextStyle(color: Color(0xFF6366F1), fontSize: 13),
                                 ),
                               ),
                             ],
@@ -408,63 +433,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                   ),
                   const SizedBox(height: 32),
 
-                  // ── ゲストモードのスキップボタン ──
-                  TextButton(
-                    onPressed: () {
-                      showDialog<void>(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: const Row(
-                              children: [
-                                Icon(Icons.warning_amber_rounded, color: Colors.orange),
-                                SizedBox(width: 8),
-                                Text('ゲストモードの注意'),
-                              ],
-                            ),
-                            content: const Text(
-                              'ゲストモードでは共有APIキー（PAT）を利用するため、APIの取得回数制限（1時間に約5,000回）があります。\n\nそのため、短時間に極端に何度も画面を開いたり更新したりすると、「取得失敗」などのエラーが表示される場合があります。\n\nすべての機能を制限なく利用するには、ログインしてご利用いただくことを推奨します。',
-                              style: TextStyle(fontSize: 14),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text('キャンセル'),
-                              ),
-                              ElevatedButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                  ref.read(isGuestModeProvider.notifier).state = true;
-                                  ref.read(isLoggedInProvider.notifier).state = true;
-                                  Navigator.of(context).pushAndRemoveUntil(
-                                    MaterialPageRoute<void>(builder: (_) => const HomeScreen()),
-                                    (route) => false,
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Theme.of(context).colorScheme.primary,
-                                  foregroundColor: Colors.white,
-                                ),
-                                child: const Text('同意して進む'),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    },
-                    child: Text(
-                      'ログインせずにスキップ (ゲストモード)',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 16),
                 ],
               ),
             ),
@@ -474,7 +443,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     );
   }
 
-  Widget _buildInfoCard(bool isDark) {
+  Widget _buildInfoCard(bool isDark, AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -495,7 +464,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                   color: Color(0xFF6366F1), size: 18),
               const SizedBox(width: 8),
               Text(
-                'Personal Access Tokenとは',
+                l10n.whatIsPat,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
@@ -507,13 +476,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
             ],
           ),
           const SizedBox(height: 10),
-          _buildInfoRow('GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)'),
+          _buildInfoRow(l10n.patStep1),
           const SizedBox(height: 6),
-          _buildInfoRow('「Generate new token (classic)」をクリック'),
+          _buildInfoRow(l10n.patStep2),
           const SizedBox(height: 6),
-          _buildInfoRow('スコープ: repo, read:user, workflow にチェックを入れる'),
+          _buildInfoRow(l10n.patStep3),
           const SizedBox(height: 6),
-          _buildInfoRow('生成されたトークン（ghp_...）を入力欄に入力します。'),
+          _buildInfoRow(l10n.patStep4),
         ],
       ),
     );

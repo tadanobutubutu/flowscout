@@ -7,5 +7,137 @@
   "selectOrder": "順序",
   "sortLastUpdated": "更新順",
   "sortName": "名前順",
-  "sortStars": "スター数順"
+  "sortStars": "スター数順",
+  "settingsTitle": "詳細設定",
+  "languageSettings": "言語設定",
+  "displayLanguage": "表示言語 / Display Language",
+  "systemDefault": "システムデフォルト",
+  "powerPerformance": "省電力・パフォーマンス",
+  "lowSpecMode": "省電力・低スペック優先モード",
+  "lowSpecModeDesc": "端末への負荷やバッテリー消費を抑えるため、極上演出やシマー効果をすべてオフにし、フラットUIに切り替えます。",
+  "springAnimation": "弾むスプリング物理アニメーション",
+  "springAnimationDesc": "ボタンタップ時に弾む物理フィードバック演出を有効にします。",
+  "shimmerLoading": "シマー（波打つ光）ローディング",
+  "shimmerLoadingDesc": "データ読み込み中にキラキラと光るスケルトン画面を表示します。",
+  "listEntranceAnimation": "リスト出現アニメーション (フェード/スライド)",
+  "listEntranceAnimationDesc": "リポジトリ一覧やワークフロー詳細の表示時に、ふわっと浮き上がるように出現させます。",
+  "hapticsTouch": "ハプティクス（指先触感）",
+  "hapticsFeedback": "ハプティクスフィードバック",
+  "hapticsFeedbackDesc": "ボタンタップや設定切り替え時に、微小な振動を返して物理的な手応えを感じさせます。",
+  "advancedTuning": "高度な微調整",
+  "advancedTuningDesc": "各演出の詳細パラメータを調整します。",
+  "notificationsUpdates": "通知とアップデート",
+  "updateCheckNotify": "アプデチェック通知",
+  "updateCheckNotifyDesc": "アプリ起動時にGitHubの最新リリース情報を自動でチェックし、アップデートがある場合に通知します。",
+  "githubIntegration": "GitHub 連携",
+  "addNewAccount": "新しいアカウントを追加",
+  "addNewAccountDesc": "別のGitHubアカウントを接続します。\\n※ブラウザ側で追加したいアカウントに事前ログインしておくとスムーズです。",
+  "manageAccounts": "アカウントを追加・管理",
+  "manageAccountsDesc": "GitHub Appを新しいOrganizationや個人アカウントにインストール・管理します。",
+  "dangerZone": "危険ゾーン (Danger Zone)",
+  "aboutApp": "このアプリについて",
+  "accessibilitySupport": "アクセシビリティ対応",
+  "accessibilitySupportDesc": "WCAG 2.2、Apple HIG Accessibility、およびAndroid Build Accessible Apps ガイドラインに準拠して設計されています。",
+  "springScaleFactor": "タップ時の縮小率",
+  "springScaleFactorDisabled": "タップ時の縮小率 (上のスイッチを有効にすると調整可能)",
+  "shimmerSpeed": "シマーアニメーション速度",
+  "shimmerSpeedDisabled": "シマーアニメーション速度 (上のスイッチを有効にすると調整可能)",
+  "vibrationStrength": "バイブレーション強度",
+  "vibrationStrengthDisabled": "バイブレーション強度 (上のスイッチを有効にすると調整可能)",
+  "hapticLight": "Light (繊細)",
+  "hapticMedium": "Medium (通常)",
+  "hapticHeavy": "Heavy (強力)",
+  "hapticSelection": "Selection (クリック感)",
+  "guestModeActive": "ゲストモードで利用中",
+  "guestModeDesc": "GitHubアカウントと連携していません (パブリック情報のみ検索可能です)",
+  "noAccountRegistered": "アカウントが登録されていません",
+  "currentlyActive": "現在使用中 (アクティブ)",
+  "tapToSwitch": "タップして切り替え",
+  "confirmDisconnectAllTitle": "すべてのアカウントを解除しますか？",
+  "confirmDisconnectTitle": "アカウントの接続を解除しますか？",
+  "confirmDisconnectAllDesc": "すべてのGitHubアカウントとの連携を解除し、完全にログアウトします。",
+  "confirmDisconnectDesc": "現在のアカウント (@{username}) との連携を解除します。",
+  "cancel": "キャンセル",
+  "disconnect": "解除",
+  "endGuestMode": "ゲストモードを終了してログイン",
+  "endGuestModeDesc": "ログイン画面へ戻り、GitHubアカウントと連携します。",
+  "disconnectCurrent": "現在のアカウントの接続解除",
+  "disconnectCurrentDesc": "選択中のアカウントのみ、このデバイスから接続を解除します。",
+  "logoutAll": "すべてのアカウントを解除してログアウト",
+  "logoutAllDesc": "登録されている全てのアカウント情報をデバイスから削除します。",
+  "updateInfoTitle": "アップデートのご案内",
+  "newVersionAvailable": "新しいバージョン {version} が利用可能です！",
+  "currentVersion": "現在のバージョン: {version}",
+  "releaseNotes": "リリースノート:",
+  "releaseNotesFallback": "バグ修正とパフォーマンスの向上。",
+  "later": "後で",
+  "update": "アップデート",
+  "themeToggle": "テーマ切り替え",
+  "searchHintText": "検索したいリポジトリ名を入力してください",
+  "repositories": "リポジトリ",
+  "sortOrderTooltip": "並び替え",
+  "sortLastCiRun": "最後のCI/CD実行順",
+  "noRepositoriesFound": "リポジトリが見つかりません",
+  "errorOccurred": "エラーが発生しました: {error}",
+  "filter": "フィルター",
+  "filterConditions": "フィルター条件",
+  "reset": "リセット",
+  "repositoryType": "リポジトリタイプ",
+  "ownerType": "オーナータイプ",
+  "account": "アカウント",
+  "all": "すべて",
+  "personal": "個人",
+  "organization": "組織 (Org)",
+  "applyFilter": "フィルターを適用",
+  "authPageOpenError": "認証ページを開くことができませんでした。",
+  "authPageError": "認証ページを開く際にエラーが発生しました: {error}",
+  "invalidTokenError": "トークンが無効です。正しいPersonal Access Tokenを入力してください。",
+  "appSubtitle": "GitHub CI/CDモニタリングアプリ",
+  "connectWithGithub": "GitHub Appで連携する",
+  "connectWithGithubDesc": "GitHub App を使用して安全かつ迅速に連携できます。",
+  "skipGuestMode": "ログインせずにスキップ (ゲストモード)",
+  "connectWithPat": "または Personal Access Token で接続",
+  "enterToken": "トークンを入力してください",
+  "connectWithPatBtn": "PATで接続する",
+  "generateTokenOnGithub": "GitHubでトークンを発行する",
+  "whatIsPat": "Personal Access Tokenとは",
+  "patStep1": "GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)",
+  "patStep2": "「Generate new token (classic)」をクリック",
+  "patStep3": "スコープ: repo, read:user, workflow にチェックを入れる",
+  "patStep4": "生成されたトークン（ghp_...）を入力欄に入力します。",
+  "@confirmDisconnectDesc": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "@newVersionAvailable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@currentVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@errorOccurred": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@authPageError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  }
 }

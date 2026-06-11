@@ -3,5 +3,141 @@
   "appTitle": "Flowscout",
   "searchHint": "搜索仓库...",
   "myRepositories": "我的仓库",
-  "settings": "设置"
+  "settings": "设置",
+  "selectOrder": "顺序",
+  "sortLastUpdated": "更新顺序",
+  "sortName": "名称顺序",
+  "sortStars": "星标数顺序",
+  "settingsTitle": "高级设置",
+  "languageSettings": "语言设置",
+  "displayLanguage": "显示语言",
+  "systemDefault": "系统默认",
+  "powerPerformance": "省电与性能",
+  "lowSpecMode": "省电及低配置优先模式",
+  "lowSpecModeDesc": "关闭所有高级动画和渐变光晕（Shimmer）效果，并切换到扁平 UI，以减少电池消耗和设备负载。",
+  "springAnimation": "弹性物理动画",
+  "springAnimationDesc": "启用按钮点击时的弹性物理反馈效果。",
+  "shimmerLoading": "渐变光晕加载",
+  "shimmerLoadingDesc": "在加载数据时显示闪烁的骨架屏。",
+  "listEntranceAnimation": "列表出现动画 (淡入/滑入)",
+  "listEntranceAnimationDesc": "在加载时，使列表项以淡入和滑入的动画效果显现。",
+  "hapticsTouch": "触觉反馈",
+  "hapticsFeedback": "触觉反馈",
+  "hapticsFeedbackDesc": "在交互时提供细微的震动反馈，体验物理手感。",
+  "advancedTuning": "高级微调",
+  "advancedTuningDesc": "微调动画的各个高级参数。",
+  "notificationsUpdates": "通知与更新",
+  "updateCheckNotify": "更新检查通知",
+  "updateCheckNotifyDesc": "在启动时自动检查 GitHub 上的最新 Release 版本，并在有可用更新时发送通知。",
+  "githubIntegration": "GitHub 关联",
+  "addNewAccount": "添加新账号",
+  "addNewAccountDesc": "连接另一个 GitHub 账号。\\n* 如果您已在浏览器中预先登录了要添加的账号，过程会更顺畅。",
+  "manageAccounts": "添加与管理账号",
+  "manageAccountsDesc": "在新组织或个人账号中安装和管理 GitHub App。",
+  "dangerZone": "危险区域 (Danger Zone)",
+  "aboutApp": "关于此应用",
+  "accessibilitySupport": "无障碍支持",
+  "accessibilitySupportDesc": "设计符合 WCAG 2.2、Apple HIG 无障碍指南以及 Android 编写无障碍应用指南。",
+  "springScaleFactor": "点击时的缩放比例",
+  "springScaleFactorDisabled": "点击时的缩放比例 (启用上方开关后可调节)",
+  "shimmerSpeed": "渐变光晕动画速度",
+  "shimmerSpeedDisabled": "渐变光晕动画速度 (启用上方开关后可调节)",
+  "vibrationStrength": "振动强度",
+  "vibrationStrengthDisabled": "振动强度 (启用上方开关后可调节)",
+  "hapticLight": "Light (细微)",
+  "hapticMedium": "Medium (默认)",
+  "hapticHeavy": "Heavy (强劲)",
+  "hapticSelection": "Selection (点击感)",
+  "guestModeActive": "正在以游客模式使用",
+  "guestModeDesc": "未与 GitHub 账号关联 (仅可搜索公开信息)",
+  "noAccountRegistered": "未注册账号",
+  "currentlyActive": "当前使用中 (活跃)",
+  "tapToSwitch": "点击切换",
+  "confirmDisconnectAllTitle": "是否断开所有账号的连接？",
+  "confirmDisconnectTitle": "是否断开账号连接？",
+  "confirmDisconnectAllDesc": "将断开与所有 GitHub 账号的关联并完全退出登录。",
+  "confirmDisconnectDesc": "断开当前账号 (@{username}) 的关联。",
+  "cancel": "取消",
+  "disconnect": "断开连接",
+  "endGuestMode": "退出游客模式并登录",
+  "endGuestModeDesc": "返回登录界面以关联您的 GitHub 账号。",
+  "disconnectCurrent": "断开当前账号的连接",
+  "disconnectCurrentDesc": "仅在此设备上断开所选账号的连接。",
+  "logoutAll": "断开所有账号并退出登录",
+  "logoutAllDesc": "从设备中删除所有已保存的账号信息。",
+  "updateInfoTitle": "更新提示",
+  "newVersionAvailable": "新版本 {version} 已可用！",
+  "currentVersion": "当前版本: {version}",
+  "releaseNotes": "更新日志:",
+  "releaseNotesFallback": "Bug 修复和性能提升。",
+  "later": "稍后",
+  "update": "更新",
+  "themeToggle": "切换主题",
+  "searchHintText": "请输入您要搜索的仓库名称",
+  "repositories": "仓库",
+  "sortOrderTooltip": "排序",
+  "sortLastCiRun": "最近一次 CI/CD 运行",
+  "noRepositoriesFound": "未找到仓库",
+  "errorOccurred": "发生错误: {error}",
+  "filter": "筛选",
+  "filterConditions": "筛选条件",
+  "reset": "重置",
+  "repositoryType": "仓库类型",
+  "ownerType": "所有者类型",
+  "account": "账号",
+  "all": "全部",
+  "personal": "个人",
+  "organization": "组织 (Org)",
+  "applyFilter": "应用筛选",
+  "authPageOpenError": "无法打开授权页面。",
+  "authPageError": "打开授权页面时发生错误: {error}",
+  "invalidTokenError": "凭证 (Token) 无效。请输入正确的 Personal Access Token。",
+  "appSubtitle": "GitHub CI/CD 监控应用",
+  "connectWithGithub": "通过 GitHub App 关联",
+  "connectWithGithubDesc": "使用 GitHub App 安全且快速地进行关联。",
+  "skipGuestMode": "跳过登录 (游客模式)",
+  "connectWithPat": "或者通过 Personal Access Token 连接",
+  "enterToken": "请输入您的 Token",
+  "connectWithPatBtn": "使用 PAT 连接",
+  "generateTokenOnGithub": "在 GitHub 上生成 Token",
+  "whatIsPat": "什么是 Personal Access Token？",
+  "patStep1": "GitHub 设置 → Developer settings → Personal access tokens → Tokens (classic)",
+  "patStep2": "点击 \"Generate new token (classic)\"",
+  "patStep3": "勾选 scopes: repo, read:user, workflow",
+  "patStep4": "在输入框中输入生成的 Token (ghp_...)",
+  "@confirmDisconnectDesc": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "@newVersionAvailable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@currentVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@errorOccurred": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@authPageError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  }
 }

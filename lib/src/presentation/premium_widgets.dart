@@ -108,14 +108,7 @@ class _PremiumSpringButtonState extends State<PremiumSpringButton> with SingleTi
     _controller.forward();
   }
 
-  void _handleTapUp(TapUpDetails details, WidgetRef ref) {
-    final isLowSpec = ref.read(lowSpecModeProvider);
-    final springEnabled = ref.read(springAnimationEnabledProvider);
-    if (!isLowSpec && springEnabled) {
-      _controller.reverse();
-    }
-    _triggerFeedbackAndTap(ref);
-  }
+  // Removed _handleTapUp as its logic is now split between onTapUp and onTap in the builder
 
   void _handleTapCancel(WidgetRef ref) {
     final isLowSpec = ref.read(lowSpecModeProvider);
@@ -163,7 +156,14 @@ class _PremiumSpringButtonState extends State<PremiumSpringButton> with SingleTi
 
         return GestureDetector(
           onTapDown: (details) => _handleTapDown(details, ref),
-          onTapUp: (details) => _handleTapUp(details, ref),
+          onTapUp: (details) {
+            final isLowSpec = ref.read(lowSpecModeProvider);
+            final springEnabled = ref.read(springAnimationEnabledProvider);
+            if (!isLowSpec && springEnabled) {
+              _controller.reverse();
+            }
+          },
+          onTap: () => _triggerFeedbackAndTap(ref),
           onTapCancel: () => _handleTapCancel(ref),
           behavior: HitTestBehavior.opaque,
           child: RepaintBoundary(

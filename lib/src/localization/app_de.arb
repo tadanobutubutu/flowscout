@@ -3,5 +3,141 @@
   "appTitle": "Flowscout",
   "searchHint": "Repositorys suchen...",
   "myRepositories": "Meine Repositorys",
-  "settings": "Einstellungen"
+  "settings": "Einstellungen",
+  "selectOrder": "Reihenfolge",
+  "sortLastUpdated": "Zuletzt aktualisiert",
+  "sortName": "Name",
+  "sortStars": "Sterne",
+  "settingsTitle": "Erweiterte Einstellungen",
+  "languageSettings": "Spracheinstellungen",
+  "displayLanguage": "Anzeigesprache",
+  "systemDefault": "Systemstandard",
+  "powerPerformance": "Leistung & Energie",
+  "lowSpecMode": "Energiespar- & niedriger Spezifikationsmodus",
+  "lowSpecModeDesc": "Schaltet Premium-Animationen und Shimmer-Effekte aus und wechselt zu einer flachen Benutzeroberfläche, um den Batterieverbrauch und die Geräteauslastung zu reduzieren.",
+  "springAnimation": "Federphysik-Animation",
+  "springAnimationDesc": "Aktiviert Federphysik-Feedback beim Tippen auf Schaltflächen.",
+  "shimmerLoading": "Shimmer-Ladeeffekt",
+  "shimmerLoadingDesc": "Zeigt während des Ladens von Daten einen schimmernden Platzhalter-Bildschirm an.",
+  "listEntranceAnimation": "Animation beim Erscheinen der Liste (Einblenden/Gleiten)",
+  "listEntranceAnimationDesc": "Listenelemente beim Laden animiert einblenden und gleiten lassen.",
+  "hapticsTouch": "Haptisches Feedback",
+  "hapticsFeedback": "Haptisches Feedback",
+  "hapticsFeedbackDesc": "Bietet feine Vibrationen bei Interaktionen für taktiles Feedback.",
+  "advancedTuning": "Erweiterte Feinabstimmung",
+  "advancedTuningDesc": "Feinabstimmung erweiterter Parameter für die Animationen.",
+  "notificationsUpdates": "Benachrichtigungen & Updates",
+  "updateCheckNotify": "Update-Benachrichtigungen",
+  "updateCheckNotifyDesc": "Prüft beim Start auf die neuesten Flowscout-Releases und benachrichtigt, wenn Updates verfügbar sind.",
+  "githubIntegration": "GitHub-Integration",
+  "addNewAccount": "Neues Konto hinzufügen",
+  "addNewAccountDesc": "Ein weiteres GitHub-Konto verbinden.\\n* Es ist einfacher, wenn Sie bereits in diesem Konto in Ihrem Browser angemeldet sind.",
+  "manageAccounts": "Konten verwalten",
+  "manageAccountsDesc": "Installieren und verwalten Sie die GitHub-App für neue Organisationen oder persönliche Konten.",
+  "dangerZone": "Gefahrenbereich",
+  "aboutApp": "Über diese App",
+  "accessibilitySupport": "Barrierefreiheit-Unterstützung",
+  "accessibilitySupportDesc": "Entwickelt in Übereinstimmung mit den Richtlinien WCAG 2.2, Apple HIG Accessibility und Android Build Accessible Apps.",
+  "springScaleFactor": "Skalierungsfaktor beim Tippen",
+  "springScaleFactorDisabled": "Skalierungsfaktor beim Tippen (Aktivieren Sie den obigen Schalter zum Anpassen)",
+  "shimmerSpeed": "Shimmer-Geschwindigkeit",
+  "shimmerSpeedDisabled": "Shimmer-Geschwindigkeit (Aktivieren Sie den obigen Schalter zum Anpassen)",
+  "vibrationStrength": "Vibrationsstärke",
+  "vibrationStrengthDisabled": "Vibrationsstärke (Aktivieren Sie den obigen Schalter zum Anpassen)",
+  "hapticLight": "Leicht (Subtil)",
+  "hapticMedium": "Mittel (Standard)",
+  "hapticHeavy": "Stark (Kräftig)",
+  "hapticSelection": "Auswahl (Klick-Effekt)",
+  "guestModeActive": "Gastmodus aktiv",
+  "guestModeDesc": "Nicht mit einem GitHub-Konto verbunden (nur Suche nach öffentlichen Informationen).",
+  "noAccountRegistered": "Kein Konto registriert",
+  "currentlyActive": "Aktiv",
+  "tapToSwitch": "Tippen zum Wechseln",
+  "confirmDisconnectAllTitle": "Alle Konten trennen?",
+  "confirmDisconnectTitle": "Konto trennen?",
+  "confirmDisconnectAllDesc": "Alle GitHub-Konten werden getrennt und Sie werden abgemeldet.",
+  "confirmDisconnectDesc": "Die Verbindung zum aktuellen Konto (@{username}) trennen.",
+  "cancel": "Abbrechen",
+  "disconnect": "Trennen",
+  "endGuestMode": "Gastmodus beenden & anmelden",
+  "endGuestModeDesc": "Gehen Sie zurück zum Anmeldebildschirm, um Ihr GitHub-Konto zu verknüpfen.",
+  "disconnectCurrent": "Aktuelles Konto trennen",
+  "disconnectCurrentDesc": "Trennen Sie nur das ausgewählte Konto von diesem Gerät.",
+  "logoutAll": "Alle trennen & abmelden",
+  "logoutAllDesc": "Entfernen Sie alle registrierten Kontoinformationen von diesem Gerät.",
+  "updateInfoTitle": "Update-Hinweis",
+  "newVersionAvailable": "Neue Version {version} ist verfügbar!",
+  "currentVersion": "Aktuelle Version: {version}",
+  "releaseNotes": "Versionshinweise:",
+  "releaseNotesFallback": "Fehlerbehebungen und Leistungsverbesserungen.",
+  "later": "Später",
+  "update": "Aktualisieren",
+  "themeToggle": "Design umschalten",
+  "searchHintText": "Geben Sie den Namen des gesuchten Repositorys ein",
+  "repositories": "Repositorys",
+  "sortOrderTooltip": "Sortieren",
+  "sortLastCiRun": "Letzter CI/CD-Lauf",
+  "noRepositoriesFound": "Keine Repositorys gefunden",
+  "errorOccurred": "Ein Fehler ist aufgetreten: {error}",
+  "filter": "Filter",
+  "filterConditions": "Filterbedingungen",
+  "reset": "Zurücksetzen",
+  "repositoryType": "Repository-Typ",
+  "ownerType": "Besitzer-Typ",
+  "account": "Konto",
+  "all": "Alle",
+  "personal": "Persönlich",
+  "organization": "Organisation",
+  "applyFilter": "Filter anwenden",
+  "authPageOpenError": "Die Authentifizierungsseite konnte nicht geöffnet werden.",
+  "authPageError": "Beim Öffnen der Authentifizierungsseite ist ein Fehler aufgetreten: {error}",
+  "invalidTokenError": "Ungültiges Token. Bitte geben Sie ein gültiges Personal Access Token ein.",
+  "appSubtitle": "GitHub CI/CD Monitoring-App",
+  "connectWithGithub": "Mit GitHub-App verbinden",
+  "connectWithGithubDesc": "Sicher und schnell über die GitHub-App verbinden.",
+  "skipGuestMode": "Überspringen und Gastmodus verwenden",
+  "connectWithPat": "Oder mit Personal Access Token verbinden",
+  "enterToken": "Bitte geben Sie Ihr Token ein",
+  "connectWithPatBtn": "Mit PAT verbinden",
+  "generateTokenOnGithub": "Token auf GitHub generieren",
+  "whatIsPat": "Was ist ein Personal Access Token?",
+  "patStep1": "GitHub-Einstellungen → Developer settings → Personal access tokens → Tokens (classic)",
+  "patStep2": "Klicken Sie auf \"Generate new token (classic)\"",
+  "patStep3": "Wählen Sie die Scopes: repo, read:user, workflow",
+  "patStep4": "Geben Sie das generierte Token (ghp_...) in das Feld ein.",
+  "@confirmDisconnectDesc": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "@newVersionAvailable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@currentVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@errorOccurred": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@authPageError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  }
 }

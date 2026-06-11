@@ -34,7 +34,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 50));
     }
     
-    // 認証連携ボタンが存在することを確認
-    expect(find.text('GitHub Appで連携する'), findsOneWidget);
+    // 認証連携ボタンが存在することを確認 (英語デフォルト)
+    expect(find.text('Connect with GitHub App'), findsOneWidget);
   });
 }

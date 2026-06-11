@@ -7,5 +7,137 @@
   "selectOrder": "Order",
   "sortLastUpdated": "Last updated",
   "sortName": "Name",
-  "sortStars": "Stars"
+  "sortStars": "Stars",
+  "settingsTitle": "Settings",
+  "languageSettings": "Language Settings",
+  "displayLanguage": "Display Language",
+  "systemDefault": "System Default",
+  "powerPerformance": "Power & Performance",
+  "lowSpecMode": "Power Saving & Low Spec Mode",
+  "lowSpecModeDesc": "Turns off premium animations and shimmer effects, switching to a flat UI to reduce battery consumption and device load.",
+  "springAnimation": "Spring Physics Animation",
+  "springAnimationDesc": "Enable spring physics feedback on button tap.",
+  "shimmerLoading": "Shimmer Loading",
+  "shimmerLoadingDesc": "Show a shimmering skeleton screen while loading data.",
+  "listEntranceAnimation": "List Entrance Animation (Fade/Slide)",
+  "listEntranceAnimationDesc": "Animate list items fading and sliding in when loaded.",
+  "hapticsTouch": "Haptic Feedback",
+  "hapticsFeedback": "Haptic Feedback",
+  "hapticsFeedbackDesc": "Provide subtle vibrations on interactions to feel tactile feedback.",
+  "advancedTuning": "Advanced Tuning",
+  "advancedTuningDesc": "Tune advanced parameters of the animations.",
+  "notificationsUpdates": "Notifications & Updates",
+  "updateCheckNotify": "Update Notifications",
+  "updateCheckNotifyDesc": "Check for the latest Flowscout releases on startup and notify if updates are available.",
+  "githubIntegration": "GitHub Integration",
+  "addNewAccount": "Add New Account",
+  "addNewAccountDesc": "Connect another GitHub account.\\n* It's smoother if you are already logged in to that account in your browser.",
+  "manageAccounts": "Manage Accounts",
+  "manageAccountsDesc": "Install and manage the GitHub App on new organizations or personal accounts.",
+  "dangerZone": "Danger Zone",
+  "aboutApp": "About This App",
+  "accessibilitySupport": "Accessibility Support",
+  "accessibilitySupportDesc": "Designed in compliance with WCAG 2.2, Apple HIG Accessibility, and Android Build Accessible Apps guidelines.",
+  "springScaleFactor": "Tap Scale Factor",
+  "springScaleFactorDisabled": "Tap Scale Factor (Enable switch above to adjust)",
+  "shimmerSpeed": "Shimmer Speed",
+  "shimmerSpeedDisabled": "Shimmer Speed (Enable switch above to adjust)",
+  "vibrationStrength": "Vibration Strength",
+  "vibrationStrengthDisabled": "Vibration Strength (Enable switch above to adjust)",
+  "hapticLight": "Light (Subtle)",
+  "hapticMedium": "Medium (Default)",
+  "hapticHeavy": "Heavy (Strong)",
+  "hapticSelection": "Selection (Click effect)",
+  "guestModeActive": "Using Guest Mode",
+  "guestModeDesc": "Not connected to a GitHub account (public info search only).",
+  "noAccountRegistered": "No account registered",
+  "currentlyActive": "Active",
+  "tapToSwitch": "Tap to switch",
+  "confirmDisconnectAllTitle": "Disconnect all accounts?",
+  "confirmDisconnectTitle": "Disconnect account?",
+  "confirmDisconnectAllDesc": "All GitHub accounts will be disconnected and you will be logged out.",
+  "confirmDisconnectDesc": "Disconnect the current account (@{username}).",
+  "cancel": "Cancel",
+  "disconnect": "Disconnect",
+  "endGuestMode": "Exit Guest Mode & Login",
+  "endGuestModeDesc": "Go back to the login screen to link your your GitHub account.",
+  "disconnectCurrent": "Disconnect Current Account",
+  "disconnectCurrentDesc": "Disconnect only the selected account from this device.",
+  "logoutAll": "Disconnect All & Logout",
+  "logoutAllDesc": "Remove all registered account information from the device.",
+  "updateInfoTitle": "Update Notice",
+  "newVersionAvailable": "New version {version} is available!",
+  "currentVersion": "Current version: {version}",
+  "releaseNotes": "Release Notes:",
+  "releaseNotesFallback": "Bug fixes and performance improvements.",
+  "later": "Later",
+  "update": "Update",
+  "themeToggle": "Toggle Theme",
+  "searchHintText": "Enter the repository name you want to search",
+  "repositories": "Repositories",
+  "sortOrderTooltip": "Sort",
+  "sortLastCiRun": "Last CI/CD Run",
+  "noRepositoriesFound": "No repositories found",
+  "errorOccurred": "An error occurred: {error}",
+  "filter": "Filter",
+  "filterConditions": "Filter Conditions",
+  "reset": "Reset",
+  "repositoryType": "Repository Type",
+  "ownerType": "Owner Type",
+  "account": "Account",
+  "all": "All",
+  "personal": "Personal",
+  "organization": "Organization",
+  "applyFilter": "Apply Filters",
+  "authPageOpenError": "Could not open the authentication page.",
+  "authPageError": "An error occurred while opening the authentication page: {error}",
+  "invalidTokenError": "Invalid token. Please enter a valid Personal Access Token.",
+  "appSubtitle": "GitHub CI/CD Monitoring App",
+  "connectWithGithub": "Connect with GitHub App",
+  "connectWithGithubDesc": "Connect securely and quickly using the GitHub App.",
+  "skipGuestMode": "Skip and use Guest Mode",
+  "connectWithPat": "Or connect with Personal Access Token",
+  "enterToken": "Please enter your token",
+  "connectWithPatBtn": "Connect with PAT",
+  "generateTokenOnGithub": "Generate Token on GitHub",
+  "whatIsPat": "What is a Personal Access Token?",
+  "patStep1": "GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)",
+  "patStep2": "Click \"Generate new token (classic)\"",
+  "patStep3": "Select scopes: repo, read:user, workflow",
+  "patStep4": "Enter the generated token (ghp_...) in the field.",
+  "@confirmDisconnectDesc": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "@newVersionAvailable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@currentVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "@errorOccurred": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@authPageError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  }
 }

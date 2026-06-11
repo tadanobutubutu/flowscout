@@ -131,14 +131,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.dispose();
   }
 
-  // アプデチェック処理 (設定でオフにする機能も内包)
   Future<void> _checkForUpdates() async {
     final service = ref.read(gitHubServiceProvider);
     final updateInfo = await service.checkUpdate();
 
+    if (!mounted) return;
     final prefs = ref.read(updateNotifyEnabledProvider);
     if (updateInfo['hasUpdate'] == true && prefs) {
-      if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
 
       // プレミアムで美しいアプデ通知ダイアログ
       showDialog<void>(
@@ -153,7 +153,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   color: Color(0xFF6366F1), size: 30),
               const SizedBox(width: 12),
               Text(
-                'アップデートのご案内',
+                l10n.updateInfoTitle,
                 style: Theme.of(context)
                     .textTheme
                     .titleMedium
@@ -166,20 +166,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Semantics(
-                label: '新しいバージョン ${updateInfo['latestVersion'] as String? ?? ''} が利用可能です！',
+                label: l10n.newVersionAvailable(updateInfo['latestVersion'] as String? ?? ''),
                 child: Text(
-                  '新しいバージョン (${updateInfo['latestVersion'] as String? ?? ''}) が利用可能です！',
+                  l10n.newVersionAvailable(updateInfo['latestVersion'] as String? ?? ''),
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
               const SizedBox(height: 8),
               Semantics(
-                label: '現在のバージョン: ${updateInfo['currentVersion'] as String? ?? ''}',
-                child: Text('現在のバージョン: ${updateInfo['currentVersion'] as String? ?? ''}'),
+                label: l10n.currentVersion(updateInfo['currentVersion'] as String? ?? ''),
+                child: Text(l10n.currentVersion(updateInfo['currentVersion'] as String? ?? '')),
               ),
               const SizedBox(height: 12),
-              const Text('リリースノート:',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
+              Text(l10n.releaseNotes,
+                  style: const TextStyle(fontWeight: FontWeight.bold)),
               Container(
                 constraints: const BoxConstraints(maxHeight: 100),
                 width: double.maxFinite,
@@ -189,7 +189,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: SingleChildScrollView(
-                  child: Text((updateInfo['releaseNotes'] as String?) ?? 'バグ修正とパフォーマンスの向上。'),
+                  child: Text((updateInfo['releaseNotes'] as String?) ?? l10n.releaseNotesFallback),
                 ),
               ),
             ],
@@ -197,7 +197,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('後で'),
+              child: Text(l10n.later),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -212,7 +212,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12)),
               ),
-              child: const Text('アップデート'),
+              child: Text(l10n.update),
             ),
           ],
         ),
@@ -224,6 +224,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final reposAsync = ref.watch(repositoriesProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -250,7 +251,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           IconButton(
             icon: Icon(
                 isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded),
-            tooltip: 'テーマ切り替え',
+            tooltip: l10n.themeToggle,
             onPressed: () {
               ref.read(themeModeProvider.notifier).state =
                   isDark ? ThemeMode.light : ThemeMode.dark;
@@ -258,7 +259,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.settings_outlined),
-            tooltip: '設定',
+            tooltip: l10n.settings,
             onPressed: () {
               Navigator.push<void>(
                 context,
@@ -277,15 +278,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             const SizedBox(height: 12),
             // プレミアムデザイン検索バー
             Semantics(
-              label: 'リポジトリ検索バー',
-              hint: '検索したいリポジトリ名を入力してください',
+              label: l10n.searchHintText,
+              hint: l10n.searchHintText,
               child: TextField(
                 controller: _searchController,
                 onChanged: (value) {
                   ref.read(searchQueryProvider.notifier).state = value;
                 },
                 decoration: InputDecoration(
-                  hintText: 'リポジトリを検索...',
+                  hintText: l10n.searchHint,
                   prefixIcon: const Icon(Icons.search_rounded,
                       color: Color(0xFF6366F1)),
                   suffixIcon: _searchController.text.isNotEmpty
@@ -320,7 +321,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'リポジトリ',
+                  l10n.repositories,
                   style: Theme.of(context)
                       .textTheme
                       .titleMedium
@@ -328,20 +329,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
                 PopupMenuButton<RepositorySortOrder>(
                   icon: const Icon(Icons.swap_vert_rounded, color: Color(0xFF6366F1), size: 26),
-                  tooltip: '並び替え',
+                  tooltip: l10n.sortOrderTooltip,
                   onSelected: (order) {
                     ref.read(repositorySortOrderProvider.notifier).state = order;
                   },
                   itemBuilder: (context) {
                     final l10n = AppLocalizations.of(context)!;
                     return [
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: RepositorySortOrder.lastCiRun,
                         child: Row(
                           children: [
-                            Icon(Icons.rocket_launch_rounded, size: 16, color: Color(0xFF6366F1)),
-                            SizedBox(width: 8),
-                            Text('最後のCI/CD実行順'),
+                            const Icon(Icons.rocket_launch_rounded, size: 16, color: Color(0xFF6366F1)),
+                            const SizedBox(width: 8),
+                            Text(l10n.sortLastCiRun),
                           ],
                         ),
                       ),
@@ -374,8 +375,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           Icon(Icons.folder_open_rounded,
                               size: 64, color: Theme.of(context).hintColor),
                           const SizedBox(height: 16),
-                          const Text('リポジトリが見つかりません',
-                              style: TextStyle(fontSize: 16)),
+                          Text(l10n.noRepositoriesFound,
+                              style: const TextStyle(fontSize: 16)),
                         ],
                       ),
                     );
@@ -589,8 +590,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
                 error: (error, stack) => Center(
                   child: Text(
-                    'エラーが発生しました: $error',
-                    semanticsLabel: 'エラーが発生しました: $error',
+                    l10n.errorOccurred(error.toString()),
+                    semanticsLabel: l10n.errorOccurred(error.toString()),
                   ),
                 ),
               ),
@@ -628,6 +629,7 @@ class _FilterSelectorArea extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final typeFilter = ref.watch(repositoryTypeFilterProvider);
     final ownerTypeFilter = ref.watch(repositoryOwnerTypeFilterProvider);
     final ownerFilter = ref.watch(repositoryOwnerFilterProvider);
@@ -675,7 +677,7 @@ class _FilterSelectorArea extends ConsumerWidget {
               ),
               const SizedBox(width: 6),
               Text(
-                'フィルター',
+                l10n.filter,
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
@@ -720,6 +722,7 @@ class _FilterSelectorArea extends ConsumerWidget {
     String localTypeFilter = ref.read(repositoryTypeFilterProvider);
     String localOwnerTypeFilter = ref.read(repositoryOwnerTypeFilterProvider);
     String? localOwnerFilter = ref.read(repositoryOwnerFilterProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     showModalBottomSheet<void>(
       context: context,
@@ -771,7 +774,7 @@ class _FilterSelectorArea extends ConsumerWidget {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          'フィルター条件',
+                          l10n.filterConditions,
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w800,
@@ -790,9 +793,9 @@ class _FilterSelectorArea extends ConsumerWidget {
                         });
                       },
                       icon: const Icon(Icons.refresh_rounded, size: 16, color: Color(0xFF6366F1)),
-                      label: const Text(
-                        'リセット',
-                        style: TextStyle(
+                      label: Text(
+                        l10n.reset,
+                        style: const TextStyle(
                           color: Color(0xFF6366F1),
                           fontWeight: FontWeight.bold,
                           fontSize: 13,
@@ -810,7 +813,7 @@ class _FilterSelectorArea extends ConsumerWidget {
 
                 // ── タイプ ──
                 Text(
-                  'リポジトリタイプ',
+                  l10n.repositoryType,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 13,
@@ -822,7 +825,7 @@ class _FilterSelectorArea extends ConsumerWidget {
                 Wrap(
                   spacing: 10,
                   children: [
-                    _filterChip(ref, context, isDark, label: 'すべて', value: 'all', groupValue: localTypeFilter,
+                    _filterChip(ref, context, isDark, label: l10n.all, value: 'all', groupValue: localTypeFilter,
                         icon: Icons.apps_rounded,
                         onTap: () => setLocalState(() => localTypeFilter = 'all')),
                     _filterChip(ref, context, isDark, label: 'Public', value: 'public', groupValue: localTypeFilter,
@@ -837,7 +840,7 @@ class _FilterSelectorArea extends ConsumerWidget {
 
                 // ── オーナータイプ ──
                 Text(
-                  'オーナータイプ',
+                  l10n.ownerType,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 13,
@@ -849,13 +852,13 @@ class _FilterSelectorArea extends ConsumerWidget {
                 Wrap(
                   spacing: 10,
                   children: [
-                    _filterChip(ref, context, isDark, label: 'すべて', value: 'all', groupValue: localOwnerTypeFilter,
+                    _filterChip(ref, context, isDark, label: l10n.all, value: 'all', groupValue: localOwnerTypeFilter,
                         icon: Icons.people_outline_rounded,
                         onTap: () => setLocalState(() => localOwnerTypeFilter = 'all')),
-                    _filterChip(ref, context, isDark, label: '個人', value: 'user', groupValue: localOwnerTypeFilter,
+                    _filterChip(ref, context, isDark, label: l10n.personal, value: 'user', groupValue: localOwnerTypeFilter,
                         icon: Icons.person_rounded,
                         onTap: () => setLocalState(() => localOwnerTypeFilter = 'user')),
-                    _filterChip(ref, context, isDark, label: '組織 (Org)', value: 'organization', groupValue: localOwnerTypeFilter,
+                    _filterChip(ref, context, isDark, label: l10n.organization, value: 'organization', groupValue: localOwnerTypeFilter,
                         icon: Icons.business_rounded,
                         onTap: () => setLocalState(() => localOwnerTypeFilter = 'organization')),
                   ],
@@ -865,7 +868,7 @@ class _FilterSelectorArea extends ConsumerWidget {
                 if (owners.isNotEmpty) ...[
                   const SizedBox(height: 16),
                   Text(
-                    'アカウント',
+                    l10n.account,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 13,
@@ -878,7 +881,7 @@ class _FilterSelectorArea extends ConsumerWidget {
                     spacing: 10,
                     runSpacing: 10,
                     children: [
-                      _filterChip(ref, context, isDark, label: 'すべて', value: 'ALL_NULL', groupValue: localOwnerFilter ?? 'ALL_NULL',
+                      _filterChip(ref, context, isDark, label: l10n.all, value: 'ALL_NULL', groupValue: localOwnerFilter ?? 'ALL_NULL',
                           icon: Icons.alternate_email_rounded,
                           onTap: () => setLocalState(() => localOwnerFilter = null)),
                       ...owners.map((owner) => _filterChip(
@@ -915,16 +918,16 @@ class _FilterSelectorArea extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF6366F1).withOpacity(0.3),
+                          color: const Color(0xFF6366F1).withValues(alpha: 0.3),
                           blurRadius: 12,
                           offset: const Offset(0, 4),
                         ),
                       ],
                     ),
-                    child: const Center(
+                    child: Center(
                       child: Text(
-                        'フィルターを適用',
-                        style: TextStyle(
+                        l10n.applyFilter,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w800,
                           fontSize: 16,
