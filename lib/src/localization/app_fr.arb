@@ -105,6 +105,10 @@
   "patStep2": "Cliquez sur « Generate new token (classic) »",
   "patStep3": "Sélectionnez les portées : repo, read:user, workflow",
   "patStep4": "Entrez le jeton généré (ghp_...) dans le champ.",
+  "sortBestMatch": "Meilleur résultat",
+  "searchTypeRepos": "Dépôts",
+  "searchTypeUsers": "Utilisateurs & Orgs",
+  "userProfile": "Profil",
   "@confirmDisconnectDesc": {
     "placeholders": {
       "username": {

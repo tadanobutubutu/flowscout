@@ -337,4 +337,16 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get patStep4 => '在输入框中输入生成的 Token (ghp_...)';
+
+  @override
+  String get sortBestMatch => '最佳匹配 (相关度顺序)';
+
+  @override
+  String get searchTypeRepos => '仓库';
+
+  @override
+  String get searchTypeUsers => '用户与组织';
+
+  @override
+  String get userProfile => '主页';
 }

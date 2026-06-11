@@ -339,4 +339,16 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get patStep4 => '생성된 토큰(ghp_...)을 입력란에 입력합니다.';
+
+  @override
+  String get sortBestMatch => '정확도순 (Best Match)';
+
+  @override
+  String get searchTypeRepos => '저장소';
+
+  @override
+  String get searchTypeUsers => '사용자 및 조직';
+
+  @override
+  String get userProfile => '프로필';
 }

@@ -105,6 +105,10 @@
   "patStep2": "点击 \"Generate new token (classic)\"",
   "patStep3": "勾选 scopes: repo, read:user, workflow",
   "patStep4": "在输入框中输入生成的 Token (ghp_...)",
+  "sortBestMatch": "最佳匹配 (相关度顺序)",
+  "searchTypeRepos": "仓库",
+  "searchTypeUsers": "用户与组织",
+  "userProfile": "主页",
   "@confirmDisconnectDesc": {
     "placeholders": {
       "username": {

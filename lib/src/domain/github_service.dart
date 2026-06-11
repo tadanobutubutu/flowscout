@@ -266,7 +266,7 @@ class GitHubService {
 
   // 2. リポジトリ検索機能 (プライベート/パブリック両対応、ページネーション/検索クエリ対応)
   Future<List<Map<String, dynamic>>> searchRepositories(
-      {String query = ''}) async {
+      {String query = '', String sort = 'best_match'}) async {
     final headers = await _getHeaders();
     final token = await getToken();
 
@@ -307,8 +307,11 @@ class GitHubService {
       } else {
         // パブリック検索APIを使用
         try {
+          // ベストマッチ（関連度順）を維持するため、sort引数が'best_match'の場合はGitHub APIにsortオプションを渡さず、in:nameフィルターも外してグローバルに検索できるようにする
           final searchUrl = Uri.parse(
-            '$_baseUrl/search/repositories?q=$query+in:name&per_page=30',
+            sort == 'best_match'
+                ? '$_baseUrl/search/repositories?q=$query&per_page=30'
+                : '$_baseUrl/search/repositories?q=$query+in:name&per_page=30',
           );
           final resp = await http.get(searchUrl, headers: headers);
           if (resp.statusCode == 200) {
@@ -405,8 +408,10 @@ class GitHubService {
             }
           }
 
-          // 更新順にソートして返す
-          allRepos.sort((a, b) => (b['updated_at'] as String).compareTo(a['updated_at'] as String));
+          // ベストマッチ（関連度順）以外の場合のみ、更新順にソートして返す
+          if (sort != 'best_match') {
+            allRepos.sort((a, b) => (b['updated_at'] as String).compareTo(a['updated_at'] as String));
+          }
           return allRepos;
         }
       }
@@ -420,7 +425,9 @@ class GitHubService {
       final fallbackUrl = Uri.parse(
         query.isEmpty
             ? '$_baseUrl/user/repos?sort=updated&per_page=100&page=$page'
-            : '$_baseUrl/search/repositories?q=$query+in:name&sort=updated&order=desc&per_page=100&page=$page',
+            : (sort == 'best_match'
+                ? '$_baseUrl/search/repositories?q=$query&per_page=100&page=$page'
+                : '$_baseUrl/search/repositories?q=$query+in:name&sort=updated&order=desc&per_page=100&page=$page'),
       );
       final resp = await http.get(fallbackUrl, headers: headers);
       if (resp.statusCode != 200) {
@@ -456,9 +463,70 @@ class GitHubService {
       }
       page++;
     }
-    // ソートして返す
-    allRepos.sort((a, b) => (b['updated_at'] as String).compareTo(a['updated_at'] as String));
+    // ベストマッチ（関連度順）以外の場合のみ、更新順にソートして返す
+    if (sort != 'best_match') {
+      allRepos.sort((a, b) => (b['updated_at'] as String).compareTo(a['updated_at'] as String));
+    }
     return allRepos;
+  }
+
+  // 2-B. ユーザー & 組織 (Org) の検索機能
+  Future<List<Map<String, dynamic>>> searchUsersAndOrgs({required String query}) async {
+    if (query.isEmpty) return [];
+    final headers = await _getHeaders();
+    try {
+      final url = Uri.parse('$_baseUrl/search/users?q=$query&per_page=30');
+      final resp = await http.get(url, headers: headers);
+      if (resp.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(resp.body) as Map<String, dynamic>;
+        final List<dynamic> items = data['items'] as List<dynamic>? ?? [];
+        return items.map((item) {
+          final itemMap = item as Map<String, dynamic>;
+          return {
+            'login': itemMap['login'] as String? ?? '',
+            'avatar_url': itemMap['avatar_url'] as String? ?? '',
+            'type': itemMap['type'] as String? ?? 'User',
+            'html_url': itemMap['html_url'] as String? ?? '',
+          };
+        }).toList();
+      }
+    } catch (e) {
+      debugPrint('Error searching users/orgs: $e');
+    }
+    return [];
+  }
+
+  // 2-C. 特定のユーザー / 組織のリポジトリ一覧取得
+  Future<List<Map<String, dynamic>>> getUserRepositories(String username) async {
+    final headers = await _getHeaders();
+    final List<Map<String, dynamic>> repos = [];
+    try {
+      final url = Uri.parse('$_baseUrl/users/$username/repos?per_page=100');
+      final resp = await http.get(url, headers: headers);
+      if (resp.statusCode == 200) {
+        final List<dynamic> items = json.decode(resp.body) as List<dynamic>;
+        for (final item in items) {
+          final itemMap = item as Map<String, dynamic>;
+          final ownerMap = itemMap['owner'] as Map<String, dynamic>;
+          repos.add({
+            'id': itemMap['id'] as int,
+            'name': itemMap['name'] as String,
+            'full_name': itemMap['full_name'] as String,
+            'private': itemMap['private'] as bool? ?? false,
+            'description': itemMap['description'] as String? ?? 'No description',
+            'stargazers_count': itemMap['stargazers_count'] as int? ?? 0,
+            'updated_at': itemMap['updated_at'] as String? ?? '',
+            'pushed_at': itemMap['pushed_at'] as String? ?? '',
+            'owner': ownerMap['login'] as String,
+            'avatar_url': ownerMap['avatar_url'] as String? ?? '',
+            'owner_type': ownerMap['type'] as String? ?? 'User',
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint('Error fetching user repositories: $e');
+    }
+    return repos;
   }
 
   // 3. 直コミットやPRで走ったワークフローラン (Workflow Runs) の一覧取得

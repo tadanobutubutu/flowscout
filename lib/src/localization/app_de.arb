@@ -105,6 +105,10 @@
   "patStep2": "Klicken Sie auf \"Generate new token (classic)\"",
   "patStep3": "Wählen Sie die Scopes: repo, read:user, workflow",
   "patStep4": "Geben Sie das generierte Token (ghp_...) in das Feld ein.",
+  "sortBestMatch": "Beste Übereinstimmung",
+  "searchTypeRepos": "Repositorys",
+  "searchTypeUsers": "Benutzer & Orgs",
+  "userProfile": "Profil",
   "@confirmDisconnectDesc": {
     "placeholders": {
       "username": {

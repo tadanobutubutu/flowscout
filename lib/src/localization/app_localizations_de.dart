@@ -358,4 +358,16 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get patStep4 =>
       'Geben Sie das generierte Token (ghp_...) in das Feld ein.';
+
+  @override
+  String get sortBestMatch => 'Beste Übereinstimmung';
+
+  @override
+  String get searchTypeRepos => 'Repositorys';
+
+  @override
+  String get searchTypeUsers => 'Benutzer & Orgs';
+
+  @override
+  String get userProfile => 'Profil';
 }

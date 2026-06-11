@@ -737,6 +737,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter the generated token (ghp_...) in the field.'**
   String get patStep4;
+
+  /// No description provided for @sortBestMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Best Match'**
+  String get sortBestMatch;
+
+  /// No description provided for @searchTypeRepos.
+  ///
+  /// In en, this message translates to:
+  /// **'Repositories'**
+  String get searchTypeRepos;
+
+  /// No description provided for @searchTypeUsers.
+  ///
+  /// In en, this message translates to:
+  /// **'Users & Orgs'**
+  String get searchTypeUsers;
+
+  /// No description provided for @userProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get userProfile;
 }
 
 class _AppLocalizationsDelegate

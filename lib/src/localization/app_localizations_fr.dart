@@ -357,4 +357,16 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get patStep4 => 'Entrez le jeton généré (ghp_...) dans le champ.';
+
+  @override
+  String get sortBestMatch => 'Meilleur résultat';
+
+  @override
+  String get searchTypeRepos => 'Dépôts';
+
+  @override
+  String get searchTypeUsers => 'Utilisateurs & Orgs';
+
+  @override
+  String get userProfile => 'Profil';
 }

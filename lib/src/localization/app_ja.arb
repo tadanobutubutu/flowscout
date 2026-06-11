@@ -105,6 +105,10 @@
   "patStep2": "「Generate new token (classic)」をクリック",
   "patStep3": "スコープ: repo, read:user, workflow にチェックを入れる",
   "patStep4": "生成されたトークン（ghp_...）を入力欄に入力します。",
+  "sortBestMatch": "ベストマッチ (関連度順)",
+  "searchTypeRepos": "リポジトリ",
+  "searchTypeUsers": "ユーザー & 組織",
+  "userProfile": "ユーザー情報",
   "@confirmDisconnectDesc": {
     "placeholders": {
       "username": {

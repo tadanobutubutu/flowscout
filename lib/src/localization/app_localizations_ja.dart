@@ -340,4 +340,16 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get patStep4 => '生成されたトークン（ghp_...）を入力欄に入力します。';
+
+  @override
+  String get sortBestMatch => 'ベストマッチ (関連度順)';
+
+  @override
+  String get searchTypeRepos => 'リポジトリ';
+
+  @override
+  String get searchTypeUsers => 'ユーザー & 組織';
+
+  @override
+  String get userProfile => 'ユーザー情報';
 }

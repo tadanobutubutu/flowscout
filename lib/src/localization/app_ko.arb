@@ -105,6 +105,10 @@
   "patStep2": "「Generate new token (classic)」 클릭",
   "patStep3": "repo, read:user, workflow 스코프 체크",
   "patStep4": "생성된 토큰(ghp_...)을 입력란에 입력합니다.",
+  "sortBestMatch": "정확도순 (Best Match)",
+  "searchTypeRepos": "저장소",
+  "searchTypeUsers": "사용자 및 조직",
+  "userProfile": "프로필",
   "@confirmDisconnectDesc": {
     "placeholders": {
       "username": {

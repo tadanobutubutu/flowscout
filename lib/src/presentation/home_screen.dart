@@ -8,6 +8,7 @@ import '../../main.dart';
 import 'workflow_detail_screen.dart';
 import 'settings_screen.dart';
 import 'premium_widgets.dart';
+import 'user_repos_screen.dart';
 
 final gitHubServiceProvider = Provider((ref) => GitHubService());
 
@@ -16,7 +17,16 @@ enum RepositorySortOrder {
   lastUpdated,
   name,
   stars,
+  bestMatch, // ベストマッチ（検索時のデフォルト）
 }
+
+enum SearchCategory {
+  repositories,
+  usersAndOrgs,
+}
+
+// 検索カテゴリを管理するStateProvider
+final searchCategoryProvider = StateProvider<SearchCategory>((ref) => SearchCategory.repositories);
 
 // リポジトリ検索のクエリを管理するStateProvider
 final searchQueryProvider = StateProvider<String>((ref) => '');
@@ -24,6 +34,34 @@ final searchQueryProvider = StateProvider<String>((ref) => '');
 // 並び替え順を管理するStateProvider
 final repositorySortOrderProvider =
     StateProvider<RepositorySortOrder>((ref) => RepositorySortOrder.lastCiRun);
+
+// 実質的な並び替え順を決定するProvider
+final effectiveSortOrderProvider = Provider<RepositorySortOrder>((ref) {
+  final query = ref.watch(searchQueryProvider);
+  final selectedSort = ref.watch(repositorySortOrderProvider);
+
+  // 検索ワードが入っている場合は、明示的に別を選択していない限り「ベストマッチ」をデフォルトにする
+  if (query.isNotEmpty) {
+    if (selectedSort == RepositorySortOrder.lastCiRun) {
+      return RepositorySortOrder.bestMatch;
+    }
+    return selectedSort;
+  }
+
+  // 検索ワードが空の場合は、明示的にbestMatchになっていてもlastCiRunに切り替える
+  if (selectedSort == RepositorySortOrder.bestMatch) {
+    return RepositorySortOrder.lastCiRun;
+  }
+  return selectedSort;
+});
+
+// ユーザー・組織の検索結果をフェッチするProvider
+final usersSearchProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
+  final service = ref.watch(gitHubServiceProvider);
+  final query = ref.watch(searchQueryProvider);
+  if (query.isEmpty) return [];
+  return await service.searchUsersAndOrgs(query: query);
+});
 
 // フィルター条件を管理するStateProvider
 final repositoryTypeFilterProvider = StateProvider<String>((ref) => 'all'); // 'all', 'public', 'private'
@@ -34,7 +72,7 @@ final repositoryOwnerFilterProvider = StateProvider<String?>((ref) => null); // 
 final allRawRepositoriesProvider =
     FutureProvider<List<Map<String, dynamic>>>((ref) async {
   final service = ref.watch(gitHubServiceProvider);
-  return await service.searchRepositories(query: '');
+  return await service.searchRepositories(query: '', sort: 'updated');
 });
 
 // 最終的に表示するリポジトリ一覧を取得するFutureProvider
@@ -42,14 +80,17 @@ final repositoriesProvider =
     FutureProvider<List<Map<String, dynamic>>>((ref) async {
   final service = ref.watch(gitHubServiceProvider);
   final query = ref.watch(searchQueryProvider);
-  final sortOrder = ref.watch(repositorySortOrderProvider);
+  final sortOrder = ref.watch(effectiveSortOrderProvider);
 
   // 各種フィルター設定をwatch
   final typeFilter = ref.watch(repositoryTypeFilterProvider);
   final ownerTypeFilter = ref.watch(repositoryOwnerTypeFilterProvider);
   final ownerFilter = ref.watch(repositoryOwnerFilterProvider);
 
-  var repos = await service.searchRepositories(query: query);
+  var repos = await service.searchRepositories(
+    query: query,
+    sort: sortOrder == RepositorySortOrder.bestMatch ? 'best_match' : 'updated',
+  );
 
   // 1. タイプフィルター (Public / Private)
   if (typeFilter != 'all') {
@@ -73,6 +114,9 @@ final repositoriesProvider =
 
   // クライアント側で並び替えを適用
   switch (sortOrder) {
+    case RepositorySortOrder.bestMatch:
+      // APIのソート順（Relevance）をそのまま維持する
+      break;
     case RepositorySortOrder.lastCiRun:
       repos.sort((a, b) {
         // pushed_atをCI/CDが最後に走った日時の代理として使用
@@ -315,75 +359,228 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
             const SizedBox(height: 10),
+            
+            // 検索クエリが存在する場合のみ、カテゴリ切り替えを表示
+            if (_searchController.text.isNotEmpty) ...[
+              Consumer(
+                builder: (context, ref, child) {
+                  final searchCategory = ref.watch(searchCategoryProvider);
+                  return Row(
+                    children: [
+                      ChoiceChip(
+                        label: Text(l10n.searchTypeRepos),
+                        selected: searchCategory == SearchCategory.repositories,
+                        onSelected: (selected) {
+                          if (selected) {
+                            ref.read(searchCategoryProvider.notifier).state = SearchCategory.repositories;
+                          }
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      ChoiceChip(
+                        label: Text(l10n.searchTypeUsers),
+                        selected: searchCategory == SearchCategory.usersAndOrgs,
+                        onSelected: (selected) {
+                          if (selected) {
+                            ref.read(searchCategoryProvider.notifier).state = SearchCategory.usersAndOrgs;
+                          }
+                        },
+                      ),
+                    ],
+                  );
+                },
+              ),
+              const SizedBox(height: 10),
+            ],
+
             const _FilterSelectorArea(),
             const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  l10n.repositories,
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium
-                      ?.copyWith(fontSize: 18),
-                ),
-                PopupMenuButton<RepositorySortOrder>(
-                  icon: const Icon(Icons.swap_vert_rounded, color: Color(0xFF6366F1), size: 26),
-                  tooltip: l10n.sortOrderTooltip,
-                  onSelected: (order) {
-                    ref.read(repositorySortOrderProvider.notifier).state = order;
-                  },
-                  itemBuilder: (context) {
-                    final l10n = AppLocalizations.of(context)!;
-                    return [
-                      PopupMenuItem(
-                        value: RepositorySortOrder.lastCiRun,
-                        child: Row(
-                          children: [
-                            const Icon(Icons.rocket_launch_rounded, size: 16, color: Color(0xFF6366F1)),
-                            const SizedBox(width: 8),
-                            Text(l10n.sortLastCiRun),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem(
-                        value: RepositorySortOrder.lastUpdated,
-                        child: Text(l10n.sortLastUpdated),
-                      ),
-                      PopupMenuItem(
-                        value: RepositorySortOrder.name,
-                        child: Text(l10n.sortName),
-                      ),
-                      PopupMenuItem(
-                        value: RepositorySortOrder.stars,
-                        child: Text(l10n.sortStars),
-                      ),
-                    ];
-                  },
-                ),
-              ],
+            
+            // リポジトリ検索モードのときのみ、ソート・フィルターヘッダーを表示
+            Consumer(
+              builder: (context, ref, child) {
+                final searchCategory = ref.watch(searchCategoryProvider);
+                final query = ref.watch(searchQueryProvider);
+                if (query.isNotEmpty && searchCategory == SearchCategory.usersAndOrgs) {
+                  return const SizedBox.shrink();
+                }
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      l10n.repositories,
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(fontSize: 18),
+                    ),
+                    PopupMenuButton<RepositorySortOrder>(
+                      icon: const Icon(Icons.swap_vert_rounded, color: Color(0xFF6366F1), size: 26),
+                      tooltip: l10n.sortOrderTooltip,
+                      onSelected: (order) {
+                        ref.read(repositorySortOrderProvider.notifier).state = order;
+                      },
+                      itemBuilder: (context) {
+                        final l10n = AppLocalizations.of(context)!;
+                        return [
+                          if (query.isNotEmpty)
+                            PopupMenuItem(
+                              value: RepositorySortOrder.bestMatch,
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.sort_rounded, size: 16, color: Color(0xFF6366F1)),
+                                  const SizedBox(width: 8),
+                                  Text(l10n.sortBestMatch),
+                                ],
+                              ),
+                            ),
+                          PopupMenuItem(
+                            value: RepositorySortOrder.lastCiRun,
+                            child: Row(
+                              children: [
+                                const Icon(Icons.rocket_launch_rounded, size: 16, color: Color(0xFF6366F1)),
+                                const SizedBox(width: 8),
+                                Text(l10n.sortLastCiRun),
+                              ],
+                            ),
+                          ),
+                          PopupMenuItem(
+                            value: RepositorySortOrder.lastUpdated,
+                            child: Text(l10n.sortLastUpdated),
+                          ),
+                          PopupMenuItem(
+                            value: RepositorySortOrder.name,
+                            child: Text(l10n.sortName),
+                          ),
+                          PopupMenuItem(
+                            value: RepositorySortOrder.stars,
+                            child: Text(l10n.sortStars),
+                          ),
+                        ];
+                      },
+                    ),
+                  ],
+                );
+              },
             ),
             const SizedBox(height: 10),
             Expanded(
-              child: reposAsync.when(
-                data: (repos) {
-                  if (repos.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.folder_open_rounded,
-                              size: 64, color: Theme.of(context).hintColor),
-                          const SizedBox(height: 16),
-                          Text(l10n.noRepositoriesFound,
-                              style: const TextStyle(fontSize: 16)),
-                        ],
-                      ),
+              child: Consumer(
+                builder: (context, ref, child) {
+                  final searchCategory = ref.watch(searchCategoryProvider);
+                  final query = ref.watch(searchQueryProvider);
+                  
+                  if (query.isNotEmpty && searchCategory == SearchCategory.usersAndOrgs) {
+                    final usersAsync = ref.watch(usersSearchProvider);
+                    return usersAsync.when(
+                      data: (users) {
+                        if (users.isEmpty) {
+                          return Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.people_alt_rounded,
+                                    size: 64, color: Theme.of(context).hintColor),
+                                const SizedBox(height: 16),
+                                Text(l10n.noRepositoriesFound,
+                                    style: const TextStyle(fontSize: 16)),
+                              ],
+                            ),
+                          );
+                        }
+                        return ListView.builder(
+                          itemCount: users.length,
+                          physics: const BouncingScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            final user = users[index];
+                            final login = user['login'] as String? ?? '';
+                            final avatarUrl = user['avatar_url'] as String? ?? '';
+                            final type = user['type'] as String? ?? 'User';
+
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 12),
+                              child: PremiumSpringButton(
+                                onTap: () {
+                                  Navigator.push<void>(
+                                    context,
+                                    MaterialPageRoute<void>(
+                                      builder: (context) => UserReposScreen(
+                                        username: login,
+                                        avatarUrl: avatarUrl,
+                                        ownerType: type,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Card(
+                                  margin: EdgeInsets.zero,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Row(
+                                      children: [
+                                        CircleAvatar(
+                                          backgroundImage: NetworkImage(avatarUrl),
+                                          radius: 24,
+                                        ),
+                                        const SizedBox(width: 16),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                login,
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                type,
+                                                style: TextStyle(
+                                                  color: Theme.of(context).hintColor,
+                                                  fontSize: 13,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const Icon(Icons.arrow_forward_ios_rounded, size: 16),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                      loading: () => const Center(child: CircularProgressIndicator()),
+                      error: (err, stack) => Center(child: Text(l10n.errorOccurred(err.toString()))),
                     );
                   }
-                  return ListView.builder(
-                    itemCount: repos.length,
-                    physics: const BouncingScrollPhysics(),
+                  
+                  return reposAsync.when(
+                    data: (repos) {
+                      if (repos.isEmpty) {
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.folder_open_rounded,
+                                  size: 64, color: Theme.of(context).hintColor),
+                              const SizedBox(height: 16),
+                              Text(l10n.noRepositoriesFound,
+                                  style: const TextStyle(fontSize: 16)),
+                            ],
+                          ),
+                        );
+                      }
+                      return ListView.builder(
+                        itemCount: repos.length,
+                        physics: const BouncingScrollPhysics(),
+
                     cacheExtent: 400,
                     itemBuilder: (context, index) {
                       final repo = repos[index];
@@ -594,9 +791,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     semanticsLabel: l10n.errorOccurred(error.toString()),
                   ),
                 ),
-              ),
-            ),
-          ],
+              );
+            },
+          ),
+        ),
+      ],
         ),
       ),
     );
