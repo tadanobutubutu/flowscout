@@ -9,6 +9,7 @@ import 'workflow_detail_screen.dart';
 import 'settings_screen.dart';
 import 'premium_widgets.dart';
 import 'user_repos_screen.dart';
+import 'login_screen.dart';
 
 final gitHubServiceProvider = Provider((ref) => GitHubService());
 
@@ -358,41 +359,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 10),
-            
-            // 検索クエリが存在する場合のみ、カテゴリ切り替えを表示
-            if (_searchController.text.isNotEmpty) ...[
-              Consumer(
-                builder: (context, ref, child) {
-                  final searchCategory = ref.watch(searchCategoryProvider);
-                  return Row(
-                    children: [
-                      ChoiceChip(
-                        label: Text(l10n.searchTypeRepos),
-                        selected: searchCategory == SearchCategory.repositories,
-                        onSelected: (selected) {
-                          if (selected) {
-                            ref.read(searchCategoryProvider.notifier).state = SearchCategory.repositories;
-                          }
-                        },
-                      ),
-                      const SizedBox(width: 8),
-                      ChoiceChip(
-                        label: Text(l10n.searchTypeUsers),
-                        selected: searchCategory == SearchCategory.usersAndOrgs,
-                        onSelected: (selected) {
-                          if (selected) {
-                            ref.read(searchCategoryProvider.notifier).state = SearchCategory.usersAndOrgs;
-                          }
-                        },
-                      ),
-                    ],
-                  );
-                },
-              ),
-              const SizedBox(height: 10),
-            ],
-
             const _FilterSelectorArea(),
             const SizedBox(height: 16),
             
@@ -833,6 +799,8 @@ class _FilterSelectorArea extends ConsumerWidget {
     final ownerTypeFilter = ref.watch(repositoryOwnerTypeFilterProvider);
     final ownerFilter = ref.watch(repositoryOwnerFilterProvider);
     final rawReposAsync = ref.watch(allRawRepositoriesProvider);
+    final searchCategory = ref.watch(searchCategoryProvider);
+    final query = ref.watch(searchQueryProvider);
 
     final List<String> owners = rawReposAsync.maybeWhen(
       data: (repos) => repos.map((r) => r['owner'] as String).toSet().toList()..sort(),
@@ -844,6 +812,7 @@ class _FilterSelectorArea extends ConsumerWidget {
     if (typeFilter != 'all') activeCount++;
     if (ownerTypeFilter != 'all') activeCount++;
     if (ownerFilter != null) activeCount++;
+    if (query.isNotEmpty && searchCategory != SearchCategory.repositories) activeCount++;
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -921,6 +890,8 @@ class _FilterSelectorArea extends ConsumerWidget {
     String localTypeFilter = ref.read(repositoryTypeFilterProvider);
     String localOwnerTypeFilter = ref.read(repositoryOwnerTypeFilterProvider);
     String? localOwnerFilter = ref.read(repositoryOwnerFilterProvider);
+    SearchCategory localSearchCategory = ref.read(searchCategoryProvider);
+    final isGuest = ref.read(isGuestModeProvider);
     final l10n = AppLocalizations.of(context)!;
 
     showModalBottomSheet<void>(
@@ -989,6 +960,7 @@ class _FilterSelectorArea extends ConsumerWidget {
                           localTypeFilter = 'all';
                           localOwnerTypeFilter = 'all';
                           localOwnerFilter = null;
+                          localSearchCategory = SearchCategory.repositories;
                         });
                       },
                       icon: const Icon(Icons.refresh_rounded, size: 16, color: Color(0xFF6366F1)),
@@ -1009,6 +981,32 @@ class _FilterSelectorArea extends ConsumerWidget {
                   ],
                 ),
                 const SizedBox(height: 16),
+
+                // ── 検索対象 (クエリ入力時のみ) ──
+                if (ref.read(searchQueryProvider).isNotEmpty) ...[
+                  Text(
+                    "検索対象",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Wrap(
+                    spacing: 10,
+                    children: [
+                      _filterChip(ref, context, isDark, label: l10n.searchTypeRepos, value: SearchCategory.repositories.name, groupValue: localSearchCategory.name,
+                          icon: Icons.folder_rounded,
+                          onTap: () => setLocalState(() => localSearchCategory = SearchCategory.repositories)),
+                      _filterChip(ref, context, isDark, label: l10n.searchTypeUsers, value: SearchCategory.usersAndOrgs.name, groupValue: localSearchCategory.name,
+                          icon: Icons.people_rounded,
+                          onTap: () => setLocalState(() => localSearchCategory = SearchCategory.usersAndOrgs)),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                ],
 
                 // ── タイプ ──
                 Text(
@@ -1064,7 +1062,7 @@ class _FilterSelectorArea extends ConsumerWidget {
                 ),
 
                 // ── アカウント名 ──
-                if (owners.isNotEmpty) ...[
+                if (owners.isNotEmpty && !isGuest) ...[
                   const SizedBox(height: 16),
                   Text(
                     l10n.account,
@@ -1103,6 +1101,7 @@ class _FilterSelectorArea extends ConsumerWidget {
                     ref.read(repositoryTypeFilterProvider.notifier).state = localTypeFilter;
                     ref.read(repositoryOwnerTypeFilterProvider.notifier).state = localOwnerTypeFilter;
                     ref.read(repositoryOwnerFilterProvider.notifier).state = localOwnerFilter;
+                    ref.read(searchCategoryProvider.notifier).state = localSearchCategory;
                     Navigator.pop(context);
                   },
                   child: Container(
