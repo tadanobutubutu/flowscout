@@ -809,10 +809,18 @@ class _FilterSelectorArea extends ConsumerWidget {
 
     // アクティブなフィルター数を計算
     int activeCount = 0;
-    if (typeFilter != 'all') activeCount++;
-    if (ownerTypeFilter != 'all') activeCount++;
-    if (ownerFilter != null) activeCount++;
-    if (query.isNotEmpty && searchCategory != SearchCategory.repositories) activeCount++;
+    if (typeFilter != 'all') {
+      activeCount++;
+    }
+    if (ownerTypeFilter != 'all') {
+      activeCount++;
+    }
+    if (ownerFilter != null) {
+      activeCount++;
+    }
+    if (query.isNotEmpty && searchCategory != SearchCategory.repositories) {
+      activeCount++;
+    }
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
