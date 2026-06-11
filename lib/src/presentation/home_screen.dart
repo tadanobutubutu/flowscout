@@ -359,6 +359,55 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
             ),
+            const SizedBox(height: 12),
+            // カテゴリ切り替えトグル（常時表示）
+            Consumer(
+              builder: (context, ref, child) {
+                final searchCategory = ref.watch(searchCategoryProvider);
+                return Row(
+                  children: [
+                    ChoiceChip(
+                      label: Text(l10n.searchTypeRepos),
+                      selected: searchCategory == SearchCategory.repositories,
+                      selectedColor: const Color(0xFF6366F1).withOpacity(0.2),
+                      checkmarkColor: const Color(0xFF6366F1),
+                      labelStyle: TextStyle(
+                        color: searchCategory == SearchCategory.repositories
+                            ? const Color(0xFF6366F1)
+                            : null,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      onSelected: (selected) {
+                        if (selected) {
+                          ref.read(searchCategoryProvider.notifier).state =
+                              SearchCategory.repositories;
+                        }
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    ChoiceChip(
+                      label: Text(l10n.searchTypeUsers),
+                      selected: searchCategory == SearchCategory.usersAndOrgs,
+                      selectedColor: const Color(0xFF6366F1).withOpacity(0.2),
+                      checkmarkColor: const Color(0xFF6366F1),
+                      labelStyle: TextStyle(
+                        color: searchCategory == SearchCategory.usersAndOrgs
+                            ? const Color(0xFF6366F1)
+                            : null,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      onSelected: (selected) {
+                        if (selected) {
+                          ref.read(searchCategoryProvider.notifier).state =
+                              SearchCategory.usersAndOrgs;
+                        }
+                      },
+                    ),
+                  ],
+                );
+              },
+            ),
+            const SizedBox(height: 12),
             const _FilterSelectorArea(),
             const SizedBox(height: 16),
             
@@ -990,31 +1039,7 @@ class _FilterSelectorArea extends ConsumerWidget {
                 ),
                 const SizedBox(height: 16),
 
-                // ── 検索対象 (クエリ入力時のみ) ──
-                if (ref.read(searchQueryProvider).isNotEmpty) ...[
-                  Text(
-                    "検索対象",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13,
-                      color: isDark ? Colors.grey[400] : Colors.grey[600],
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Wrap(
-                    spacing: 10,
-                    children: [
-                      _filterChip(ref, context, isDark, label: l10n.searchTypeRepos, value: SearchCategory.repositories.name, groupValue: localSearchCategory.name,
-                          icon: Icons.folder_rounded,
-                          onTap: () => setLocalState(() => localSearchCategory = SearchCategory.repositories)),
-                      _filterChip(ref, context, isDark, label: l10n.searchTypeUsers, value: SearchCategory.usersAndOrgs.name, groupValue: localSearchCategory.name,
-                          icon: Icons.people_rounded,
-                          onTap: () => setLocalState(() => localSearchCategory = SearchCategory.usersAndOrgs)),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                ],
+
 
                 // ── タイプ ──
                 Text(

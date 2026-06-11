@@ -11,6 +11,10 @@ class GitHubService {
   static const _registeredUsersKey = 'github_registered_users';
   static const _tokenPrefix = 'github_oauth_token_';
 
+  // デフォルトリポジトリリストのメモリキャッシュ
+  List<Map<String, dynamic>>? _cachedDefaultRepos;
+
+
   // 1. セキュアトークンの保存と取得 (アクティブなアカウント用)
   Future<String?> getToken() async {
     final activeUser = await _secureStorage.read(key: _activeUserKey);
@@ -77,6 +81,7 @@ class GitHubService {
 
   // アクティブなユーザーを切り替える
   Future<void> setActiveUser(String username) async {
+    _cachedDefaultRepos = null;
     await _secureStorage.write(key: _activeUserKey, value: username);
     
     // 互換性維持：単一アカウント用キーにも同期
@@ -107,10 +112,12 @@ class GitHubService {
         await _secureStorage.delete(key: 'github_oauth_token');
       }
     }
+    _cachedDefaultRepos = null;
   }
 
   // 全てのアカウントをログアウト
   Future<void> deleteAllTokens() async {
+    _cachedDefaultRepos = null;
     final users = await getRegisteredUsers();
     for (final user in users) {
       await _secureStorage.delete(key: '$_tokenPrefix$user');
@@ -267,6 +274,9 @@ class GitHubService {
   // 2. リポジトリ検索機能 (プライベート/パブリック両対応、ページネーション/検索クエリ対応)
   Future<List<Map<String, dynamic>>> searchRepositories(
       {String query = '', String sort = 'best_match'}) async {
+    if (query.isEmpty && _cachedDefaultRepos != null) {
+      return _cachedDefaultRepos!;
+    }
     final headers = await _getHeaders();
     final token = await getToken();
 
@@ -303,6 +313,7 @@ class GitHubService {
             debugPrint('Error fetching default repo $repoFullName: $e');
           }
         }
+        _cachedDefaultRepos = guestRepos;
         return guestRepos;
       } else {
         // パブリック検索APIを使用
@@ -466,6 +477,9 @@ class GitHubService {
     // ベストマッチ（関連度順）以外の場合のみ、更新順にソートして返す
     if (sort != 'best_match') {
       allRepos.sort((a, b) => (b['updated_at'] as String).compareTo(a['updated_at'] as String));
+    }
+    if (query.isEmpty) {
+      _cachedDefaultRepos = allRepos;
     }
     return allRepos;
   }
