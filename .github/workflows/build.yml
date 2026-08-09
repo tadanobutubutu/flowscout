@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Java Development Kit (JDK)
         uses: actions/setup-java@v3
@@ -51,7 +51,7 @@ jobs:
     runs-on: macos-14
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Java Development Kit (JDK)
         uses: actions/setup-java@v3
